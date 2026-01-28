@@ -166,8 +166,8 @@ app.get("/api/game/gender-drill", async (req, res) => {
 
 app.get("/health", (req, res) => res.json({ ok: true }));
 
-// Render sets PORT for web services
-const port = process.env.PORT || 3100;
+// Render sets PORT for web services; keep local override too.
+const port = process.env.PORT || process.env.GAMES_PORT || 3100;
 
 app.listen(port, () => {
   console.log(`Games server: http://localhost:${port}`);
