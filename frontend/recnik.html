@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rečnik – Demo interfejs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    /* ---------- RESET & BASE ---------- */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #f5f5f5;
+      --bg-elevated: #ffffff;
+      --bg-sidebar: #f1f1f5;
+      --text: #1f2933;
+      --text-muted: #6b7280;
+      --accent: #2563eb;
+      --accent-soft: #e0ecff;
+      --border-soft: #e5e7eb;
+      --shadow-soft: 0 8px 20px rgba(15, 23, 42, 0.08);
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --transition-fast: 0.15s ease-out;
+      --header-height: 64px;
+    }
+
+    body.dark {
+      --bg: #020617;
+      --bg-elevated: #020617;
+      --bg-sidebar: #030712;
+      --text: #e5e7eb;
+      --text-muted: #9ca3af;
+      --accent: #3b82f6;
+      --accent-soft: #0b1120;
+      --border-soft: #111827;
+      --shadow-soft: 0 14px 32px rgba(15, 23, 42, 0.8);
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #e0edff 0, var(--bg) 45%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---------- LAYOUT ---------- */
+    .app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      height: var(--header-height);
+      display: flex;
+      align-items: center;
+      padding: 0 1.5rem;
+      border-bottom: 1px solid var(--border-soft);
+      backdrop-filter: blur(10px);
+      background-color: rgba(245, 245, 245, 0.86);
+    }
+
+    body.dark header {
+      background-color: rgba(2, 6, 23, 0.9);
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      background: var(--bg-elevated);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+      cursor: default;
+    }
+
+    .logo-mark {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #111827, var(--accent));
+    }
+
+    .logo-text {
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .search-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.6rem 2.8rem 0.6rem 1rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-elevated);
+      font-size: 0.95rem;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+      outline: none;
+      color: var(--text);
+      transition: border var(--transition-fast), box-shadow var(--transition-fast),
+        background var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.24);
+      transform: translateY(-1px);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 0.9rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .search-wrapper:hover .search-icon {
+      color: var(--accent);
+      transform: scale(1.05);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .icon-button {
+      border: none;
+      background: transparent;
+      border-radius: 999px;
+      padding: 0.35rem 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background var(--transition-fast), color var(--transition-fast),
+        transform var(--transition-fast);
+    }
+
+    .icon-button span {
+      font-size: 1.05rem;
+    }
+
+    .icon-button:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .icon-button--primary {
+      background: var(--accent);
+      color: white;
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.45);
+    }
+
+    .icon-button--primary:hover {
+      background: #1d4ed8;
+      box-shadow: 0 14px 32px rgba(37, 99, 235, 0.6);
+    }
+
+    /* Mobile filter button (hidden on desktop) */
+    .mobile-filter-toggle {
+      display: none;
+    }
+
+    /* MAIN LAYOUT */
+    .main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 1.25rem;
+    }
+
+    .main-inner {
+      max-width: 1200px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      gap: 1.25rem;
+    }
+
+    /* ---------- SIDEBAR (FILTERS) ---------- */
+    .sidebar {
+      background: var(--bg-sidebar);
+      border-radius: var(--radius-xl);
+      padding: 1rem;
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .sidebar-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      padding: 0.28rem 0.7rem;
+      font-size: 0.78rem;
+      border: 1px solid var(--border-soft);
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background var(--transition-fast), color var(--transition-fast),
+        border-color var(--transition-fast), transform var(--transition-fast);
+      backdrop-filter: blur(8px);
+    }
+
+    body.dark .chip {
+      background: rgba(15, 23, 42, 0.7);
+    }
+
+    .chip:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .chip.chip--active {
+      background: var(--accent);
+      color: #f9fafb;
+      border-color: transparent;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.4);
+    }
+
+    .chip.chip--ghost {
+      background: transparent;
+      border-style: dashed;
+      font-size: 0.75rem;
+      opacity: 0.7;
+    }
+
+    /* ---------- MAIN CONTENT (WORD VIEW) ---------- */
+    .content-card {
+      background: var(--bg-elevated);
+      border-radius: var(--radius-xl);
+      padding: 1.5rem 1.4rem;
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .word-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .word-main {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .lemma-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .lemma {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .lemma-badge {
+      font-size: 0.85rem;
+      padding: 0.18rem 0.6rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(37, 99, 235, 0.25);
+    }
+
+    .word-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .word-meta span::before {
+      content: "• ";
+      opacity: 0.4;
+    }
+
+    .word-meta span:first-child::before {
+      content: "";
+    }
+
+    .pronunciation {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .tag-pill {
+      font-size: 0.8rem;
+      padding: 0.16rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      color: var(--text-muted);
+    }
+
+    .word-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .action-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background var(--transition-fast), color var(--transition-fast),
+        border-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .action-pill span {
+      font-size: 1rem;
+    }
+
+    .action-pill:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    /* Meaning / definition blocks */
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .section-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .section-badge {
+      font-size: 0.75rem;
+      padding: 0.1rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      color: var(--text-muted);
+    }
+
+    .primary-meaning {
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
+
+    .meaning-note {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .examples-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      margin-top: 0.2rem;
+    }
+
+    .example-item {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-soft);
+      padding: 0.55rem 0.7rem;
+      background: linear-gradient(
+        135deg,
+        rgba(37, 99, 235, 0.04),
+        rgba(148, 163, 184, 0.03)
+      );
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    body.dark .example-item {
+      background: radial-gradient(
+        circle at top left,
+        rgba(37, 99, 235, 0.18),
+        rgba(15, 23, 42, 0.9)
+      );
+    }
+
+    .example-src {
+      font-weight: 500;
+    }
+
+    .example-tr {
+      color: var(--text-muted);
+    }
+
+    .extra-notes {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 900px) {
+      .main-inner {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .sidebar {
+        position: fixed;
+        top: calc(var(--header-height) + 0.5rem);
+        left: 0.75rem;
+        right: 0.75rem;
+        max-width: 360px;
+        z-index: 20;
+        transform: translateX(-120%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform var(--transition-fast), opacity var(--transition-fast);
+      }
+
+      .sidebar.sidebar--open {
+        transform: translateX(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .mobile-filter-toggle {
+        display: inline-flex;
+      }
+    }
+
+    @media (max-width: 640px) {
+      header {
+        padding: 0 1rem;
+      }
+
+      .search-wrapper {
+        order: 3;
+        width: 100%;
+      }
+
+      .header-inner {
+        flex-wrap: wrap;
+      }
+
+      .header-actions {
+        margin-left: auto;
+      }
+
+      .content-card {
+        padding: 1.15rem 1rem;
+      }
+
+      .lemma {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- HEADER -->
+    <header>
+      <div class="header-inner">
+        <!-- Logo -->
+        <div class="logo">
+          <div class="logo-mark"></div>
+          <div class="logo-text">Rečnik</div>
+        </div>
+
+        <!-- Mobile filter button (visible on small screens) -->
+        <button
+          class="icon-button mobile-filter-toggle"
+          id="mobileFilterToggle"
+          type="button"
+        >
+          <span>☰</span> Filteri
+        </button>
+
+        <!-- Search -->
+        <div class="search-wrapper">
+          <input
+            class="search-input"
+            type="text"
+            placeholder="Traži nemačku ili srpsku reč…"
+          />
+          <div class="search-icon">🔍</div>
+        </div>
+
+        <!-- Actions -->
+        <div class="header-actions">
+          <button class="icon-button icon-button--primary" type="button">
+            <span>🎮</span> Igre
+          </button>
+          <button class="icon-button" id="darkModeToggle" type="button">
+            <span>🌙</span>
+            <span class="dark-label">Noć</span>
+          </button>
+          <button class="icon-button" type="button">
+            <span>⚙️</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="main-inner">
+        <!-- SIDEBAR / FILTERS -->
+        <aside class="sidebar" id="sidebar">
+          <div class="sidebar-section">
+            <div class="sidebar-title">Nivoi</div>
+            <div class="chip-row">
+              <button class="chip chip--active" type="button">A1</button>
+              <button class="chip" type="button">A2</button>
+              <button class="chip" type="button">B1</button>
+              <button class="chip" type="button">B2</button>
+              <button class="chip chip--ghost" type="button">Sve razine</button>
+            </div>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-title">Vrste reči</div>
+            <div class="chip-row">
+              <button class="chip" type="button">N (imenice)</button>
+              <button class="chip" type="button">V (glagoli)</button>
+              <button class="chip" type="button">ADJ</button>
+              <button class="chip" type="button">ADV</button>
+              <button class="chip chip--ghost" type="button">Sve vrste</button>
+            </div>
+          </div>
+
+          <div class="sidebar-section">
+            <div class="sidebar-title">Teme</div>
+            <div class="chip-row">
+              <button class="chip" type="button">posao</button>
+              <button class="chip" type="button">škola</button>
+              <button class="chip" type="button">sport</button>
+              <button class="chip" type="button">putovanja</button>
+              <button class="chip" type="button">porodica</button>
+            </div>
+          </div>
+        </aside>
+
+        <!-- MAIN CONTENT CARD -->
+        <section class="content-card">
+          <!-- Word header -->
+          <div class="word-header">
+            <div class="word-main">
+              <div class="lemma-row">
+                <div class="lemma">der Hund</div>
+                <div class="lemma-badge">A1</div>
+              </div>
+              <div class="word-meta">
+                <span>imenica</span>
+                <span>muški rod (der)</span>
+                <span>tema: životinje</span>
+              </div>
+              <div class="pronunciation">/hʊnt/</div>
+            </div>
+
+            <div class="word-actions">
+              <button class="action-pill" type="button">
+                <span>🎧</span> Slušaj
+              </button>
+              <button class="action-pill" type="button">
+                <span>⭐</span> Omiljena
+              </button>
+              <button class="action-pill" type="button">
+                <span>🧩</span> Igra
+              </button>
+              <button class="action-pill" type="button">
+                <span>📌</span> Moj set
+              </button>
+            </div>
+          </div>
+
+          <!-- Primary meaning -->
+          <div class="section">
+            <div class="section-header">
+              <div class="section-title">Osnovno značenje</div>
+              <div class="section-badge">glavno</div>
+            </div>
+            <div class="primary-meaning">pas</div>
+            <div class="meaning-note">
+              Najčešće značenje u svakodnevnom govoru.
+            </div>
+          </div>
+
+          <!-- Examples / phrases -->
+          <div class="section">
+            <div class="section-header">
+              <div class="section-title">Značenja i fraze</div>
+              <div class="section-badge">primeri</div>
+            </div>
+
+            <div class="examples-list">
+              <div class="example-item">
+                <div class="example-src">Der Hund bellt.</div>
+                <div class="example-tr">Pas laje.</div>
+              </div>
+
+              <div class="example-item">
+                <div class="example-src">
+                  Er kommt wie ein geprügelter Hund zurück.
+                </div>
+                <div class="example-tr">
+                  Vraća se kao prebijen pas. (ponižen, tužan)
+                </div>
+              </div>
+
+              <div class="example-item">
+                <div class="example-src">Viele Menschen haben Angst vor Hunden.</div>
+                <div class="example-tr">
+                  Mnogi ljudi se plaše pasa. (opšti opis, tipična upotreba)
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Extra notes -->
+          <div class="section">
+            <div class="section-header">
+              <div class="section-title">Napomene</div>
+              <div class="section-badge">gramatika / stil</div>
+            </div>
+            <div class="extra-notes">
+              U množini: <strong>die Hunde</strong> (psi). Reč je vrlo frekventna i često
+              se javlja i u metaforama (npr. <em>ein armer Hund</em> – jadnik).
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Small JS just for dark mode & mobile sidebar toggle -->
+  <script>
+    // Dark mode toggle
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    const darkLabel = darkModeToggle?.querySelector(".dark-label");
+
+    function updateDarkLabel() {
+      if (!darkLabel) return;
+      const isDark = document.body.classList.contains("dark");
+      darkLabel.textContent = isDark ? "Dan" : "Noć";
+    }
+
+    darkModeToggle?.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      updateDarkLabel();
+    });
+
+    updateDarkLabel();
+
+    // Mobile sidebar toggle
+    const sidebar = document.getElementById("sidebar");
+    const mobileFilterToggle = document.getElementById("mobileFilterToggle");
+
+    mobileFilterToggle?.addEventListener("click", () => {
+      sidebar?.classList.toggle("sidebar--open");
+    });
+
+    // Close sidebar when clicking outside (basic behavior)
+    document.addEventListener("click", (e) => {
+      if (!sidebar) return;
+      const withinSidebar = sidebar.contains(e.target);
+      const withinToggle = mobileFilterToggle?.contains(e.target);
+      const smallScreen = window.matchMedia("(max-width: 900px)").matches;
+
+      if (
+        smallScreen &&
+        sidebar.classList.contains("sidebar--open") &&
+        !withinSidebar &&
+        !withinToggle
+      ) {
+        sidebar.classList.remove("sidebar--open");
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8">
+  <title>Moj rečnik</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    /* Super simple, mobile-first layout */
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 1rem;
+      max-width: 600px;
+      margin-inline: auto;
+      background: #111;
+      color: #f5f5f5;
+    }
+
+    h1 {
+      font-size: 1.3rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .search-box {
+      position: sticky;
+      top: 0;
+      background: #111;
+      padding-bottom: 0.5rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      font-size: 1rem;
+      border-radius: 999px;
+      border: 1px solid #444;
+      outline: none;
+      background: #000;
+      color: #f5f5f5;
+    }
+
+    input[type="text"]:focus {
+      border-color: #888;
+    }
+
+    .suggestions {
+      margin-top: 0.5rem;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      border: 1px solid #222;
+      background: #000;
+    }
+
+    .suggestion-item {
+      padding: 0.4rem 0.7rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    .suggestion-item:nth-child(odd) {
+      background: #050505;
+    }
+
+    .suggestion-item:hover {
+      background: #222;
+    }
+
+    .suggestion-headword {
+      font-weight: 600;
+    }
+
+    .suggestion-gloss {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-left: 0.25rem;
+    }
+
+    .entry-detail {
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border-radius: 0.7rem;
+      border: 1px solid #333;
+      background: #000;
+      min-height: 2.5rem;
+      font-size: 0.95rem;
+    }
+
+    .entry-headword {
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .entry-meta {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-bottom: 0.4rem;
+    }
+
+    .no-results {
+      padding: 0.5rem;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <h1>Moj rečnik</h1>
+
+  <div class="search-box">
+    <input
+      id="searchInput"
+      type="text"
+      placeholder="Ukucaj reč na nemačkom..."
+      autocomplete="off"
+    >
+  </div>
+
+  <div id="suggestions" class="suggestions" style="display:none;"></div>
+
+  <div id="entryDetail" class="entry-detail">
+    <span style="opacity:0.6; font-size:0.85rem;">
+      Ukucaj reč iznad i izaberi iz liste.
+    </span>
+  </div>
+
+  <script>
+    // For now: tiny in-memory "dictionary" just to demo the UI.
+    // Later you will replace this with API calls to your DB.
+    const entries = [
+      {
+        headword: "Faschismus",
+        main_gloss: "fašizam",
+        plain_text: "fašizam; politička ideologija...",
+        pos: "noun",
+        gender: "der",
+        level: "B2",
+        content_html: "<p><b>Faschismus</b> (der) – fašizam; politička ideologija...</p>"
+      },
+      {
+        headword: "Faschist",
+        main_gloss: "fašista",
+        plain_text: "fašista (pristalica fašizma)...",
+        pos: "noun",
+        gender: "der",
+        level: "B2",
+        content_html: "<p><b>Faschist</b> (der) – fašista...</p>"
+      },
+      {
+        headword: "Faser",
+        main_gloss: "vlakno, nit",
+        plain_text: "vlakno, nit; mišićna vlakna...",
+        pos: "noun",
+        gender: "die",
+        level: "B2",
+        content_html: "<p><b>Faser</b> (die) – vlakno, nit...</p>"
+      },
+      {
+        headword: "fassbar",
+        main_gloss: "razumljiv",
+        plain_text: "razumljiv, shvatljiv, pojmljiv.",
+        pos: "adj",
+        gender: null,
+        level: "B2",
+        content_html: "<p><b>fassbar</b> – razumljiv, shvatljiv, pojmljiv.</p>"
+      },
+      {
+        headword: "fassen",
+        main_gloss: "uhvatiti; shvatiti",
+        plain_text: "uhvatiti; shvatiti nešto; formulisati, izraziti.",
+        pos: "verb",
+        gender: null,
+        level: "B2",
+        content_html: "<p><b>fassen</b> – uhvatiti; shvatiti; izraziti.</p>"
+      }
+    ];
+
+    const searchInput   = document.getElementById("searchInput");
+    const suggestionsEl = document.getElementById("suggestions");
+    const entryDetailEl = document.getElementById("entryDetail");
+
+    // Renders the right-hand / bottom area with full meaning
+    function renderEntry(entry) {
+      if (!entry) {
+        entryDetailEl.innerHTML = '<span class="no-results">Nema rezultata.</span>';
+        return;
+      }
+
+      const genderLabel = entry.gender ? ` (${entry.gender})` : "";
+      const metaParts = [];
+      if (entry.pos)   metaParts.push(entry.pos);
+      if (entry.level) metaParts.push(entry.level);
+
+      entryDetailEl.innerHTML = `
+        <div class="entry-headword">${entry.headword}${genderLabel}</div>
+        <div class="entry-meta">${metaParts.join(" · ")}</div>
+        <div>${entry.content_html}</div>
+      `;
+    }
+
+    // Renders the suggestion list under the input
+    function renderSuggestions(list) {
+      if (!list.length) {
+        suggestionsEl.style.display = "none";
+        suggestionsEl.innerHTML = "";
+        return;
+      }
+
+      const itemsHtml = list.map(e => `
+        <div class="suggestion-item" data-headword="${e.headword}">
+          <span class="suggestion-headword">${e.headword}</span>
+          <span class="suggestion-gloss">${e.main_gloss || ""}</span>
+        </div>
+      `).join("");
+
+      suggestionsEl.innerHTML = itemsHtml;
+      suggestionsEl.style.display = "block";
+    }
+
+    // Simple case-insensitive prefix search on `headword`
+    function search(prefix) {
+      const p = prefix.trim().toLowerCase();
+      if (!p) {
+        renderSuggestions([]);
+        return;
+      }
+
+      const matches = entries
+        .filter(e => e.headword.toLowerCase().startsWith(p))
+        .sort((a, b) => a.headword.localeCompare(b.headword))
+        .slice(0, 30); // limit results
+
+      renderSuggestions(matches);
+    }
+
+    // Handle typing
+    searchInput.addEventListener("input", (e) => {
+      const value = e.target.value;
+      search(value);
+    });
+
+    // Clicking on a suggestion = show full entry
+    suggestionsEl.addEventListener("click", (e) => {
+      const item = e.target.closest(".suggestion-item");
+      if (!item) return;
+
+      const hw = item.dataset.headword;
+      const entry = entries.find(e => e.headword === hw);
+      renderEntry(entry);
+    });
+
+    // Optional: pressing Enter when only one result -> open it
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const visibleItems = suggestionsEl.querySelectorAll(".suggestion-item");
+        if (visibleItems.length === 1) {
+          const hw = visibleItems[0].dataset.headword;
+          const entry = entries.find(e => e.headword === hw);
+          renderEntry(entry);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

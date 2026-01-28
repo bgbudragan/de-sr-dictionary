@@ -1,0 +1,923 @@
+<!doctype html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gramatika – Oblast</title>
+  <style>
+    :root{
+      --bg: #f6f8fc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --muted2:#64748b;
+      --line:#e7edf6;
+      --shadow: 0 10px 30px rgba(15, 23, 42, .06);
+      --shadow2: 0 6px 18px rgba(15, 23, 42, .07);
+      --radius: 16px;
+
+      --primary:#2563eb;
+      --primary2:#1d4ed8;
+
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+
+      --chip:#eef2ff;
+      --chipText:#3730a3;
+
+      --barBg:#eef2f7;
+      --barFill:#2563eb;
+
+      --focus: rgba(37, 99, 235, .18);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 700px at 20% -10%, #eef2ff 0%, transparent 60%),
+                  radial-gradient(1000px 600px at 90% 0%, #e0f2fe 0%, transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 26px 18px 50px;
+    }
+
+    .crumbs{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:var(--muted2);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .crumbs a{
+      color: var(--primary);
+      text-decoration:none;
+      font-weight: 700;
+    }
+    .crumbs a:hover{ color: var(--primary2); text-decoration:underline; }
+
+    .top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom: 14px;
+    }
+
+    h1{
+      margin:0;
+      font-size: 30px;
+      letter-spacing:-.5px;
+      line-height:1.1;
+    }
+
+    .sub{
+      margin-top:6px;
+      color:var(--muted);
+      font-size: 14px;
+      line-height:1.4;
+      max-width: 62ch;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      padding-top: 2px;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 1px 0 rgba(15,23,42,.04);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:14px;
+      line-height:1;
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); border-color:#dbe5f5; }
+    .btn:active{ transform: translateY(0px); box-shadow: 0 2px 8px rgba(15,23,42,.08); }
+    .btn.primary{
+      background: linear-gradient(180deg, #2f6cff 0%, var(--primary) 100%);
+      border-color: rgba(37,99,235,.35);
+      color:#fff;
+    }
+    .btn.primary:hover{ border-color: rgba(37,99,235,.55); }
+
+    .hero{
+      background: rgba(255,255,255,.78);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 10px 28px rgba(15,23,42,.05);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom: 14px;
+    }
+
+    .heroLeft{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      min-width: 260px;
+      flex: 1 1 520px;
+    }
+
+    .chips{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: var(--chip);
+      color: var(--chipText);
+      border: 1px solid rgba(55,48,163,.14);
+      white-space:nowrap;
+    }
+    .chip.gray{
+      background:#f1f5f9;
+      color:#334155;
+      border-color:#e2e8f0;
+    }
+    .chip.ok{
+      background: #ecfdf5;
+      color:#065f46;
+      border-color:#a7f3d0;
+    }
+    .chip.warn{
+      background:#fffbeb;
+      color:#92400e;
+      border-color:#fde68a;
+    }
+
+    .heroRight{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex: 0 0 auto;
+    }
+
+    .ring{
+      width: 56px;
+      height: 56px;
+      border-radius: 999px;
+      background:
+        conic-gradient(var(--primary) calc(var(--p) * 1%), #e8eef8 0);
+      display:grid;
+      place-items:center;
+      box-shadow: 0 1px 0 rgba(15,23,42,.03);
+      border: 1px solid #dbe5f7;
+    }
+    .ring span{
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.95);
+      display:grid;
+      place-items:center;
+      font-weight: 900;
+      font-size: 12px;
+      color: var(--text);
+      border: 1px solid #edf2f7;
+    }
+
+    .panel{
+      background: rgba(255,255,255,.75);
+      border:1px solid var(--line);
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: 0 10px 28px rgba(15,23,42,.05);
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+      margin-bottom: 14px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width: 220px;
+      flex: 1 1 320px;
+    }
+    .label{
+      font-size:12px;
+      color:var(--muted2);
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .input, .select{
+      width:100%;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.95);
+      outline:none;
+      font-size:14px;
+      transition: box-shadow .12s ease, border-color .12s ease;
+    }
+    .input:focus, .select:focus{
+      border-color: rgba(37,99,235,.45);
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+    .toggles{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex: 0 0 auto;
+    }
+    .toggle{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.95);
+      border-radius: 14px;
+      padding: 10px 12px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      user-select:none;
+      min-height: 44px;
+      white-space:nowrap;
+    }
+    .toggle input{ width:18px; height:18px; margin:0; }
+
+    .list{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow:hidden;
+      box-shadow: 0 1px 0 rgba(15,23,42,.03);
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns: 84px 1fr 140px;
+      gap:12px;
+      padding: 12px 14px;
+      border-top: 1px solid #f0f4fb;
+      align-items:center;
+      cursor:pointer;
+      transition: background .12s ease;
+    }
+    .row:first-child{ border-top:none; }
+    .row:hover{ background: #f8fbff; }
+
+    .code{
+      font-variant-numeric: tabular-nums;
+      font-weight: 900;
+      color: #0b3aa6;
+      background: #eef4ff;
+      border: 1px solid #dbe7ff;
+      border-radius: 12px;
+      padding: 8px 10px;
+      width: fit-content;
+    }
+
+    .title{
+      font-weight: 900;
+      letter-spacing:-.2px;
+      margin: 0;
+      font-size: 14.5px;
+    }
+    .desc{
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .rightMeta{
+      justify-self:end;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:6px;
+      color: var(--muted2);
+      font-size: 12.5px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid transparent;
+      white-space:nowrap;
+    }
+    .pill.done{ background:#ecfdf5; color:#065f46; border-color:#a7f3d0; font-weight:800; }
+    .pill.todo{ background:#eff6ff; color:#1e3a8a; border-color:#bfdbfe; font-weight:800; }
+    .pill.soon{ background:#f1f5f9; color:#334155; border-color:#e2e8f0; font-weight:800; }
+    .pill.weak{ background:#fffbeb; color:#92400e; border-color:#fde68a; font-weight:800; }
+
+    .footerCards{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+    }
+    .card{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 1px 0 rgba(15,23,42,.03);
+    }
+    .card h3{
+      margin:0 0 6px;
+      font-size: 15px;
+      letter-spacing:-.2px;
+    }
+    .card p{
+      margin:0 0 10px;
+      color:var(--muted);
+      font-size: 13px;
+      line-height:1.4;
+    }
+    .card .bar{
+      height: 10px;
+      background: var(--barBg);
+      border-radius: 999px;
+      overflow:hidden;
+      border:1px solid #edf2f7;
+      margin: 8px 0 12px;
+    }
+    .card .bar > span{
+      display:block;
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--barFill) 0%, #22c55e 140%);
+      border-radius: 999px;
+    }
+
+    .empty{
+      margin-top: 14px;
+      padding: 18px;
+      border:1px dashed #dbe5f7;
+      border-radius: 16px;
+      background: rgba(255,255,255,.65);
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px){
+      .row{ grid-template-columns: 84px 1fr; }
+      .rightMeta{ grid-column: 2 / 3; justify-self:start; align-items:flex-start; flex-direction:row; flex-wrap:wrap; }
+      .footerCards{ grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px){
+      .top{ flex-direction:column; align-items:stretch; }
+      .actions{ justify-content:flex-start; }
+      h1{ font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="crumbs">
+      <a href="grammar.html">← Gramatika</a>
+      <span>›</span>
+      <span id="crumbTopic">Oblast</span>
+    </div>
+
+    <div class="top">
+      <div>
+        <h1 id="topicTitle">Oblast</h1>
+        <div class="sub" id="topicDesc">Pregled lekcija u ovoj oblasti. Naslovi i opisi su napisani neutralno i originalno.</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="btnContinue">▶ Nastavi</button>
+        <button class="btn" id="btnTest">🧪 Test</button>
+        <button class="btn" id="btnBack">↩ Nazad</button>
+      </div>
+    </div>
+
+    <div class="hero">
+      <div class="heroLeft">
+        <div class="chips" id="chips"></div>
+        <div style="color:var(--muted); font-size:13px;" id="heroMeta"></div>
+      </div>
+
+      <div class="heroRight">
+        <div class="ring" id="ring" style="--p: 0;">
+          <span id="ringText">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="field">
+        <div class="label">Pretraga lekcija u ovoj oblasti</div>
+        <input class="input" id="q" placeholder="npr. padeži, perfekat, red reči..." />
+      </div>
+
+      <div class="field" style="flex:0 0 220px; min-width:220px;">
+        <div class="label">Prikaži</div>
+        <select class="select" id="view">
+          <option value="all">Sve lekcije</option>
+          <option value="ready">Samo spremno</option>
+          <option value="soon">Samo u pripremi</option>
+        </select>
+      </div>
+
+      <div class="toggles">
+        <label class="toggle" title="Sakrij završene lekcije (demo: status se pamti lokalno)">
+          <input type="checkbox" id="hideDone" />
+          <span><b>Sakrij završene</b></span>
+        </label>
+      </div>
+    </div>
+
+    <div id="list" class="list" aria-live="polite"></div>
+    <div id="empty" class="empty" style="display:none;">Nema rezultata za trenutne filtere.</div>
+
+    <div class="footerCards">
+      <div class="card" id="testCard">
+        <h3>Test za oblast</h3>
+        <p>Brzi test (10–20 pitanja) preko ključnih tema iz ove oblasti. (Placeholder UI)</p>
+        <div class="bar"><span id="testBar"></span></div>
+        <button class="btn primary" id="btnStartTest">Pokreni test</button>
+      </div>
+
+      <div class="card">
+        <h3>Napomena o sadržaju</h3>
+        <p>
+          Ova struktura prati oblasti i teme, ali su naslovi i opisi ovde napisani originalno,
+          bez preuzimanja primer-rečenica ili specifičnih formulacija iz udžbenika.
+        </p>
+        <button class="btn" id="btnResetProgress">Reset lokalnog progresa</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------------------------
+    // Data: struktura po oblastima (teme), neutralni/originalni naslovi i opisi
+    // (bez prepisivanja primer-rečenica iz knjige)
+    // ---------------------------
+    const TOPICS = {
+      nomen: {
+        id: "nomen",
+        title: "Nomen",
+        level: "A1+",
+        ready: true,
+        desc: "Osnove imenica: rod, množina, padeži i posebna n-deklinacija.",
+        lessons: [
+          { code:"1.01", title:"Rod imenica i signali", desc:"Kako prepoznati rod kroz tipične obrasce i završetke.", minutes: 8, status:"ready" },
+          { code:"1.02", title:"Množina: najčešći obrasci", desc:"Pregled tipova množine i kako ih sistematski uvežbati.", minutes: 10, status:"ready" },
+          { code:"1.03", title:"Padeži u praksi (N/A/D/G)", desc:"Kada se koji padež koristi i kako ga brzo prepoznati.", minutes: 12, status:"ready" },
+          { code:"1.04", title:"n-deklinacija: posebna grupa", desc:"Ko spada u ovu grupu i šta se menja kroz padeže.", minutes: 14, status:"ready" }
+        ],
+        test: { id:"test-nomen", title:"Test: Nomen" }
+      },
+
+      artikelwoerter: {
+        id: "artikelwoerter",
+        title: "Artikelwörter",
+        level: "A1+",
+        ready: true,
+        desc: "Članovi i reči uz imenicu: oblici, upotreba i negacija.",
+        lessons: [
+          { code:"2.01", title:"Određeni i neodređeni član: oblici", desc:"Oblici kroz rod/padež i tipične greške.", minutes: 10, status:"ready" },
+          { code:"2.02", title:"Upotreba članova u kontekstu", desc:"Kada je član obavezan, a kada izostaje (nulti član).", minutes: 10, status:"ready" },
+          { code:"2.03", title:"Negativni član „kein“", desc:"Kako se menja i kada je bolji izbor od „nicht“.", minutes: 8, status:"ready" },
+          { code:"2.04", title:"Prisvojni oblici (mein/dein/...)", desc:"Oblici i slaganje sa imenicom kroz padeže.", minutes: 10, status:"ready" },
+          { code:"2.05", title:"Dodatne reči uz imenicu (uvod)", desc:"Kratak pregled pokaznih/količinskih i sličnih oblika.", minutes: 8, status:"ready" }
+        ],
+        test: { id:"test-artikelwoerter", title:"Test: Artikelwörter" }
+      },
+
+      pronomen: {
+        id: "pronomen",
+        title: "Pronomen",
+        level: "A1+",
+        ready: true,
+        desc: "Zamenice: lične, prisvojne i osnovni tipovi neodređenih/pokaznih.",
+        lessons: [
+          { code:"3.01", title:"Lične zamenice i padeži", desc:"Oblici i tipične pozicije u rečenici.", minutes: 10, status:"ready" },
+          { code:"3.02", title:"Prisvojne zamenice", desc:"Oblici i slaganje (moj/tvoj/... u nemačkom).", minutes: 10, status:"ready" },
+          { code:"3.03", title:"Neodređene zamenice (uvod)", desc:"Kako izraziti „neko/nešto/nekoliko“ i sl.", minutes: 10, status:"ready" },
+          { code:"3.04", title:"Pokazne zamenice (uvod)", desc:"Osnovna upotreba pokaznih oblika u praksi.", minutes: 10, status:"ready" }
+        ],
+        test: { id:"test-pronomen", title:"Test: Pronomen" }
+      },
+
+      adjektive: {
+        id: "adjektive",
+        title: "Adjektive",
+        level: "A2+",
+        ready: false,
+        desc: "Deklinacija, poređenje i česte konstrukcije sa pridevima.",
+        lessons: [
+          { code:"4.01", title:"Deklinacija posle neodređenog člana", desc:"Kako se pridev menja posle ein/eine…", minutes: 10, status:"soon" },
+          { code:"4.02", title:"Deklinacija posle određenog člana", desc:"Kako se pridev menja posle der/die/das…", minutes: 10, status:"soon" },
+          { code:"4.03", title:"Deklinacija bez člana", desc:"Osnovni obrasci kada član izostaje.", minutes: 10, status:"soon" },
+          { code:"4.04", title:"Poređenje: komparativ i superlativ", desc:"Pravila + najčešće nepravilnosti (bez spiskova iz knjiga).", minutes: 10, status:"soon" },
+          { code:"4.05", title:"Particip kao pridev", desc:"Kako se particip koristi opisno u rečenici.", minutes: 10, status:"soon" },
+          { code:"4.06", title:"Pridev kao imenica (nominalizacija)", desc:"Kada pridev „postane“ imenica i kako se piše/menja.", minutes: 10, status:"soon" }
+        ],
+        test: { id:"test-adjektive", title:"Test: Adjektive" }
+      },
+
+      verben: {
+        id: "verben",
+        title: "Verben",
+        level: "A1+",
+        ready: false,
+        desc: "Vremena, modalni glagoli, pasiv, Konjunktiv II i ključne konstrukcije.",
+        lessons: [
+          { code:"5.01", title:"Prezent: osnove", desc:"Konjugacija i najčešće upotrebe.", minutes: 10, status:"soon" },
+          { code:"5.02", title:"Razdvojivi glagoli", desc:"Pozicija prefiksa i ritam rečenice.", minutes: 10, status:"soon" },
+          { code:"5.03", title:"Perfekat (1): uvod", desc:"Osnovna građa i izbor pomoćnog glagola.", minutes: 10, status:"soon" },
+          { code:"5.04", title:"Perfekat (2): proširenje", desc:"Praktična pravila + češći obrasci.", minutes: 10, status:"soon" },
+          { code:"5.05", title:"Perfekat (3): uvežbavanje", desc:"Strategije za tačnost bez preopterećenja teorijom.", minutes: 10, status:"soon" },
+          { code:"5.06", title:"Preterit: osnove", desc:"Kada se koristi i kako ga brzo prepoznati.", minutes: 10, status:"soon" },
+          { code:"5.07", title:"Pluskvamperfekat", desc:"Građenje i tipične situacije upotrebe.", minutes: 10, status:"soon" },
+          { code:"5.08", title:"Budućnost: Futur i prezent za buduće", desc:"Praktična razlika i česte konstrukcije.", minutes: 10, status:"soon" },
+          { code:"5.09", title:"Modalni glagoli: können", desc:"Mogućnost/umeće: obrasci i vežbanje.", minutes: 8, status:"soon" },
+          { code:"5.10", title:"Modalni glagoli: wollen / möchten", desc:"Namera i želja: nijanse i tipične fraze.", minutes: 8, status:"soon" },
+          { code:"5.11", title:"Modalni glagoli: müssen / dürfen", desc:"Obaveza i dozvola: česte zamke.", minutes: 8, status:"soon" },
+          { code:"5.12", title:"Modalni glagoli: sollen", desc:"Preporuka/prenošenje: osnovne upotrebe.", minutes: 8, status:"soon" },
+          { code:"5.13", title:"Pasiv: osnove", desc:"Kako se gradi i kada se koristi.", minutes: 10, status:"soon" },
+          { code:"5.14", title:"Pasiv + modalni glagoli", desc:"Kombinovanje pasiva i modalnih obrazaca.", minutes: 10, status:"soon" },
+          { code:"5.15", title:"Konstrukcija „lassen“", desc:"Tipične upotrebe i rečenični obrasci.", minutes: 10, status:"soon" },
+          { code:"5.16", title:"Glagol „werden“ (više uloga)", desc:"Budućnost, pasiv i promene stanja.", minutes: 10, status:"soon" },
+          { code:"5.17", title:"Konjunktiv II: želje i saveti", desc:"Učtivi i hipotetički iskazi (osnovni).", minutes: 10, status:"soon" },
+          { code:"5.18", title:"Konjunktiv II: uslovi i hipotetika", desc:"If-scenariji i strukture u rečenici.", minutes: 10, status:"soon" },
+          { code:"5.19", title:"Imperativ", desc:"Forme i tonalitet (neutralno/ljubazno).", minutes: 8, status:"soon" },
+          { code:"5.20", title:"Valencija: Nominativ + Akuzativ", desc:"Najčešći obrasci dopune glagola.", minutes: 10, status:"soon" },
+          { code:"5.21", title:"Valencija: Dativ", desc:"Glagoli koji tipično traže dativ.", minutes: 10, status:"soon" },
+          { code:"5.22", title:"Valencija: Akuzativ + Dativ", desc:"Dve dopune: redosled i logika.", minutes: 10, status:"soon" },
+          { code:"5.23", title:"Glagoli sa predlozima", desc:"Kako učiti glagol + predlog kao celinu.", minutes: 10, status:"soon" },
+          { code:"5.24", title:"Povratni glagoli", desc:"Osnovni obrasci i prepoznavanje.", minutes: 10, status:"soon" },
+          { code:"5.25", title:"„es“ konstrukcije (uvod)", desc:"Kada „es“ mora da stoji i šta predstavlja.", minutes: 10, status:"soon" }
+        ],
+        test: { id:"test-verben", title:"Test: Verben" }
+      },
+
+      praepositionen: {
+        id: "praepositionen",
+        title: "Präpositionen",
+        level: "A1+",
+        ready: true,
+        desc: "Predlozi za vreme i mesto + proširenje na lokalne i uzročne tipove.",
+        lessons: [
+          { code:"6.01", title:"Predlozi za vreme", desc:"Tipične konstrukcije za vremenske odnose.", minutes: 10, status:"ready" },
+          { code:"6.02", title:"Predlozi za mesto", desc:"Osnovni predlozi i izbor padeža.", minutes: 10, status:"ready" },
+          { code:"6.03", title:"Lokalni predlozi (proširenje)", desc:"Širi set predloga i kako ih grupisati.", minutes: 10, status:"ready" },
+          { code:"6.04", title:"Modalni i uzročni predlozi (uvod)", desc:"Kako izraziti način/razlog uz predloge.", minutes: 10, status:"ready" }
+        ],
+        test: { id:"test-praepositionen", title:"Test: Präpositionen" }
+      },
+
+      adverbien_partikeln: {
+        id: "adverbien_partikeln",
+        title: "Adverbien & Partikeln",
+        level: "A2+",
+        ready: false,
+        desc: "Prilozi i partikle: vreme/mesto/pravac i osnovne modalne partikle.",
+        lessons: [
+          { code:"7.01", title:"Vremenski prilozi", desc:"Kako organizovati i uvežbati najčešće temporalne obrasce.", minutes: 10, status:"soon" },
+          { code:"7.02", title:"Prilozi za mesto i pravac", desc:"Razlika lokacije i kretanja + tipične pozicije u rečenici.", minutes: 10, status:"soon" },
+          { code:"7.03", title:"Partikle za gradaciju", desc:"Pojačavanje/ublažavanje: pregled tipičnih reči.", minutes: 10, status:"soon" },
+          { code:"7.04", title:"Modalne partikle (uvod)", desc:"Kako utiču na ton i šta je realno vežbati na A2 nivou.", minutes: 10, status:"soon" }
+        ],
+        test: { id:"test-adverbien", title:"Test: Adverbien & Partikeln" }
+      },
+
+      zahlwoerter: {
+        id: "zahlwoerter",
+        title: "Zahlwörter",
+        level: "A1+",
+        ready: true,
+        desc: "Brojevi u govoru i pisanju: osnove i tipične konstrukcije.",
+        lessons: [
+          { code:"8.01", title:"Brojevi u rečenici (osnove)", desc:"Kako se brojevi ponašaju u najčešćim situacijama.", minutes: 10, status:"ready" }
+        ],
+        test: { id:"test-zahlwoerter", title:"Test: Zahlwörter" }
+      },
+
+      negation: {
+        id: "negation",
+        title: "Negation",
+        level: "A1+",
+        ready: true,
+        desc: "Negacija u nemačkom: izbor između „nicht“ i „kein“ i pozicija u rečenici.",
+        lessons: [
+          { code:"9.01", title:"Negacija: nicht vs kein", desc:"Pravila izbora + tipične pozicije (neutralno, bez prepisanih primera).", minutes: 12, status:"ready" }
+        ],
+        test: { id:"test-negation", title:"Test: Negation" }
+      },
+
+      saetze: {
+        id: "saetze",
+        title: "Sätze & Satzverbindungen",
+        level: "A2+",
+        ready: false,
+        desc: "Red reči, pitanja, veznici i zavisne rečenice – sistematski i vežbovno.",
+        lessons: [
+          { code:"10.01", title:"Red reči u glavnoj rečenici", desc:"Osnovno pravilo + česte varijacije.", minutes: 10, status:"soon" },
+          { code:"10.02", title:"Glagolski okvir (Satzklammer)", desc:"Kako “drži” rečenicu i gde šta stoji.", minutes: 10, status:"soon" },
+          { code:"10.03", title:"Pitanja: osnove", desc:"Da/ne i upitne rečenice – struktura.", minutes: 10, status:"soon" },
+          { code:"10.04", title:"Veznici u glavnim rečenicama (uvod)", desc:"Kako povezati dve glavne rečenice.", minutes: 10, status:"soon" },
+          { code:"10.05", title:"Povezivanje: prilozi vezivanja", desc:"Zato, ipak, zbog toga… (kako utiču na red reči).", minutes: 10, status:"soon" },
+          { code:"10.06", title:"Zavisna rečenica sa „dass“", desc:"Osnovna struktura i pozicija glagola.", minutes: 10, status:"soon" },
+          { code:"10.07", title:"Infinitivske konstrukcije sa „zu“", desc:"Kada se koriste i kako izgledaju.", minutes: 10, status:"soon" },
+          { code:"10.08", title:"Zavisne rečenice: vremenski veznici", desc:"Konstrukcije tipa kad/dok/od… (neutralno).", minutes: 10, status:"soon" },
+          { code:"10.09", title:"Uzročne i suprotne rečenice (uvod)", desc:"Zašto i uprkos čemu – osnovne strukture.", minutes: 10, status:"soon" },
+          { code:"10.10", title:"Cilj: „damit“ i „um … zu“", desc:"Kako izraziti nameru i cilj.", minutes: 10, status:"soon" },
+          { code:"10.11", title:"Uslov: „falls“ i „wenn“", desc:"Uslovne konstrukcije i tipične razlike.", minutes: 10, status:"soon" },
+          { code:"10.12", title:"Način / izuzetak (uvod)", desc:"Kako izraziti „tako što“, „bez da“, „umesto da“.", minutes: 10, status:"soon" },
+          { code:"10.13", title:"Dvočlani veznici", desc:"Strukture tipa „ne samo… nego i…“ i sl.", minutes: 10, status:"soon" },
+          { code:"10.14", title:"Relativne rečenice (uvod)", desc:"Ko/koji: osnovni obrazac i padeži.", minutes: 12, status:"soon" }
+        ],
+        test: { id:"test-saetze", title:"Test: Sätze & Satzverbindungen" }
+      },
+
+      wortbildung: {
+        id: "wortbildung",
+        title: "Wortbildung",
+        level: "B1+",
+        ready: false,
+        desc: "Osnovna tvorba reči: kako nastaju imenice i pridevi (uvod).",
+        lessons: [
+          { code:"11.01", title:"Tvorba imenica (uvod)", desc:"Najčešći načini i kako ih prepoznati.", minutes: 10, status:"soon" },
+          { code:"11.02", title:"Tvorba prideva (uvod)", desc:"Najčešći sufiksi/prefiksi i značenja (neutralno).", minutes: 10, status:"soon" }
+        ],
+        test: { id:"test-wortbildung", title:"Test: Wortbildung" }
+      }
+    };
+
+    // ---------------------------
+    // Helpers / state
+    // ---------------------------
+    const elTopicTitle = document.getElementById("topicTitle");
+    const elTopicDesc  = document.getElementById("topicDesc");
+    const elCrumbTopic = document.getElementById("crumbTopic");
+    const elChips      = document.getElementById("chips");
+    const elHeroMeta   = document.getElementById("heroMeta");
+    const elRing       = document.getElementById("ring");
+    const elRingText   = document.getElementById("ringText");
+    const elList       = document.getElementById("list");
+    const elEmpty      = document.getElementById("empty");
+
+    const elQ       = document.getElementById("q");
+    const elView    = document.getElementById("view");
+    const elHideDone= document.getElementById("hideDone");
+
+    const btnBack = document.getElementById("btnBack");
+    const btnContinue = document.getElementById("btnContinue");
+    const btnTest = document.getElementById("btnTest");
+    const btnStartTest = document.getElementById("btnStartTest");
+    const btnResetProgress = document.getElementById("btnResetProgress");
+    const testBar = document.getElementById("testBar");
+
+    function getParam(name){
+      const u = new URL(window.location.href);
+      return u.searchParams.get(name);
+    }
+    function normalize(s){ return (s || "").toLowerCase().trim(); }
+
+    // demo progress: localStorage keys
+    // - topic last lesson: grammar_last_lesson_<topicId>
+    // - lesson done: grammar_done_<topicId>_<code>
+    function doneKey(topicId, code){ return `grammar_done_${topicId}_${code}`; }
+    function lastLessonKey(topicId){ return `grammar_last_lesson_${topicId}`; }
+
+    function getTopic(){
+      const id = (getParam("topic") || "nomen").toLowerCase();
+      return TOPICS[id] || TOPICS["nomen"];
+    }
+
+    function computeProgress(topic){
+      // demo: percent = done lessons / total ready lessons
+      const readyLessons = topic.lessons.filter(l => l.status === "ready");
+      const base = readyLessons.length ? readyLessons : topic.lessons;
+      const total = base.length;
+      let done = 0;
+      for(const l of base){
+        if(localStorage.getItem(doneKey(topic.id, l.code)) === "1") done++;
+      }
+      const pct = total ? Math.round((done / total) * 100) : 0;
+      return { done, total, pct };
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function lessonHref(topicId, code){
+      return `lesson.html?topic=${encodeURIComponent(topicId)}&lesson=${encodeURIComponent(code)}`;
+    }
+
+    function renderHeader(topic){
+      document.title = `Gramatika – ${topic.title}`;
+      elTopicTitle.textContent = topic.title;
+      elCrumbTopic.textContent = topic.title;
+      elTopicDesc.textContent = topic.desc;
+
+      elChips.innerHTML = "";
+      elChips.appendChild(makeChip(`${topic.level}`));
+      elChips.appendChild(makeChip(topic.ready ? "spremno" : "u pripremi", topic.ready ? "ok" : "gray"));
+
+      const {done, total, pct} = computeProgress(topic);
+      const weak = pct < 30;
+
+      elChips.appendChild(makeChip(`${topic.lessons.length} lekcija`, "gray"));
+      elChips.appendChild(makeChip(`${weak ? "slabije" : "stabilno"} · ${pct}%`, weak ? "warn" : "ok"));
+
+      elHeroMeta.textContent = `Lekcije: ${topic.lessons.length} · Test: dostupan kao UI placeholder · Lokalni progres (demo): ${done}/${total} završeno`;
+
+      elRing.style.setProperty("--p", pct);
+      elRingText.textContent = `${pct}%`;
+
+      testBar.style.width = `${pct}%`;
+    }
+
+    function makeChip(text, variant){
+      const s = document.createElement("span");
+      s.className = "chip" + (variant ? ` ${variant}` : "");
+      s.textContent = text;
+      return s;
+    }
+
+    function renderList(topic){
+      const q = normalize(elQ.value);
+      const view = elView.value;
+      const hideDone = elHideDone.checked;
+
+      const { pct } = computeProgress(topic);
+      elRing.style.setProperty("--p", pct);
+      elRingText.textContent = `${pct}%`;
+      testBar.style.width = `${pct}%`;
+
+      let items = topic.lessons.slice();
+
+      // filter: view
+      items = items.filter(l => {
+        if(view === "ready" && l.status !== "ready") return false;
+        if(view === "soon" && l.status !== "soon") return false;
+        return true;
+      });
+
+      // filter: search
+      if(q){
+        items = items.filter(l => normalize(l.code + " " + l.title + " " + l.desc).includes(q));
+      }
+
+      // filter: hide done
+      if(hideDone){
+        items = items.filter(l => localStorage.getItem(doneKey(topic.id, l.code)) !== "1");
+      }
+
+      elList.innerHTML = "";
+      elEmpty.style.display = items.length ? "none" : "block";
+
+      for(const l of items){
+        const isDone = localStorage.getItem(doneKey(topic.id, l.code)) === "1";
+        const pill = isDone ? "done" : (l.status === "ready" ? "todo" : "soon");
+        const pillText = isDone ? "završeno" : (l.status === "ready" ? "spremno" : "u pripremi");
+
+        const row = document.createElement("div");
+        row.className = "row";
+        row.setAttribute("role","button");
+        row.setAttribute("tabindex","0");
+
+        row.innerHTML = `
+          <div class="code">${escapeHtml(l.code)}</div>
+          <div>
+            <div class="title">${escapeHtml(l.title)}</div>
+            <div class="desc">${escapeHtml(l.desc)}</div>
+          </div>
+          <div class="rightMeta">
+            <span class="pill ${pill}">${escapeHtml(pillText)}</span>
+            <span>${escapeHtml(String(l.minutes))} min</span>
+          </div>
+        `;
+
+        // click: open lesson if ready, else just notify
+        row.addEventListener("click", () => {
+          localStorage.setItem("grammar_last_topic", topic.id);
+          localStorage.setItem(lastLessonKey(topic.id), l.code);
+
+          if(l.status !== "ready"){
+            alert("Ova lekcija je označena kao 'u pripremi' (UI placeholder).");
+            return;
+          }
+          window.location.href = lessonHref(topic.id, l.code);
+        });
+
+        row.addEventListener("keydown", (e) => {
+          if(e.key === "Enter" || e.key === " "){
+            e.preventDefault();
+            row.click();
+          }
+        });
+
+        // right click simulation: toggle done (demo) via double click
+        row.addEventListener("dblclick", () => {
+          if(l.status !== "ready") return;
+          const key = doneKey(topic.id, l.code);
+          const now = localStorage.getItem(key) === "1" ? "0" : "1";
+          localStorage.setItem(key, now);
+          renderHeader(topic);
+          renderList(topic);
+        });
+
+        elList.appendChild(row);
+      }
+    }
+
+    // ---------------------------
+    // Boot
+    // ---------------------------
+    const topic = getTopic();
+    localStorage.setItem("grammar_last_topic", topic.id);
+
+    renderHeader(topic);
+    renderList(topic);
+
+    // controls
+    ["input","change"].forEach(ev => {
+      elQ.addEventListener(ev, () => renderList(topic));
+      elView.addEventListener(ev, () => renderList(topic));
+      elHideDone.addEventListener(ev, () => renderList(topic));
+    });
+
+    btnBack.addEventListener("click", () => window.location.href = "grammar.html");
+
+    btnContinue.addEventListener("click", () => {
+      const last = localStorage.getItem(lastLessonKey(topic.id));
+      // fallback: first ready lesson
+      const firstReady = topic.lessons.find(l => l.status === "ready");
+      const target = last || (firstReady ? firstReady.code : topic.lessons[0]?.code);
+      if(!target){
+        alert("Nema lekcija definisanih za ovu oblast (placeholder).");
+        return;
+      }
+      const lessonObj = topic.lessons.find(l => l.code === target);
+      if(lessonObj && lessonObj.status !== "ready"){
+        alert("Poslednja lekcija je u pripremi. Otvaram prvu dostupnu (spremnu) lekciju.");
+        if(firstReady) window.location.href = lessonHref(topic.id, firstReady.code);
+        return;
+      }
+      // open
+      if(lessonObj && lessonObj.status === "ready"){
+        window.location.href = lessonHref(topic.id, target);
+      } else {
+        alert("Ova oblast je u pripremi (UI placeholder).");
+      }
+    });
+
+    function startTest(){
+      alert(`${topic.test.title} (UI placeholder) — ovde kasnije ide test režim za oblast.`);
+    }
+    btnTest.addEventListener("click", startTest);
+    btnStartTest.addEventListener("click", startTest);
+
+    btnResetProgress.addEventListener("click", () => {
+      // clear done flags and last lesson for this topic
+      for(const l of topic.lessons){
+        localStorage.removeItem(doneKey(topic.id, l.code));
+      }
+      localStorage.removeItem(lastLessonKey(topic.id));
+      renderHeader(topic);
+      renderList(topic);
+    });
+  </script>
+</body>
+</html>

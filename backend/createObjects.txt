@@ -1,0 +1,394 @@
+Super, idemo da zaokružimo priču 🎯
+Dobićeš:
+
+1. kompletan **CREATE TABLE** (sa svim kolonama o kojima smo pričali)
+2. **šablone INSERT-a** za:
+
+   * imenicu (standardna množina)
+   * imenicu (mutirana množina, tipa *Buch → Bücher*)
+   * glagol (pravilan, jednostavniji)
+   * glagol (nepravilni / više značenja)
+   * pridev
+
+Možeš da ih bukvalno copy–paste i popunjavaš mesta označena velikim slovima.
+
+---
+
+## 1️⃣ Predlog `CREATE TABLE` (prazna tabela sa punim modelom)
+
+Ako želiš novu “čistu” tabelu, npr. `entries`:
+
+```sql
+CREATE TABLE public.entries (
+  id              serial4       PRIMARY KEY,
+  direction       text          NOT NULL,   -- 'DE_SR' ili 'SR_DE'
+  headword        text          NOT NULL,   -- lema (osnovni oblik)
+  main_gloss      text          NULL,       -- prvo osnovno znacenje
+  plain_text      text          NOT NULL,   -- rezime svih znacenja (srpski)
+  content_html    text          NOT NULL,   -- HTML za prikaz
+  image_url       text          NULL,       -- opcionalno
+
+  -- metadata za igrice / filtere:
+  pos             text,                    -- 'noun','verb','adj','adv',...
+  gender          text,                    -- 'der','die','das' ili NULL
+  level           text,                    -- 'A1','A2','B1',...
+  topics          text[]       DEFAULT '{}',-- npr. '{medicina,ekonomija}'
+  is_irregular    boolean      DEFAULT false,
+  has_audio       boolean      DEFAULT false,
+  frequency_rank  integer,
+  created_at      timestamptz  DEFAULT now(),
+  updated_at      timestamptz  DEFAULT now()
+);
+```
+
+👉 Naravno, umesto `entries` slobodno stavi opet `entries` ako ti ne treba paralelna tabela.
+
+---
+
+## 2️⃣ Šablon: **imenica – “normalna” množina**
+
+Primer: nemački *Angler* (der Angler, die Angler), ali u šablonu ostavljam PLACEHOLDER-e.
+
+```sql
+INSERT INTO public.entries (
+  direction,
+  headword,
+  main_gloss,
+  plain_text,
+  content_html,
+  image_url,
+  pos,
+  gender,
+  level,
+  topics,
+  is_irregular,
+  has_audio,
+  frequency_rank
+)
+VALUES (
+  'DE_SR',                     -- smer
+  'LEMA',                      -- npr. 'Angler'
+  'OSNOVNO_SR_ZNACENJE',       -- npr. 'pecaros'
+  'KRATKI_REZIME_SVIH_ZNACENJA', -- npr. 'pecaros'
+  $$<div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="DER_DIE_DAS"
+            data-base="LEMA"
+            data-plural="PUNA_MNOZINA">
+        LEMA
+      </span>
+    </h2>
+
+    <div class="meta">
+      (DER_DIE_DAS |GEN_SG_NASTAVAK, PL_NASTAVAK|)
+      <!-- npr. (der |-s, -|) ili (der |-s, -e|) -->
+    </div>
+
+    <ol class="senses">
+      <li>
+        <span class="sense-number">1</span>
+        <span class="sense-text">PRVO_SR_ZNACENJE</span>
+      </li>
+      <!-- po potrebi dodaj jos <li> ... -->
+    </ol>
+  </div>$$,
+  NULL,                        -- image_url
+  'noun',                      -- pos
+  'DER_DIE_DAS',               -- gender
+  NULL,                        -- level (za sad)
+  '{}',                        -- topics
+  false,                       -- is_irregular
+  false,                       -- has_audio
+  NULL                         -- frequency_rank
+);
+```
+
+---
+
+## 3️⃣ Šablon: **imenica – mutirana množina (Buch → Bücher)**
+
+Tip iz napomena: `Buch [das] |-es, -ü-er|`
+
+```sql
+INSERT INTO public.entries (
+  direction,
+  headword,
+  main_gloss,
+  plain_text,
+  content_html,
+  image_url,
+  pos,
+  gender,
+  level,
+  topics,
+  is_irregular,
+  has_audio,
+  frequency_rank
+)
+VALUES (
+  'DE_SR',
+  'LEMA',                        -- npr. 'Buch'
+  'OSNOVNO_SR_ZNACENJE',         -- npr. 'knjiga'
+  'KRATKI_REZIME_SVIH_ZNACENJA', -- npr. 'knjiga; ...'
+  $$<div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="DER_DIE_DAS"
+            data-base="LEMA"
+            data-gen-sg="GEN_SG_NASTAVAK"      -- npr. '-es'
+            data-plural-full="PUNA_MNOZINA"    -- npr. 'Bücher'
+            data-plural-pattern="PL_PATTERN">  -- npr. '-ü-er'
+        LEMA
+      </span>
+    </h2>
+
+    <div class="meta">
+      (DER_DIE_DAS |GEN_SG_NASTAVAK, PL_PATTERN|)
+      <!-- npr. (das |-es, -ü-er|) -->
+    </div>
+
+    <ol class="senses">
+      <li>
+        <span class="sense-number">1</span>
+        <span class="sense-text">PRVO_SR_ZNACENJE</span>
+      </li>
+    </ol>
+  </div>$$,
+  NULL,
+  'noun',
+  'DER_DIE_DAS',
+  NULL,
+  '{}',
+  false,
+  false,
+  NULL
+);
+```
+
+---
+
+## 4️⃣ Šablon: **glagol – jednostavan (pravilan, 1 značenje)**
+
+Tip kao `abblassen`:
+
+```sql
+INSERT INTO public.entries (
+  direction,
+  headword,
+  main_gloss,
+  plain_text,
+  content_html,
+  image_url,
+  pos,
+  gender,
+  level,
+  topics,
+  is_irregular,
+  has_audio,
+  frequency_rank
+)
+VALUES (
+  'DE_SR',
+  'LEMA',                         -- npr. 'abblassen'
+  'OSNOVNO_SR_ZNACENJE',          -- npr. 'izbledeti'
+  'KRATKI_REZIME_SVIH_ZNACENJA',  -- npr. 'izbledeti; ova boja brzo bledi'
+  $$<div class="entry">
+    <h2>
+      <span class="verb-headword"
+            data-base="LEMA"
+            data-irregular="false">
+        LEMA
+      </span>
+    </h2>
+
+    <div class="meta">
+      <span class="abbr">T_ILI_I_GL.</span>
+      <span class="aux">(HAT_ILI_IST)</span>
+      <!-- npr. i.gl. (ist) / t.gl. (hat) -->
+    </div>
+
+    <ol class="senses">
+      <li>
+        <span class="sense-number">1</span>
+        <span class="sense-text">PRVO_SR_ZNACENJE</span>
+        <div class="examples">
+          <div class="example">
+            <span class="de">NEMACKA_RECENICA.</span>
+            <span class="sr">SRPSKI_PREVOD_PRIMERA.</span>
+          </div>
+        </div>
+      </li>
+    </ol>
+  </div>$$,
+  NULL,
+  'verb',
+  NULL,
+  NULL,
+  '{}',
+  false,       -- is_irregular
+  false,       -- has_audio
+  NULL
+);
+```
+
+---
+
+## 5️⃣ Šablon: **glagol – nepravilni, više značenja, fig., povratni**
+
+Tip kao `abbiegen` ili `anmelden` (ovo je generički skeleton):
+
+```sql
+INSERT INTO public.entries (
+  direction,
+  headword,
+  main_gloss,
+  plain_text,
+  content_html,
+  image_url,
+  pos,
+  gender,
+  level,
+  topics,
+  is_irregular,
+  has_audio,
+  frequency_rank
+)
+VALUES (
+  'DE_SR',
+  'LEMA',
+  'OSNOVNO_SR_ZNACENJE',
+  'KRATKI_REZIME_SVIH_ZNACENJA',
+  $$<div class="entry">
+    <h2>
+      <span class="verb-headword"
+            data-base="LEMA"
+            data-irregular="true">
+        LEMA
+      </span>
+    </h2>
+
+    <div class="meta">
+      <span class="abbr">nepr. T_ILI_I_GL.</span>
+      <span class="aux">(HAT_ILI_IST)</span>
+    </div>
+
+    <ol class="senses">
+      <li>
+        <span class="sense-number">1</span>
+        <span class="sense-text">PRVO_SR_ZNACENJE</span>
+        <div class="examples">
+          <div class="example">
+            <span class="de">PRIMER_1_DE.</span>
+            <span class="sr">PRIMER_1_SR.</span>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <span class="sense-number">2</span>
+        <!-- opcioni stil/domene -->
+        <span class="label label-style"
+              data-code="fig"
+              data-style="figurativno">fig.</span>
+        <span class="sense-text">DRUGO_SR_ZNACENJE</span>
+        <div class="examples">
+          <div class="example">
+            <span class="de">PRIMER_2_DE.</span>
+            <span class="sr">PRIMER_2_SR.</span>
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <span class="sense-number">3</span>
+        <span class="label label-verb-kind"
+              data-code="refl"
+              data-verb-kind="povratni">
+          r.gl. sich LEMA
+        </span>
+        <span class="sense-text">POVRATNO_SR_ZNACENJE</span>
+        <div class="examples">
+          <div class="example">
+            <span class="de">PRIMER_REFL_DE.</span>
+            <span class="sr">PRIMER_REFL_SR.</span>
+          </div>
+        </div>
+      </li>
+    </ol>
+  </div>$$,
+  NULL,
+  'verb',
+  NULL,
+  NULL,
+  '{}',       -- topics (npr. '{medicina}' ako ima (med.))
+  true,       -- is_irregular
+  false,      -- has_audio
+  NULL
+);
+```
+
+---
+
+## 6️⃣ Šablon: **pridev**
+
+Tip kao `achtlos`:
+
+```sql
+INSERT INTO public.entries (
+  direction,
+  headword,
+  main_gloss,
+  plain_text,
+  content_html,
+  image_url,
+  pos,
+  gender,
+  level,
+  topics,
+  is_irregular,
+  has_audio,
+  frequency_rank
+)
+VALUES (
+  'DE_SR',
+  'LEMA',                         -- npr. 'achtlos'
+  'OSNOVNO_SR_ZNACENJE',          -- npr. 'nepazljiv'
+  'KRATKI_REZIME_SVIH_ZNACENJA',  -- npr. 'nepazljiv; nemaran'
+  $$<div class="entry">
+    <h2>
+      <span class="adj-headword"
+            data-base="LEMA"
+            data-comp="KOMPARATIV"    -- opcionalno
+            data-sup="SUPERLATIV">   -- opcionalno
+        LEMA
+      </span>
+    </h2>
+
+    <div class="meta">
+      <span class="abbr">adj.</span>
+      <!-- po potrebi dodaj info o komparativu/superlativu tekstom -->
+    </div>
+
+    <ol class="senses">
+      <li>
+        <span class="sense-number">1</span>
+        <span class="sense-text">PRVO_SR_ZNACENJE</span>
+      </li>
+      <!-- jos znacenja po potrebi -->
+    </ol>
+  </div>$$,
+  NULL,
+  'adj',      -- pos
+  NULL,
+  NULL,
+  '{}',
+  false,
+  false,
+  NULL
+);
+```
+
+---
+
+Ako hoćeš, kad napraviš novu praznu tabelu, možemo da odaberemo **jedan ceo “mini-paket” iz rečnika** (npr. 3–5 uzastopnih odrednica) i ja ti ih pretvorim po ovim šablonima – da kreneš sa punjenjem praktično, a ne samo teoretski.

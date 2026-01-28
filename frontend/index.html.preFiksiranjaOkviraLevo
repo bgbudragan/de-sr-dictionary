@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mali DE–SR rečnik</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;        /* svetlo siva pozadina stranice */
+      color: #111;                 /* skoro crna */
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 10px auto;
+      border: 1px solid #ddd;
+      background: #ffffff;         /* bela pozadina aplikacije */
+      display: flex;
+      flex-direction: column;
+      height: 90vh;
+    }
+
+    header {
+      background: #000000;         /* crni header */
+      color: #ffffff;
+      padding: 6px 10px 4px 10px;
+      font-size: 14px;
+      border-bottom: 1px solid #222;
+    }
+
+    .header-title {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .logo {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 120px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+      flex-wrap: wrap;
+      padding: 0;
+    }
+
+    /* podrazumevano: opcija ISKLJUČENA → crno dugme, belo slovo */
+    .toolbar button {
+      padding: 4px 8px;
+      border: 1px solid #666;
+      background: #000000;
+      cursor: pointer;
+      font-size: 12px;
+      color: #ffffff;
+    }
+
+    .toolbar button:hover {
+      background: #222222;
+    }
+
+    /* kada je OPCIJA UKLJUČENA/SELEKTOVANA → belo dugme, crno slovo */
+    .toolbar button.active {
+      background: #ffffff;
+      color: #000000;
+      font-weight: bold;
+      border-color: #000000;
+    }
+
+    .toolbar label {
+      font-size: 12px;
+      color: #f0f0f0;
+    }
+
+    /* crno/beli checkbox umesto plavog */
+    .toolbar input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+      accent-color: #ffffff;
+    }
+
+    #searchInput {
+      margin-left: auto;
+      padding: 4px;
+      font-size: 13px;
+      min-width: 220px;
+      border: 1px solid #ccc;
+      border-radius: 2px;
+    }
+
+    .main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 220px 1fr 220px;
+      gap: 4px;
+      padding: 4px;
+      background: #f5f5f5;
+    }
+
+    .panel {
+      background: #ffffff;
+      border: 1px solid #ddd;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel h3 {
+      background: #f0f0f0;
+      padding: 4px 6px;
+      font-size: 12px;
+      border-bottom: 1px solid #ddd;
+      color: #111;
+    }
+
+    .panel-content {
+      flex: 1;
+      overflow: auto;
+      padding: 4px;
+      font-size: 13px;
+      position: relative;   /* zbog tooltipa za imenice */
+    }
+
+    .list {
+      list-style: none;
+      font-size: 13px;
+    }
+
+    .list li {
+      padding: 2px 4px;
+      cursor: pointer;
+    }
+
+    .list li:hover {
+      background: #eeeeee;
+    }
+
+    .list li.selected {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    /* deo reči koji se poklapa sa pretragom u listama A/B */
+    .list .match {
+      font-weight: bold;
+    }
+
+    /* jedan prikaz reči */
+    .entry-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .entry {
+      flex: 1;
+      background: #ffffff;
+      border: 1px solid #eee;
+      padding: 6px;
+    }
+
+    .entry h2 {
+      color: #000000;
+      font-size: 20px;
+      margin-bottom: 3px;
+    }
+
+    .entry .meta {
+      font-style: italic;
+      font-size: 13px;
+      margin-bottom: 4px;
+      color: #444;
+    }
+
+    .entry ol {
+      padding-left: 18px;
+      margin-top: 4px;
+    }
+
+    .entry li {
+      margin-bottom: 4px;
+    }
+
+    .entry .label {
+      font-style: italic;
+    }
+
+    .entry .example {
+      display: block;
+      margin-left: 4px;
+    }
+
+    .entry .example strong {
+      font-weight: bold;
+    }
+
+    /* mali tooltip preko title=... za skraćenice (adj., i. gl. itd.) */
+    .abbr {
+      border-bottom: 1px dotted #888;
+      cursor: help;
+    }
+
+    /* slika reči (ako postoji) */
+    .entry-image img {
+      max-width: 160px;
+      height: auto;
+      border: 1px solid #ddd;
+    }
+
+    .history-item {
+      padding: 2px 4px;
+      cursor: pointer;
+    }
+
+    .history-item:hover {
+      background: #eeeeee;
+    }
+
+    .footer-note {
+      padding: 2px 6px;
+      font-size: 11px;
+      background: #fafafa;
+      border-top: 1px solid #ddd;
+      color: #555;
+    }
+
+    /* highlight u panelu Značenje reči kod pretrage "Ceo tekst" */
+    .fulltext-match {
+      background: #b3d7ff;  /* svetloplava, kao selekcija */
+      padding: 0 1px;
+    }
+
+    /* tooltip za jedninu/množinu imenica */
+    .noun-overlay {
+      position: absolute;
+      display: none;
+      background: #ffffe0;
+      border: 1px solid #aaa;
+      padding: 2px 4px;
+      font-size: 11px;
+      white-space: nowrap;
+      z-index: 20;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    }
+
+    .noun-overlay .art-der {
+      color: #0066cc;   /* der – plavo */
+      font-weight: bold;
+    }
+
+    .noun-overlay .art-die {
+      color: #cc0000;   /* die – crveno */
+      font-weight: bold;
+    }
+
+    .noun-overlay .art-das {
+      color: #008800;   /* das – zeleno */
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="header-title">
+      <!-- stavi logo.png u isti folder kao index.html -->
+      <img src="logo.png" class="logo" alt="Logo rečnika" />
+    </div>
+
+    <div class="toolbar">
+      <button id="btnNS" class="active">DE → SR</button>
+      <button id="btnSN">SR → DE</button>
+
+      <button id="btnHeadword" class="active">Reč</button>
+      <button id="btnFulltext">Ceo tekst</button>
+
+      <button id="btnWithin">Unutar reči</button>
+
+      <label>
+        <input type="checkbox" id="doubleViewToggle" />
+        Prikaz dve reči
+      </label>
+
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="unesite reč... / Wort eingeben..."
+      />
+    </div>
+  </header>
+
+  <div class="main">
+    <!-- Levo: A + B -->
+    <div class="panel">
+      <h3>Reč / Wort</h3>
+      <div class="panel-content" id="listAContainer"></div>
+      <h3>Unutar reči / Im Wort</h3>
+      <div class="panel-content" id="listBContainer"></div>
+    </div>
+
+    <!-- Sredina: panel C -->
+    <div class="panel">
+      <h3>Značenje reči / Wortbedeutung</h3>
+      <div class="panel-content" id="contentPanel">
+        <p>Učitavanje podataka sa servera...</p>
+      </div>
+      <div class="footer-note">
+        Mod: <span id="modeInfo">DE→SR, pretraga po reči / Suche nach Wort</span>
+      </div>
+    </div>
+
+    <!-- Desno: istorija D -->
+    <div class="panel">
+      <h3>Istorijat pretrage / Suchhistorie</h3>
+      <div class="panel-content" id="historyPanel"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- PODACI: sada stižu iz backend-a --------------------------
+
+  // umesto velikog const entriesDESR = [...] sada samo prazno polje:
+  let entriesDESR = [];
+  const entriesSRDE = []; // za kasnije, kad ubacimo SR→DE
+
+  // --- Stanje --------------------------------------------------
+
+  let currentDirection = "DE_SR";
+  let searchMode = "headword"; // 'headword' ili 'fulltext'
+  let searchWithinWords = false;
+  let doubleView = false;
+
+  let currentEntries = [];
+  let selectedIds = [];
+  let history = [];
+
+  const listAContainer = document.getElementById("listAContainer");
+  const listBContainer = document.getElementById("listBContainer");
+  const contentPanel = document.getElementById("contentPanel");
+  const historyPanel = document.getElementById("historyPanel");
+  const searchInput = document.getElementById("searchInput");
+  const modeInfo = document.getElementById("modeInfo");
+
+  let nounOverlay = null;
+
+  function ensureNounOverlay() {
+    if (!nounOverlay) {
+      nounOverlay = document.createElement("div");
+      nounOverlay.id = "nounOverlay";
+      nounOverlay.className = "noun-overlay";
+    }
+    if (!contentPanel.contains(nounOverlay)) {
+      contentPanel.appendChild(nounOverlay);
+    }
+    nounOverlay.style.display = "none";
+  }
+
+  // --- Učitavanje podataka sa backend-a ------------------------
+
+  async function loadEntriesFromAPI() {
+    try {
+      const response = await fetch("http://localhost:4000/api/entries");
+      const data = await response.json();
+      entriesDESR = data;
+      currentEntries = entriesDESR;
+
+      contentPanel.innerHTML =
+        "<p>Unesi „ban“ u polje za pretragu ili klikni na neku reč iz liste A/B.</p>";
+
+      filterAndRender();
+    } catch (err) {
+      console.error("Greška pri učitavanju podataka:", err);
+      contentPanel.innerHTML =
+        "<p>Ne mogu da učitam podatke iz API-ja. Proveri da li backend radi na portu 4000.</p>";
+    }
+  }
+
+  // --- Promena smera --------------------------------------------------
+
+  function setDirection(dir) {
+    currentDirection = dir;
+    if (dir === "DE_SR") {
+      currentEntries = entriesDESR;
+      document.getElementById("btnNS").classList.add("active");
+      document.getElementById("btnSN").classList.remove("active");
+    } else {
+      currentEntries = entriesSRDE;
+      document.getElementById("btnNS").classList.remove("active");
+      document.getElementById("btnSN").classList.add("active");
+      if (entriesSRDE.length === 0) {
+        contentPanel.innerHTML =
+          "<p>SR→DE još nema unetih podataka. Koristi DE→SR za ovu simulaciju.</p>";
+      }
+    }
+    updateModeInfo();
+    filterAndRender();
+  }
+
+  // --- Mod pretrage ---------------------------------------------------
+
+  function setSearchMode(mode) {
+    searchMode = mode;
+    if (mode === "headword") {
+      document.getElementById("btnHeadword").classList.add("active");
+      document.getElementById("btnFulltext").classList.remove("active");
+    } else {
+      document.getElementById("btnHeadword").classList.remove("active");
+      document.getElementById("btnFulltext").classList.add("active");
+    }
+    updateModeInfo();
+    filterAndRender();
+  }
+
+  function toggleWithinWords() {
+    searchWithinWords = !searchWithinWords;
+    const btn = document.getElementById("btnWithin");
+    btn.classList.toggle("active", searchWithinWords);
+    filterAndRender();
+  }
+
+  function updateModeInfo() {
+    const dirText = currentDirection === "DE_SR" ? "DE→SR" : "SR→DE";
+    const modeText =
+      searchMode === "headword"
+        ? "pretraga po reči / Suche nach Wort"
+        : "pretraga po celom tekstu / Suche im ganzen Text";
+    modeInfo.textContent = dirText + ", " + modeText;
+  }
+
+  // --- Filtriranje i liste --------------------------------------------
+
+  function filterAndRender() {
+    if (!currentEntries || !currentEntries.length) {
+      listAContainer.innerHTML = "<p><em>(nema podataka)</em></p>";
+      listBContainer.innerHTML = "<p><em>(nema podataka)</em></p>";
+      return;
+    }
+
+    const q = (searchInput.value || "").toLowerCase().trim();
+    let listA = [];
+    let listB = [];
+
+    if (!q) {
+      listA = currentEntries.slice();
+    } else if (searchMode === "headword") {
+      listA = currentEntries.filter(e =>
+        e.headword.toLowerCase().startsWith(q)
+      );
+      if (searchWithinWords) {
+        listB = currentEntries.filter(
+          e =>
+            e.headword.toLowerCase().includes(q) &&
+            !e.headword.toLowerCase().startsWith(q)
+        );
+      }
+    } else {
+      // full-text
+      listA = currentEntries.filter(e =>
+        (e.plainText || "").toLowerCase().includes(q)
+      );
+      listB = [];
+    }
+
+    renderList(listAContainer, listA);
+    renderList(listBContainer, listB);
+
+    if (selectedIds.length) {
+      renderContent();
+    }
+  }
+
+  function renderList(container, items) {
+    if (!items || !items.length) {
+      container.innerHTML = "<p><em>(nema rezultata)</em></p>";
+      return;
+    }
+    const q = (searchInput.value || "").toLowerCase().trim();
+    const ul = document.createElement("ul");
+    ul.className = "list";
+
+    items.forEach(e => {
+      const li = document.createElement("li");
+
+      if (q) {
+        const hw = e.headword || "";
+        const lower = hw.toLowerCase();
+        const idx = lower.indexOf(q);
+        if (idx !== -1) {
+          const before = hw.slice(0, idx);
+          const match = hw.slice(idx, idx + q.length);
+          const after = hw.slice(idx + q.length);
+          li.innerHTML =
+            before + '<span class="match">' + match + "</span>" + after;
+        } else {
+          li.textContent = hw;
+        }
+      } else {
+        li.textContent = e.headword || "";
+      }
+
+      if (selectedIds.includes(e.id)) {
+        li.classList.add("selected");
+      }
+      li.addEventListener("click", () => {
+        onSelectEntry(e.id);
+      });
+      ul.appendChild(li);
+    });
+    container.innerHTML = "";
+    container.appendChild(ul);
+  }
+
+  // --- Odabir reči ----------------------------------------------------
+
+  function onSelectEntry(id) {
+    const entry = currentEntries.find(e => e.id === id);
+    if (!entry) return;
+
+    if (!doubleView) {
+      selectedIds = [id];
+    } else {
+      if (!selectedIds.includes(id)) {
+        selectedIds.push(id);
+        if (selectedIds.length > 2) {
+          selectedIds.shift();
+        }
+      }
+    }
+    renderContent();
+    addToHistory(entry.headword);
+    filterAndRender(); // da osveži selekciju u listama
+  }
+
+  // --- Prikaz sadržaja reči -------------------------------------------
+
+  function renderContent() {
+    contentPanel.innerHTML = "";
+    ensureNounOverlay();
+
+    if (!selectedIds.length) {
+      contentPanel.innerHTML =
+        "<p>Izaberi reč iz liste A ili B da vidiš sadržaj.</p>";
+      return;
+    }
+
+    selectedIds.forEach((id, index) => {
+      const e = currentEntries.find(x => x.id === id);
+      if (!e) return;
+
+      if (index > 0) {
+        const hr = document.createElement("hr");
+        contentPanel.appendChild(hr);
+      }
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "entry-container";
+      wrapper.innerHTML = e.contentHtml;
+
+      if (e.image) {
+        const imgDiv = document.createElement("div");
+        imgDiv.className = "entry-image";
+        const img = document.createElement("img");
+        img.src = e.image;
+        img.alt = e.headword;
+        imgDiv.appendChild(img);
+        wrapper.appendChild(imgDiv);
+      }
+
+      contentPanel.appendChild(wrapper);
+    });
+
+    processNounHeadwords();
+
+    if (searchMode === "fulltext") {
+      highlightContentMatches();
+    }
+  }
+
+  // tooltip za imenice (jednina/množina)
+  function processNounHeadwords() {
+    ensureNounOverlay();
+    const spans = contentPanel.querySelectorAll(".noun-headword");
+    spans.forEach(span => {
+      span.addEventListener("mouseenter", () => showNounOverlay(span));
+      span.addEventListener("mouseleave", hideNounOverlay);
+    });
+  }
+
+  function showNounOverlay(span) {
+    ensureNounOverlay();
+
+    const gender = (span.dataset.gender || "").trim(); // der/die/das
+    const base = (span.dataset.base || span.textContent).trim();
+    const explicitPlural = (span.dataset.plural || "").trim();
+    const pluralSuffix = (span.dataset.pluralSuffix || "").trim();
+
+    let pluralForm;
+    if (explicitPlural) {
+      pluralForm = explicitPlural;
+    } else if (pluralSuffix && pluralSuffix !== "-") {
+      const suff = pluralSuffix.replace(/^-/, "");
+      pluralForm = base + suff;
+    } else {
+      pluralForm = "–";
+    }
+
+    const artClass =
+      gender === "der" ? "art-der" : gender === "die" ? "art-die" : "art-das";
+
+    const singularText = `${gender} ${base}`.trim();
+    const pluralText = pluralForm === "–" ? "–" : `die ${pluralForm}`;
+
+    nounOverlay.innerHTML =
+      `<span class="${artClass}">${singularText}</span>, ${pluralText}`;
+
+    // privremeno prikaži da bismo izmerili dimenzije
+    nounOverlay.style.display = "block";
+    nounOverlay.style.visibility = "hidden";
+
+    const rect = span.getBoundingClientRect();
+    const panelRect = contentPanel.getBoundingClientRect();
+
+    // početno - pokušaj iznad reči
+    let left = rect.left - panelRect.left;
+    let top = rect.top - panelRect.top - nounOverlay.offsetHeight - 4;
+
+    // ako bi izašao iznad panela, prebaci ispod reči
+    if (top < 0) {
+      top = rect.bottom - panelRect.top + 4;
+    }
+
+    // ograniči u levo/desno da tooltip ne iseče panel
+    const maxLeft = panelRect.width - nounOverlay.offsetWidth - 4;
+    if (left < 0) left = 0;
+    if (left > maxLeft) left = maxLeft;
+
+    nounOverlay.style.left = left + "px";
+    nounOverlay.style.top = top + "px";
+    nounOverlay.style.visibility = "visible";
+  }
+
+  function hideNounOverlay() {
+    if (nounOverlay) {
+      nounOverlay.style.display = "none";
+    }
+  }
+
+  // --- Highlight u sadržaju kod "Ceo tekst" ---------------------------
+
+  function highlightContentMatches() {
+    const q = (searchInput.value || "").trim();
+    if (!q) return;
+
+    const qLower = q.toLowerCase();
+
+    function walk(node) {
+      if (node === nounOverlay) return;
+
+      if (node.nodeType === Node.TEXT_NODE) {
+        const text = node.nodeValue;
+        const lower = text.toLowerCase();
+        let idx = lower.indexOf(qLower);
+        if (idx === -1) return;
+
+        const frag = document.createDocumentFragment();
+        let cur = 0;
+
+        while (idx !== -1) {
+          if (idx > cur) {
+            frag.appendChild(document.createTextNode(text.slice(cur, idx)));
+          }
+          const span = document.createElement("span");
+          span.className = "fulltext-match";
+          span.textContent = text.slice(idx, idx + q.length);
+          frag.appendChild(span);
+          cur = idx + q.length;
+          idx = lower.indexOf(qLower, cur);
+        }
+
+        if (cur < text.length) {
+          frag.appendChild(document.createTextNode(text.slice(cur)));
+        }
+
+        node.parentNode.replaceChild(frag, node);
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        if (node.tagName === "SCRIPT" || node.tagName === "STYLE") return;
+        if (node.id === "nounOverlay") return;
+        const children = Array.from(node.childNodes);
+        children.forEach(walk);
+      }
+    }
+
+    walk(contentPanel);
+  }
+
+  // --- Istorija -------------------------------------------------------
+
+  function addToHistory(headword) {
+    if (!headword) return;
+    if (history.length && history[history.length - 1] === headword) return;
+    history.push(headword);
+    renderHistory();
+  }
+
+  function renderHistory() {
+    if (!history.length) {
+      historyPanel.innerHTML = "<p><em>Još nema istorije.</em></p>";
+      return;
+    }
+    historyPanel.innerHTML = "";
+    history
+      .slice()
+      .reverse()
+      .forEach(hw => {
+        const div = document.createElement("div");
+        div.className = "history-item";
+        div.textContent = hw;
+        div.addEventListener("click", () => {
+          const entry = currentEntries.find(e => e.headword === hw);
+          if (entry) {
+            onSelectEntry(entry.id);
+          }
+        });
+        historyPanel.appendChild(div);
+      });
+  }
+
+  // --- Event listener-i ----------------------------------------
+
+  document.getElementById("btnNS").addEventListener("click", () => {
+    setDirection("DE_SR");
+  });
+
+  document.getElementById("btnSN").addEventListener("click", () => {
+    setDirection("SR_DE");
+  });
+
+  document.getElementById("btnHeadword").addEventListener("click", () => {
+    setSearchMode("headword");
+  });
+
+  document.getElementById("btnFulltext").addEventListener("click", () => {
+    setSearchMode("fulltext");
+  });
+
+  document.getElementById("btnWithin").addEventListener("click", () => {
+    toggleWithinWords();
+  });
+
+  document
+    .getElementById("doubleViewToggle")
+    .addEventListener("change", e => {
+      doubleView = e.target.checked;
+      if (!doubleView && selectedIds.length > 1) {
+        selectedIds = selectedIds.slice(-1);
+        renderContent();
+      }
+    });
+
+  searchInput.addEventListener("input", () => {
+    filterAndRender();
+  });
+
+  // --- Inicijalizacija -----------------------------------------
+
+  updateModeInfo();
+  loadEntriesFromAPI();
+</script>
+</body>
+</html>

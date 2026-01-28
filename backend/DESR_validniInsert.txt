@@ -1,0 +1,3355 @@
+--------------------------------------------------------------------
+-- A, a  (imenica, das A)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'A, a',
+  'A, a (das] |,-(s)| 1 a, slovo a 2 (mus.) ton c-dur-le-stvice; A-Dur A-dur; a-Moll a-mol 3 von A bis Z od a do s, od pocetka do kraja',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="das"
+            data-base="A"
+            data-plural=""
+            data-plural-suffix="-">
+        A, a
+      </span>
+    </h2>
+    <div class="meta">(das) |,-(s)|</div>
+    <ol>
+      <li>a, slovo a</li>
+      <li>
+        <span class="abbr" title="muzika, Musik">(mus.)</span>
+        ton c-dur-le-stvice;
+        <span class="example"><strong>A-Dur</strong> – A-dur;</span>
+        <span class="example"><strong>a-Moll</strong> – a-mol</span>
+      </li>
+      <li>
+        <span class="example">
+          <strong>von A bis Z</strong> – od a do s, od pocetka do kraja
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- A, ä  (imenica, das)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'A, ä',
+  'A, ä /€/ [das] |--(s)| preglas glasa a',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="das"
+            data-base="A, ä"
+            data-plural=""
+            data-plural-suffix="-">
+        A, ä
+      </span>
+    </h2>
+    <div class="meta">[das] |--(s)|</div>
+    <ol>
+      <li>preglas glasa a</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- a  (predlog)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'a',
+  'a prep. po; 3 Stück a 5 Euro 3 komada (od) po 5',
+  $$
+  <div class="entry">
+    <h2>a</h2>
+    <div class="meta">
+      <span class="abbr" title="predlog, Präposition">prep.</span>
+    </div>
+    <ol>
+      <li>po</li>
+      <li>
+        <span class="example">
+          <strong>3 Stück à 5 Euro</strong> – 3 komada (od) po 5
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- a-  (prefiks)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'a-',
+  'a pref. alogisch nelogican; anormal nenormalan; asymetrisch asimetrican i sl',
+  $$
+  <div class="entry">
+    <h2>a-</h2>
+    <div class="meta">pref.</div>
+    <p>Prefiks u recima kao:</p>
+    <ul>
+      <li><strong>alogisch</strong> – nelogican</li>
+      <li><strong>anormal</strong> – nenormalan</li>
+      <li><strong>asymetrisch</strong> – asimetrican i sl.</li>
+    </ul>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Aal  (imenica, der Aal, die Aale)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Aal',
+  'Aal (der I-s-el jegulja; sich winden wie ein Aal iz-vijati se kao crv, pokusati se izmigoljiti',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="der"
+            data-base="Aal"
+            data-plural="Aale"
+            data-plural-suffix="-e">
+        Aal
+      </span>
+    </h2>
+    <div class="meta">(der) |-s,-e|</div>
+    <ol>
+      <li>jegulja</li>
+      <li>
+        <span class="example">
+          <strong>sich winden wie ein Aal</strong> – iz-vijati se kao crv, pokusati se izmigoljiti
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- aalen, sich  (povratni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'aalen, sich',
+  'aalen, sich r.gl. (hat) protezati se; sie aalen sich in der Sonne oni se protezu na suncu',
+  $$
+  <div class="entry">
+    <h2>aalen, sich</h2>
+    <div class="meta">
+      <span class="abbr" title="refleksivni glagol, reflexives Verb">r.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>protezati se</li>
+      <li>
+        <span class="example">
+          <strong>sie aalen sich in der Sonne</strong> – oni se protezu na suncu
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- aalglatt  (pridev)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'aalglatt',
+  'aalglatt adj. gladak kao jegulja',
+  $$
+  <div class="entry">
+    <h2>aalglatt</h2>
+    <div class="meta">
+      <span class="abbr" title="pridev, Adjektiv">adj.</span>
+    </div>
+    <ol>
+      <li>gladak kao jegulja</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Aar  (imenica, der Aar, die Aare)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Aar',
+  'Aar (der] |s,-e| (orn.) veca grabljivica',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="der"
+            data-base="Aar"
+            data-plural="Aare"
+            data-plural-suffix="-e">
+        Aar
+      </span>
+    </h2>
+    <div class="meta">
+      (der) |s,-e|
+      <span class="abbr" title="ornitologija, Ornithologie">(orn.)</span>
+    </div>
+    <ol>
+      <li>veca grabljivica</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Aas  (imenica, das Aas, samo sg.)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Aas',
+  'Aas (das) |-es, samosg.| 1 strvina, lesina 2 mam, ma-mac 3 jarma, prekrupa',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="das"
+            data-base="Aas"
+            data-plural=""
+            data-plural-suffix="-">
+        Aas
+      </span>
+    </h2>
+    <div class="meta">(das) |-es, samosg.|</div>
+    <ol>
+      <li>strvina, lesina</li>
+      <li>mam, ma-mac</li>
+      <li>jarma, prekrupa</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- aasen  (tranzitivni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'aasen',
+  'aasen t.gl. (hat) 1 rasipati, arciti 2 mrijaviti',
+  $$
+  <div class="entry">
+    <h2>aasen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>rasipati, arciti</li>
+      <li>mrijaviti</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Aasgeier  (imenica, der Aasgeier, die Aasgeier)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Aasgeier',
+  'Aasgeier (der] |-s,-| (om.) lesinar, strvinar',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="der"
+            data-base="Aasgeier"
+            data-plural="Aasgeier"
+            data-plural-suffix="-">
+        Aasgeier
+      </span>
+    </h2>
+    <div class="meta">
+      (der) |-s,-|
+      <span class="abbr" title="ornitologija, Ornithologie">(orn.)</span>
+    </div>
+    <ol>
+      <li>lesinar, strvinar</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- ab  (predlog + prilog)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'ab',
+  'ab prep. + dat. 1 a) od, sa; ab Bahnhof od/sa stanice b) iz; ab Werk iz fabrike c) pocev od, pocevsi od; ab erstem/ersten Mai (pocev) od prvog maja • adv. ab und zu ponekad, katkad, povremeno',
+  $$
+  <div class="entry">
+    <h2>ab</h2>
+    <div class="meta">
+      <span class="abbr" title="predlog, Präposition">prep.</span> + Dat.;
+      <span class="abbr" title="prilog, Adverb">adv.</span>
+    </div>
+    <ol>
+      <li>
+        <span class="label">prep. + Dat.</span>
+        <ul>
+          <li>a) od, sa;
+            <span class="example">
+              <strong>ab Bahnhof</strong> – od/sa stanice
+            </span>
+          </li>
+          <li>b) iz;
+            <span class="example">
+              <strong>ab Werk</strong> – iz fabrike
+            </span>
+          </li>
+          <li>c) pocev od, pocevsi od;
+            <span class="example">
+              <strong>ab erstem/ersten Mai</strong> – (pocev) od prvog maja
+            </span>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <span class="label">
+          <span class="abbr" title="prilog, Adverb">adv.</span>
+        </span>
+        <span class="example">
+          <strong>ab und zu</strong> – ponekad, katkad, povremeno
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- ab-  (prefiks – glagolski)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'ab-',
+  'ab- pref. → abfahren, abfliegen i sl.',
+  $$
+  <div class="entry">
+    <h2>ab-</h2>
+    <div class="meta">pref.</div>
+    <p>→ <strong>abfahren</strong>, <strong>abfliegen</strong> i sl.</p>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Ab-  (prefiks – imenički)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Ab-',
+  'Ab- pref. → Abfahrt, Abflug ish',
+  $$
+  <div class="entry">
+    <h2>Ab-</h2>
+    <div class="meta">pref.</div>
+    <p>→ <strong>Abfahrt</strong>, <strong>Abflug</strong> ish</p>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abändern  (tranzitivni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abändern',
+  'abändern t.gl. (hat) promeniti, preinaciti',
+  $$
+  <div class="entry">
+    <h2>abändern</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>promeniti, preinaciti</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abänderung  (imenica, die Abänderung, die Abänderungen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abänderung',
+  'Abänderung (diel|, en| 1 promena 2 (prov.) amand-man',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abänderung"
+            data-plural="Abänderungen"
+            data-plural-suffix="-en">
+        Abänderung
+      </span>
+    </h2>
+    <div class="meta">(die) |-en|</div>
+    <ol>
+      <li>promena</li>
+      <li>
+        <span class="abbr" title="pravo, Jura">(prav.)</span>
+        amand-man
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abarbeiten  (tranzitivni + povratni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abarbeiten',
+  'abarbeiten t.gl. (hat) odraditi; smanjiti; er hat die Strafe abgearbeitet odradio je kaznu 2 r.gl. sich abarbeiten inuriti/iscrpiti se radom',
+  $$
+  <div class="entry">
+    <h2>abarbeiten</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat);
+      <span class="abbr" title="refleksivni glagol, reflexives Verb">r.gl.</span> sich
+    </div>
+    <ol>
+      <li>
+        odraditi; smanjiti
+        <span class="example">
+          <strong>er hat die Strafe abgearbeitet</strong> – odradio je kaznu
+        </span>
+      </li>
+      <li>
+        <span class="label">sich abarbeiten</span> – inuriti/iscrpiti se radom
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abart  (imenica, die Abart, die Abarten)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abart',
+  'Abart [diel |--en| 1 podvrsta 2 izopacena vI-sta; odrod',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abart"
+            data-plural="Abarten"
+            data-plural-suffix="-en">
+        Abart
+      </span>
+    </h2>
+    <div class="meta">(die) |-en|</div>
+    <ol>
+      <li>podvrsta</li>
+      <li>izopacena vrsta; odrod</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abartig  (pridev)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abartig',
+  'abartig adj. nastran, perverzan',
+  $$
+  <div class="entry">
+    <h2>abartig</h2>
+    <div class="meta">
+      <span class="abbr" title="pridev, Adjektiv">adj.</span>
+    </div>
+    <ol>
+      <li>nastran, perverzan</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abbau  (imenica, der Abbau)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abbau',
+  'Abbau [der] -s, ten| 1 razgradnja 2 a) opadanje b) (elektr) redukcija, smanjenje 3 iskopavanje rude 4 (ekon.) smanjenje 5 ukidanje',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="der"
+            data-base="Abbau"
+            data-plural=""
+            data-plural-suffix="-">
+        Abbau
+      </span>
+    </h2>
+    <div class="meta">[der] -s, ten|</div>
+    <ol>
+      <li>razgradnja</li>
+      <li>
+        a) opadanje<br />
+        b) <span class="abbr" title="elektrotehnika, Elektrizität/Elektronik">(elektr.)</span>
+           redukcija, smanjenje
+      </li>
+      <li>iskopavanje rude</li>
+      <li>
+        <span class="abbr" title="privreda, Wirtschaft">(ekon.)</span>
+        smanjenje
+      </li>
+      <li>ukidanje</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbaubar  (pridev)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbaubar',
+  'abbaubar adj. razgradiv',
+  $$
+  <div class="entry">
+    <h2>abbaubar</h2>
+    <div class="meta">
+      <span class="abbr" title="pridev, Adjektiv">adj.</span>
+    </div>
+    <ol>
+      <li>razgradiv</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbauen  (tranzitivni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbauen',
+  'abbauen t.gl. (hat) 1 rasklopiti; razgraditi 2 smanjiti 3 iskopa(va)ti rudu 4 (ekon.) smanjiti, sniziti',
+  $$
+  <div class="entry">
+    <h2>abbauen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>rasklopiti; razgraditi</li>
+      <li>smanjiti</li>
+      <li>iskopa(va)ti rudu</li>
+      <li>
+        <span class="abbr" title="privreda, Wirtschaft">(ekon.)</span>
+        smanjiti, sniziti
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+
+
+
+
+--------------------------------------------------------------------
+-- abbeißen  (nepravilni prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbeißen',
+  'abbeißen nepr.t.gl. (hat) odgristi; sie hat ein großes Stück Schokolade abgebissen odgrizla je veliko parče čokolade; sich (dat.) abbeißen ugristi se; er beißt sich lieber die Zunge ab, als etw. zu sagen radije će se ugristi za jezik, nego da kaže nešto; (fig.) drmnuti (piće); lass uns noch e-n ab-beißen! hajde da drmnemo još po jednu!',
+  $$
+  <div class="entry">
+    <h2>abbeißen</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni prelazni glagol, unregelmäßiges transitives Verb">nepr.t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>
+        odgristi
+        <span class="example">
+          <strong>sie hat ein großes Stück Schokolade abgebissen</strong> – odgrizla je veliko parče čokolade
+        </span>
+      </li>
+      <li>
+        <span class="label">sich (dat.) abbeißen</span> – ugristi se
+        <span class="example">
+          <strong>er beißt sich lieber die Zunge ab, als etw. zu sagen</strong> – radije će se ugristi za jezik, nego da kaže nešto
+        </span>
+      </li>
+      <li>
+        <span class="abbr" title="figurativno, figurativ">fig.</span>
+        drmnuti (piće)
+        <span class="example">
+          <strong>lass uns noch e-n ab-beißen!</strong> – hajde da drmnemo još po jednu!
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbekommen  (nepravilni prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbekommen',
+  'abbekommen nepr.t.gl. (hat) razdvojiti (delove celine); ich bekomme den Deckel nicht ab ne mogu da skinem poklopac',
+  $$
+  <div class="entry">
+    <h2>abbekommen</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni prelazni glagol, unregelmäßiges transitives Verb">nepr.t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>
+        razdvojiti (delove celine)
+        <span class="example">
+          <strong>ich bekomme den Deckel nicht ab</strong> – ne mogu da skinem poklopac
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abberufen  (nepravilni prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abberufen',
+  'abberufen nepr.t.gl. (hat) opozvati; die Regierung hat den Botschaftler abberufen vlada je opozvala ambasadora; er wurde in die Ewigkeit abberufen otišao je u večnost, preminuo',
+  $$
+  <div class="entry">
+    <h2>abberufen</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni prelazni glagol, unregelmäßiges transitives Verb">nepr.t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>
+        opozvati
+        <span class="example">
+          <strong>die Regierung hat den Botschaftler abberufen</strong> – vlada je opozvala ambasadora
+        </span>
+      </li>
+      <li>
+        (fig.) preminuti, otići u večnost
+        <span class="example">
+          <strong>er wurde in die Ewigkeit abberufen</strong> – otišao je u večnost
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abberufung  (imenica, die Abberufung, die Abberufungen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abberufung',
+  'Abberufung [die] |--en| opoziv(anje)',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abberufung"
+            data-plural="Abberufungen"
+            data-plural-suffix="-en">
+        Abberufung
+      </span>
+    </h2>
+    <div class="meta">[die] |-en|</div>
+    <ol>
+      <li>opoziv(anje)</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbestellen  (tranzitivni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbestellen',
+  'abbestellen t.gl. (hat) otkazati; leider bestellen wir das Hotelzimmer ab nažalost otkazujemo sobu u hotelu; (trg.) otkazati porudžbinu',
+  $$
+  <div class="entry">
+    <h2>abbestellen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>
+        otkazati
+        <span class="example">
+          <strong>leider bestellen wir das Hotelzimmer ab</strong> – nažalost otkazujemo sobu u hotelu
+        </span>
+      </li>
+      <li>
+        <span class="abbr" title="trgovina, Handel">(trg.)</span>
+        otkazati porudžbinu
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abbestellung  (imenica, die Abbestellung, die Abbestellungen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abbestellung',
+  'Abbestellung (die] |,-en| otkazivanje; (ekon.) otkazivanje porudžbine',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abbestellung"
+            data-plural="Abbestellungen"
+            data-plural-suffix="-en">
+        Abbestellung
+      </span>
+    </h2>
+    <div class="meta">(die) |-en|</div>
+    <ol>
+      <li>otkazivanje</li>
+      <li>
+        <span class="abbr" title="privreda, Wirtschaft">(ekon.)</span>
+        otkazivanje porudžbine
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbetten  (tranzitivni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbetten',
+  'abbetten t.gl. (hat) izmoliti, isprositi, iznuditi',
+  $$
+  <div class="entry">
+    <h2>abbetten</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>izmoliti, isprositi, iznuditi</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbezahlen  (tranzitivni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbezahlen',
+  'abbezahlen t.gl. (hat) otplatiti',
+  $$
+  <div class="entry">
+    <h2>abbezahlen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>otplatiti</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abbezahlung  (imenica, die Abbezahlung, die Abbezahlungen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abbezahlung',
+  'Abbezahlung (die] |,-en| otplata',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abbezahlung"
+            data-plural="Abbezahlungen"
+            data-plural-suffix="-en">
+        Abbezahlung
+      </span>
+    </h2>
+    <div class="meta">(die) |-en|</div>
+    <ol>
+      <li>otplata</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbiegen  (nepravilni glagol – tranzitivni i intransitivni)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbiegen',
+  'abbiegen nepr.t.gl. (hat) 1 savi(ja)ti; Reingold lässt sich leicht abbiegen čisto zlato se lako (da) savija(ti) 2 sprečiti; die Ausführung e-s Planes abbiegen sprečiti izvođenje (nekog) plana 3 (fig.) skrenuti; er hat das Gespräch abgebogen skrenuo je razgovor na drugu stranu; i.gl. (ist) 4 skrenuti, saviti; sie sind in den Wald abgebogen skrenuli su u šumu',
+  $$
+  <div class="entry">
+    <h2>abbiegen</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni prelazni glagol, unregelmäßiges transitives Verb">nepr.t.gl.</span> (hat);
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (ist)
+    </div>
+    <ol>
+      <li>
+        saviti, savijati
+        <span class="example">
+          <strong>Reingold lässt sich leicht abbiegen</strong> – čisto zlato se lako savija
+        </span>
+      </li>
+      <li>
+        sprečiti
+        <span class="example">
+          <strong>die Ausführung eines Planes abbiegen</strong> – sprečiti izvođenje (nekog) plana
+        </span>
+      </li>
+      <li>
+        <span class="abbr" title="figurativno, figurativ">fig.</span>
+        skrenuti (razgovor)
+        <span class="example">
+          <strong>er hat das Gespräch abgebogen</strong> – skrenuo je razgovor na drugu stranu
+        </span>
+      </li>
+      <li>
+        skrenuti, saviti (intransitivno)
+        <span class="example">
+          <strong>sie sind in den Wald abgebogen</strong> – skrenuli su u šumu
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abbild  (imenica, das Abbild, die Abbilder)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abbild',
+  'Abbild (das] -es,-er| 1 kopija, reprodukcija; portret 2 slika i prilika; sie ist das Abbild ihrer Mutter ona je slika i prilika svoje majke',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="das"
+            data-base="Abbild"
+            data-plural="Abbilder"
+            data-plural-suffix="-er">
+        Abbild
+      </span>
+    </h2>
+    <div class="meta">(das) -es,-er</div>
+    <ol>
+      <li>kopija, reprodukcija; portret</li>
+      <li>
+        slika i prilika
+        <span class="example">
+          <strong>sie ist das Abbild ihrer Mutter</strong> – ona je slika i prilika svoje majke
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbilden  (tranzitivni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbilden',
+  'abbilden t.gl. (hat) preslikati, precrtati',
+  $$
+  <div class="entry">
+    <h2>abbilden</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>preslikati, precrtati</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abbildung  (imenica, die Abbildung, die Abbildungen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abbildung',
+  'Abbildung (die] |,-en| preslikavanje; kopija',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abbildung"
+            data-plural="Abbildungen"
+            data-plural-suffix="-en">
+        Abbildung
+      </span>
+    </h2>
+    <div class="meta">(die) |-en|</div>
+    <ol>
+      <li>preslikavanje</li>
+      <li>kopija</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbinden  (nepravilni prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbinden',
+  'abbinden nepr.t.gl. (hat) 1 odvezati, razvezati; den Knoten abbinden razvezati čvor 2 podvezati; die verletzte Hand wurde abgebunden povređenu ruku su podvezali 3 odbiti (mladunče od sise)',
+  $$
+  <div class="entry">
+    <h2>abbinden</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni prelazni glagol, unregelmäßiges transitives Verb">nepr.t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>
+        odvezati, razvezati
+        <span class="example">
+          <strong>den Knoten abbinden</strong> – razvezati čvor
+        </span>
+      </li>
+      <li>
+        podvezati
+        <span class="example">
+          <strong>die verletzte Hand wurde abgebunden</strong> – povređenu ruku su podvezali
+        </span>
+      </li>
+      <li>odbiti (mladunče od sise)</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abblasen  (nepravilni prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abblasen',
+  'abblasen nepr.t.gl. (hat) 1 oduvati 2 ispustiti paru',
+  $$
+  <div class="entry">
+    <h2>abblasen</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni prelazni glagol, unregelmäßiges transitives Verb">nepr.t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>oduvati</li>
+      <li>ispustiti paru</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abblassen  (intransitivni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abblassen',
+  'abblassen i.gl. (ist) izbledeti; diese Farbe blässt schnell ab ova boja brzo bledi',
+  $$
+  <div class="entry">
+    <h2>abblassen</h2>
+    <div class="meta">
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (ist)
+    </div>
+    <ol>
+      <li>
+        izbledeti
+        <span class="example">
+          <strong>diese Farbe blässt schnell ab</strong> – ova boja brzo bledi
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+
+
+
+
+--------------------------------------------------------------------
+-- abblättern  (neprelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abblättern',
+  'abblättern i.gl. (ist) 1 pokidati lišće 2 vgl. sich abblättern ljuštiti se, opadati u listovima/ljuskicama',
+  $$
+  <div class="entry">
+    <h2>abblättern</h2>
+    <div class="meta">
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (ist)
+    </div>
+    <ol>
+      <li>pokidati lišće</li>
+      <li>
+        <span class="label">sich abblättern</span> – ljuštiti se, opadati u listovima/ljuskicama
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abblenden  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abblenden',
+  'abblenden t.gl. (hat) 1 zaseniti, zatamniti; oboriti svetlo; (aut.) ablendovati 2 (aut.) isključiti dugo i upaliti srednje svetlo',
+  $$
+  <div class="entry">
+    <h2>abblenden</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>
+        zaseniti, zatamniti; oboriti svetlo;
+        <span class="abbr" title="automobilizam, Autoverkehr">(aut.)</span>
+        ablendovati
+      </li>
+      <li>
+        <span class="abbr" title="automobilizam, Autoverkehr">(aut.)</span>
+        isključiti dugo i upaliti srednje svetlo
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abblendlicht  (imenica, das Abblendlicht, samo sg.)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abblendlicht',
+  'Abblendlicht (das] |-es, samo sg.| (aut.) svetlo za ablendovanje',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="das"
+            data-base="Abblendlicht"
+            data-plural=""
+            data-plural-suffix="-">
+        Abblendlicht
+      </span>
+    </h2>
+    <div class="meta">
+      (das) |-es, samo sg.|
+      <span class="abbr" title="automobilizam, Autoverkehr">(aut.)</span>
+    </div>
+    <ol>
+      <li>svetlo za ablendovanje</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abblitzen  (neprelazni glagol, kolokvijalno)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abblitzen',
+  'abblitzen i.gl. (ist) (kol.) nemati uspeha, biti odbijen',
+  $$
+  <div class="entry">
+    <h2>abblitzen</h2>
+    <div class="meta">
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (ist)
+      <span class="abbr" title="kolokvijalno, umgangssprachlich">(kol.)</span>
+    </div>
+    <ol>
+      <li>nemati uspeha, biti odbijen</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abblocken  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abblocken',
+  'abblocken t.gl. (hat) blokirati, sprečiti; (sport) blokirati, odbraniti',
+  $$
+  <div class="entry">
+    <h2>abblocken</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>blokirati, sprečiti</li>
+      <li>
+        <span class="abbr" title="sport, Sport">(sport)</span>
+        blokirati, odbraniti
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbraten  (nepravilni prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbraten',
+  'abbraten nepr.t.gl. (hat) zapeći, ispeći',
+  $$
+  <div class="entry">
+    <h2>abbraten</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni prelazni glagol, unregelmäßiges transitives Verb">nepr.t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>zapeći, ispeći</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbrausen  (prelazni, neprelazni i povratni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbrausen',
+  'abbrausen t.gl. (hat) 1 istuširati; (ist) i.gl. 2 (kol.) zbrisati, pobeći (uz buku) 3 r.gl. (hat) sich abbrausen istuširati se',
+  $$
+  <div class="entry">
+    <h2>abbrausen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat);
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (ist);
+      <span class="abbr" title="refleksivni glagol, reflexives Verb">r.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>istuširati</li>
+      <li>
+        <span class="abbr" title="kolokvijalno, umgangssprachlich">(kol.)</span>
+        zbrisati, pobeći (uz buku)
+      </li>
+      <li>
+        <span class="label">sich abbrausen</span> – istuširati se
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbrechen  (nepravilni + povratni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbrechen',
+  'abbrechen nepr.t.gl. (hat) 1 (od)lomiti 2 (fig.) raskinuti, prekinuti 3 sich (dat.) abbrechen otkinuti sebi/od sebe, odvajati od sebe; ich breche mir vieles am Munde ab mnogo toga odvajam sebi od usta 4 r.gl. sich abbrechen odlomiti/otkinuti se',
+  $$
+  <div class="entry">
+    <h2>abbrechen</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni prelazni glagol, unregelmäßiges transitives Verb">nepr.t.gl.</span> (hat);
+      <span class="abbr" title="refleksivni glagol, reflexives Verb">r.gl.</span>
+    </div>
+    <ol>
+      <li>(od)lomiti</li>
+      <li>
+        <span class="abbr" title="figurativno, figurativ">fig.</span>
+        raskinuti, prekinuti
+      </li>
+      <li>
+        <span class="label">sich (dat.) abbrechen</span> – otkinuti sebi/od sebe, odvajati od sebe
+        <span class="example">
+          <strong>ich breche mir vieles am Munde ab</strong> – mnogo toga odvajam sebi od usta
+        </span>
+      </li>
+      <li>
+        <span class="label">sich abbrechen</span> – odlomiti/otkinuti se
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abrechnung  (imenica, die Abrechnung, die Abrechnungen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abrechnung',
+  'Abrechnung (die] |,-en| (ekon.) obračun; virman',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abrechnung"
+            data-plural="Abrechnungen"
+            data-plural-suffix="-en">
+        Abrechnung
+      </span>
+    </h2>
+    <div class="meta">
+      (die) |-en|
+      <span class="abbr" title="privreda, Wirtschaft">(ekon.)</span>
+    </div>
+    <ol>
+      <li>obračun</li>
+      <li>virman</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbremsen  (prelazni i neprelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbremsen',
+  'abbremsen t./i.gl. (hat) zakočiti (da stane); er hat das Auto abgebremst zakočio je auto',
+  $$
+  <div class="entry">
+    <h2>abbremsen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> /
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>
+        zakočiti (da stane)
+        <span class="example">
+          <strong>er hat das Auto abgebremst</strong> – zakočio je auto
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbrennen  (nepravilni glagol – prelazni i neprelazni)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbrennen',
+  'abbrennen nepr.t.gl. (hat) 1 spaliti, sagoreti; i.gl. (ist) 2 izgoreti u požaru',
+  $$
+  <div class="entry">
+    <h2>abbrennen</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni prelazni glagol, unregelmäßiges transitives Verb">nepr.t.gl.</span> (hat);
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (ist)
+    </div>
+    <ol>
+      <li>spaliti, sagoreti</li>
+      <li>izgoreti u požaru</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbringen  (nepravilni prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbringen',
+  'abbringen nepr.t.gl. (hat) 1 skinuti, odneti 2 odvratiti, odučiti, sprečiti; sie brachte ihn davon ab, vom Dach zu springen odvratila ga je da skoči s krova',
+  $$
+  <div class="entry">
+    <h2>abbringen</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni prelazni glagol, unregelmäßiges transitives Verb">nepr.t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>skinuti, odneti</li>
+      <li>
+        odvratiti, odučiti, sprečiti
+        <span class="example">
+          <strong>sie brachte ihn davon ab, vom Dach zu springen</strong> – odvratila ga je da skoči s krova
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbröckeln  (neprelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbröckeln',
+  'abbröckeln i.gl. (ist) 1 kruniti se, mrviti se, odvajati se (u ljuskama) 2 (ekon.) gubiti na vrednosti',
+  $$
+  <div class="entry">
+    <h2>abbröckeln</h2>
+    <div class="meta">
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (ist)
+    </div>
+    <ol>
+      <li>kruniti se, mrviti se, odvajati se (u ljuskama)</li>
+      <li>
+        <span class="abbr" title="privreda, Wirtschaft">(ekon.)</span>
+        gubiti na vrednosti
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abbruch  (imenica, der Abbruch, die Abbrüche)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abbruch',
+  'Abbruch (der) |-(e)s-ü-e| 1 odron, odronjavanje 2 rušenje; das alte Gebäude ist zum Abbruch bereit stara zgrada je spremna za rušenje 3 šteta, uštrb; das hat unserer alten Freundschaft Abbruch getan to je išlo na uštrb našeg starog prijateljstva 4 prekid (sl./fig.); ohne Abbruch bez prekida; der Abbruch der (diplomatischen) Beziehungen prekid (diplomatskih) odnosa',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="der"
+            data-base="Abbruch"
+            data-plural="Abbrüche"
+            data-plural-suffix="-e">
+        Abbruch
+      </span>
+    </h2>
+    <div class="meta">(der) |-(e)s,-ü-e|</div>
+    <ol>
+      <li>odron, odronjavanje</li>
+      <li>
+        rušenje
+        <span class="example">
+          <strong>das alte Gebäude ist zum Abbruch bereit</strong> – stara zgrada je spremna za rušenje
+        </span>
+      </li>
+      <li>
+        šteta, uštrb
+        <span class="example">
+          <strong>das hat unserer alten Freundschaft Abbruch getan</strong> – to je išlo na uštrb našeg starog prijateljstva
+        </span>
+      </li>
+      <li>
+        prekid (sl./fig.)
+        <span class="example">
+          <strong>ohne Abbruch</strong> – bez prekida;
+          <strong>der Abbruch der (diplomatischen) Beziehungen</strong> – prekid (diplomatskih) odnosa
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abbruch-  (prefiks)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abbruch-',
+  'Abbruch-pref. [die] Abbruchgenehmigung odobrenje za rušenje; (das) Abbruchunternehmen preduzeće za rušenje (starih objekata)',
+  $$
+  <div class="entry">
+    <h2>Abbruch-</h2>
+    <div class="meta">pref.</div>
+    <ol>
+      <li>
+        <strong>Abbruchgenehmigung</strong> – odobrenje za rušenje
+      </li>
+      <li>
+        <strong>Abbruchunternehmen</strong> – preduzeće za rušenje (starih objekata)
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbruchreif  (pridev)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbruchreif',
+  'abbruchreif adj. zreo za rušenje',
+  $$
+  <div class="entry">
+    <h2>abbruchreif</h2>
+    <div class="meta">
+      <span class="abbr" title="pridev, Adjektiv">adj.</span>
+    </div>
+    <ol>
+      <li>zreo za rušenje</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbrühen  (prelazni glagol, kulinarstvo)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbrühen',
+  'abbrühen t.gl. (hat) (kul.) preliti vrelom vodom, popariti',
+  $$
+  <div class="entry">
+    <h2>abbrühen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+      <span class="abbr" title="kulinarstvo, Kochkunst">(kul.)</span>
+    </div>
+    <ol>
+      <li>preliti vrelom vodom, popariti</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbrummen  (prelazni glagol, kolokvijalno)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbrummen',
+  'abbrummen t.gl. (hat) (kol.) odguliti/odsedeti u zatvoru; er muss noch drei Jahre abbrummen on mora da odguli još tri godine u zatvoru',
+  $$
+  <div class="entry">
+    <h2>abbrummen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+      <span class="abbr" title="kolokvijalno, umgangssprachlich">(kol.)</span>
+    </div>
+    <ol>
+      <li>
+        odguliti/odsedeti u zatvoru
+        <span class="example">
+          <strong>er muss noch drei Jahre abbrummen</strong> – on mora da odguli još tri godine u zatvoru
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbuchen  (prelazni glagol, bankarstvo)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbuchen',
+  'abbuchen t.gl. (hat) (bank.) skinuti sa računa',
+  $$
+  <div class="entry">
+    <h2>abbuchen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+      <span class="abbr" title="bankarstvo, Bankwesen">(bank.)</span>
+    </div>
+    <ol>
+      <li>skinuti sa računa</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbürsten  (prelazni i povratni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbürsten',
+  'abbürsten t.gl. (hat) 1 očetkati 2 r.gl. sich abbürsten očetkati se',
+  $$
+  <div class="entry">
+    <h2>abbürsten</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat);
+      <span class="abbr" title="refleksivni glagol, reflexives Verb">r.gl.</span>
+    </div>
+    <ol>
+      <li>očetkati</li>
+      <li>
+        <span class="label">sich abbürsten</span> – očetkati se
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abbüßen  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abbüßen',
+  'abbüßen t.gl. (hat) ispaštati, okajati',
+  $$
+  <div class="entry">
+    <h2>abbüßen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>ispaštati, okajati</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abc  (imenica, das Abc, samo sg.)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abc',
+  'Abc /abetse/ [das] |-s, samo sg.| abeceda',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="das"
+            data-base="Abc"
+            data-plural=""
+            data-plural-suffix="-">
+        Abc
+      </span>
+    </h2>
+    <div class="meta">/abetse/ (das) |-s, samo sg.|</div>
+    <ol>
+      <li>abeceda</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abchecken  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abchecken',
+  'abchecken /-tfekan/ t.gl. (hat) proveriti',
+  $$
+  <div class="entry">
+    <h2>abchecken</h2>
+    <div class="meta">
+      /-tfekan/
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>proveriti</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+
+
+
+
+--------------------------------------------------------------------
+-- ABC-Waffen  (imenica, samo množina)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'ABC-Waffen',
+  'ABC-Waffen (die) (samopl.) atomsko, biološko i hemijsko naoružanje',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="ABC-Waffen"
+            data-plural="ABC-Waffen"
+            data-plural-suffix="-">
+        ABC-Waffen
+      </span>
+    </h2>
+    <div class="meta">
+      (die)
+      <span class="abbr" title="samo množina, nur Plural">(samopl.)</span>
+    </div>
+    <ol>
+      <li>atomsko, biološko i hemijsko naoružanje</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abdachen  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abdachen',
+  'abdachen t.gl. (hat) skinuti krov',
+  $$
+  <div class="entry">
+    <h2>abdachen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>skinuti krov</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abdachung  (imenica, die Abdachung, die Abdachungen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abdachung',
+  'Abdachung (die] |,-en| skidanje krova',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abdachung"
+            data-plural="Abdachungen"
+            data-plural-suffix="-en">
+        Abdachung
+      </span>
+    </h2>
+    <div class="meta">(die) |-en|</div>
+    <ol>
+      <li>skidanje krova</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abdämmen  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abdämmen',
+  'abdämmen t.gl. (hat) 1 zajaziti, napraviti nasip 2 zaštititi bedemom',
+  $$
+  <div class="entry">
+    <h2>abdämmen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>zajaziti, napraviti nasip</li>
+      <li>zaštititi bedemom</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abdämmung  (imenica, die Abdämmung, die Abdämmungen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abdämmung',
+  'Abdämmung (die] |--en| nasip(anje)',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abdämmung"
+            data-plural="Abdämmungen"
+            data-plural-suffix="-en">
+        Abdämmung
+      </span>
+    </h2>
+    <div class="meta">(die) |-en|</div>
+    <ol>
+      <li>nasip(anje)</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abdampfen  (neprelazni glagol, više značenja)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abdampfen',
+  'abdampfen i.gl. (ist) 1 (kol.) otputovati 2 isparavati (se), ispariti (se) 3 (fig.) otperjati/odmagliti (vozilom)',
+  $$
+  <div class="entry">
+    <h2>abdampfen</h2>
+    <div class="meta">
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (ist)
+    </div>
+    <ol>
+      <li>
+        <span class="abbr" title="kolokvijalno, umgangssprachlich">(kol.)</span>
+        otputovati
+      </li>
+      <li>isparavati (se), ispariti (se)</li>
+      <li>
+        <span class="abbr" title="figurativno, figurativ">fig.</span>
+        otperjati, odmagliti (vozilom)
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abdanken  (neprelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abdanken',
+  'abdanken i.gl. (hat) abdicirati',
+  $$
+  <div class="entry">
+    <h2>abdanken</h2>
+    <div class="meta">
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>abdicirati</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abdankung  (imenica, die Abdankung, die Abdankungen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abdankung',
+  'Abdankung (die],-en abdikacija',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abdankung"
+            data-plural="Abdankungen"
+            data-plural-suffix="-en">
+        Abdankung
+      </span>
+    </h2>
+    <div class="meta">(die) |-en|</div>
+    <ol>
+      <li>abdikacija</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abdankungs-  (prefiks)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abdankungs-',
+  'Abdankungs- pref. [der] Abdankungsakt akt o odricanju od prestola; [die] Abdankungsurkunde = Abdankungsakt',
+  $$
+  <div class="entry">
+    <h2>Abdankungs-</h2>
+    <div class="meta">pref.</div>
+    <ol>
+      <li>
+        <strong>Abdankungsakt</strong> – akt o odricanju od prestola
+      </li>
+      <li>
+        <strong>Abdankungsurkunde</strong> – = Abdankungsakt
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abdecken  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abdecken',
+  'abdecken t.gl. (hat) 1 otkriti, skinuti sa; hast du den Tisch abgedeckt? jesi li odneo sve sa stola? 2 poskidati, otkriti; das Gewitter hat viele Häuser abgedeckt oluja je skinula krovove sa mnogih kuća',
+  $$
+  <div class="entry">
+    <h2>abdecken</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>
+        otkriti, skinuti sa
+        <span class="example">
+          <strong>hast du den Tisch abgedeckt?</strong> – jesi li odneo sve sa stola?
+        </span>
+      </li>
+      <li>
+        poskidati, otkriti
+        <span class="example">
+          <strong>das Gewitter hat viele Häuser abgedeckt</strong> – oluja je skinula krovove sa mnogih kuća
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abdichten  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abdichten',
+  'abdichten t.gl. (hat) zadihtovati, zaptivati',
+  $$
+  <div class="entry">
+    <h2>abdichten</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>zadihtovati, zaptivati</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abdichtung  (imenica, die Abdichtung, die Abdichtungen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abdichtung',
+  'Abdichtung (die] |--en| dihtovanje, zaptivanje',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abdichtung"
+            data-plural="Abdichtungen"
+            data-plural-suffix="-en">
+        Abdichtung
+      </span>
+    </h2>
+    <div class="meta">(die) |-en|</div>
+    <ol>
+      <li>dihtovanje, zaptivanje</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abdizieren  (neprelazni glagol, = abdanken)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abdizieren',
+  'abdizieren i.gl. (hat) = abdanken',
+  $$
+  <div class="entry">
+    <h2>abdizieren</h2>
+    <div class="meta">
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>= <strong>abdanken</strong></li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abdomen  (imenica, das Abdomen, die Abdomina)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abdomen',
+  'Abdomen (das] |-s,-/ -domina) (anat.) abdomen',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="das"
+            data-base="Abdomen"
+            data-plural="Abdomina"
+            data-plural-suffix="-a">
+        Abdomen
+      </span>
+    </h2>
+    <div class="meta">
+      (das) |-s,-/–domina|
+      <span class="abbr" title="anatomija, Anatomie">(anat.)</span>
+    </div>
+    <ol>
+      <li>abdomen</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abdrehen  (prelazni glagol + promena kursa)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abdrehen',
+  'abdrehen t.gl. (hat) 1 prekinuti dovod, zavrnuti, isključiti; den Hahn abdrehen zavrnuti slavinu 2 odvrnuti 3 okrenuti 4 uvrtati; (ist/hat) 5 (av, pom.) promeniti kurs; das Flugzeug hat/ist abgedreht avion je promenio kurs',
+  $$
+  <div class="entry">
+    <h2>abdrehen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>
+        prekinuti dovod, zavrnuti, isključiti
+        <span class="example">
+          <strong>den Hahn abdrehen</strong> – zavrnuti slavinu
+        </span>
+      </li>
+      <li>odvrnuti</li>
+      <li>okrenuti</li>
+      <li>uvrtati</li>
+      <li>
+        <span class="abbr" title="vazduhoplovstvo / pomorstvo, Luft-/Seefahrt">(av, pom.)</span>
+        promeniti kurs
+        <span class="example">
+          <strong>das Flugzeug hat/ist abgedreht</strong> – avion je promenio kurs
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abdreschen  (nepravilni prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abdreschen',
+  'abdre­schen nepr.t.gl. (hat) 1 (polj.) ovrsiti, omlatiti 2 (kol.) izlemati, izdevetati',
+  $$
+  <div class="entry">
+    <h2>abdre­schen</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni prelazni glagol, unregelmäßiges transitives Verb">nepr.t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>
+        <span class="abbr" title="poljoprivreda, Landwirtschaft">(polj.)</span>
+        ovršiti, omlatiti
+      </li>
+      <li>
+        <span class="abbr" title="kolokvijalno, umgangssprachlich">(kol.)</span>
+        izlemati, izdevetati
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abdruck  (imenica, der Abdruck, die Abdrücke)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abdruck',
+  'Abdruck (der] -,-ü-e| 1 a) (gotov) otisak; b) štampanje 2 reprint 3 izlivak, odlivak; der Abdruck in Gips/Wachs odlivak u gipsu/vosku',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="der"
+            data-base="Abdruck"
+            data-plural="Abdrücke"
+            data-plural-suffix="-e">
+        Abdruck
+      </span>
+    </h2>
+    <div class="meta">(der) -,-ü-e</div>
+    <ol>
+      <li>
+        a) (gotov) otisak<br/>
+        b) štampanje
+      </li>
+      <li>reprint</li>
+      <li>
+        izlivak, odlivak
+        <span class="example">
+          <strong>der Abdruck in Gips/Wachs</strong> – odlivak u gipsu/vosku
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abdrucken  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abdrücken',
+  'abdrucken t.gl. (hat) (od)štampati',
+  $$
+  <div class="entry">
+    <h2>abdrucken</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>(od)štampati</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abdrücken  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abdrücken',
+  'abdrücken t.gl. (hat) 1 pritisnuti, pritiskivati 2 otisnuti, otiskivati, napraviti otisak',
+  $$
+  <div class="entry">
+    <h2>abdrücken</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>pritisnuti, pritiskivati</li>
+      <li>otisnuti, otiskivati, napraviti otisak</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abdunkeln  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abdunkeln',
+  'abdunkeln t.gl. (hat) zatamniti, potamniti',
+  $$
+  <div class="entry">
+    <h2>abdunkeln</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>zatamniti, potamniti</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abduschen  (prelazni i povratni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abduschen',
+  'abduschen t.gl. (hat) 1 istuširati 2 r.gl. sich abduschen istuširati se',
+  $$
+  <div class="entry">
+    <h2>abduschen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat);
+      <span class="abbr" title="refleksivni glagol, reflexives Verb">r.gl.</span>
+    </div>
+    <ol>
+      <li>istuširati</li>
+      <li>
+        <span class="label">sich abduschen</span> – istuširati se
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abebben  (neprelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abebben',
+  'abebben i.gl. (ist) opadati, povlačiti se (voda i sl.)',
+  $$
+  <div class="entry">
+    <h2>abebben</h2>
+    <div class="meta">
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (ist)
+    </div>
+    <ol>
+      <li>opadati, povlačiti se (voda i sl.)</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- -abel  (sufiks)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  '-abel',
+  '-abel suf. akzeptabel prihvatljiv; transportabel prenosiv; reparabel koji može da se popravi',
+  $$
+  <div class="entry">
+    <h2>-abel</h2>
+    <div class="meta">
+      <span class="abbr" title="sufiks, Suffix">suf.</span>
+    </div>
+    <p>Sufiks u rečima kao:</p>
+    <ul>
+      <li><strong>akzeptabel</strong> – prihvatljiv</li>
+      <li><strong>transportabel</strong> – prenosiv</li>
+      <li><strong>reparabel</strong> – koji može da se popravi</li>
+    </ul>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abend  (imenica, der Abend, die Abende)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abend',
+  'Abend (der] |-s,-e| veče; guten Abend! dobro veče!; zu Abend essen večerati',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="der"
+            data-base="Abend"
+            data-plural="Abende"
+            data-plural-suffix="-e">
+        Abend
+      </span>
+    </h2>
+    <div class="meta">(der) |-s,-e|</div>
+    <ol>
+      <li>veče</li>
+      <li>
+        <span class="example">
+          <strong>guten Abend!</strong> – dobro veče!
+        </span>
+      </li>
+      <li>
+        <span class="example">
+          <strong>zu Abend essen</strong> – večerati
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abend-  (prefiks)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abend-',
+  'Abend- pref. večernji -, - za veče',
+  $$
+  <div class="entry">
+    <h2>Abend-</h2>
+    <div class="meta">pref.</div>
+    <ol>
+      <li>veče, večernji-, - za veče (u složenicama)</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abendanzug  (imenica, der Abendanzug, die Abendanzüge)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abendanzug',
+  'Abendanzug (der] |-s,-ü-e| večernje odelo',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="der"
+            data-base="Abendanzug"
+            data-plural="Abendanzüge"
+            data-plural-suffix="-e">
+        Abendanzug
+      </span>
+    </h2>
+    <div class="meta">(der) |-s,-ü-e|</div>
+    <ol>
+      <li>večernje odelo</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abendblatt  (imenica, das Abendblatt, die Abendblätter)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abendblatt',
+  'Abendblatt (das] |-es,-äer| večernji list / večernje novine',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="das"
+            data-base="Abendblatt"
+            data-plural="Abendblätter"
+            data-plural-suffix="-er">
+        Abendblatt
+      </span>
+    </h2>
+    <div class="meta">(das) |-es,-äer|</div>
+    <ol>
+      <li>večernji list, večernje novine</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abendbrot  (imenica, das Abendbrot, die Abendbrote)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abendbrot',
+  'Abendbrot (das] |-(e)s,-e| večera',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="das"
+            data-base="Abendbrot"
+            data-plural="Abendbrote"
+            data-plural-suffix="-e">
+        Abendbrot
+      </span>
+    </h2>
+    <div class="meta">(das) |-(e)s,-e|</div>
+    <ol>
+      <li>večera</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abendessen  (imenica, das Abendessen, die Abendessen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abendessen',
+  'Abendessen (das] |-s,-| = Abendbrot',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="das"
+            data-base="Abendessen"
+            data-plural="Abendessen"
+            data-plural-suffix="-">
+        Abendessen
+      </span>
+    </h2>
+    <div class="meta">(das) |-s,-|</div>
+    <ol>
+      <li>= <strong>Abendbrot</strong> – večera</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abendkleid  (imenica, das Abendkleid, die Abendkleider)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abendkleid',
+  'Abendkleid (das] |-es,-er| večernja haljina',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="das"
+            data-base="Abendkleid"
+            data-plural="Abendkleider"
+            data-plural-suffix="-er">
+        Abendkleid
+      </span>
+    </h2>
+    <div class="meta">(das) |-es,-er|</div>
+    <ol>
+      <li>večernja haljina</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abendkursus  (imenica, der Abendkursus, die Abendkurse)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abendkursus',
+  'Abendkursus (der] |-kurses,-kurse| večernji tečaj',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="der"
+            data-base="Abendkursus"
+            data-plural="Abendkurse"
+            data-plural-suffix="-e">
+        Abendkursus
+      </span>
+    </h2>
+    <div class="meta">(der) |-kurses,-kurse|</div>
+    <ol>
+      <li>večernji tečaj</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abendmesse  (imenica, die Abendmesse, die Abendmessen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abendmesse',
+  'Abendmesse (die] |,-n| večernja misa',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abendmesse"
+            data-plural="Abendmessen"
+            data-plural-suffix="-n">
+        Abendmesse
+      </span>
+    </h2>
+    <div class="meta">(die) |-n|</div>
+    <ol>
+      <li>večernja misa</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abendnachrichten  (imenica, samo množina)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abendnachrichten',
+  'Abendnachrichten (die] (pl.) večernje vesti',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abendnachrichten"
+            data-plural="Abendnachrichten"
+            data-plural-suffix="-">
+        Abendnachrichten
+      </span>
+    </h2>
+    <div class="meta">
+      (die) (pl.)
+    </div>
+    <ol>
+      <li>večernje vesti</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+
+
+
+
+
+--------------------------------------------------------------------
+-- abfangen  (nepravilni prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abfangen',
+  'abfangen nepr.t.gl. (hat) 1 uhvatiti; sprečiti (pred ciljem) 2 ponovo staviti pod kontrolu; das Flugzeug wurde wieder abgefangen avion je opet stavljen pod kontrolu 3 (sport) preteći; parirati 4 (teh.) amortizovati',
+  $$
+  <div class="entry">
+    <h2>abfangen</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni prelazni glagol, unregelmäßiges transitives Verb">nepr.t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>uhvatiti; sprečiti (pred ciljem)</li>
+      <li>
+        ponovo staviti pod kontrolu
+        <span class="example">
+          <strong>das Flugzeug wurde wieder abgefangen</strong> – avion je opet stavljen pod kontrolu
+        </span>
+      </li>
+      <li>
+        <span class="abbr" title="sport, Sport">(sport)</span>
+        preteći; parirati
+      </li>
+      <li>
+        <span class="abbr" title="tehnika, Technik">(teh.)</span>
+        amortizovati
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abfangjäger  (imenica, der Abfangjäger, die Abfangjäger)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abfangjäger',
+  'Abfangjäger (der] |-s,-| (av.) lovac-presretač',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="der"
+            data-base="Abfangjäger"
+            data-plural="Abfangjäger"
+            data-plural-suffix="-">
+        Abfangjäger
+      </span>
+    </h2>
+    <div class="meta">
+      (der) |-s,-|
+      <span class="abbr" title="vazduhoplovstvo, Luftfahrt">(av.)</span>
+    </div>
+    <ol>
+      <li>lovac-presretač</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abfärben  (neprelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abfärben',
+  'abfärben i.gl. (hat) (is)pustati boju',
+  $$
+  <div class="entry">
+    <h2>abfärben</h2>
+    <div class="meta">
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>(is)pustati boju</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abfassen  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abfassen',
+  'abfassen t.gl. (hat) sastaviti, pismeno formulisati; e-n Artikel/Brief abfassen napisati članak/pismo',
+  $$
+  <div class="entry">
+    <h2>abfassen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>
+        sastaviti, pismeno formulisati
+        <span class="example">
+          <strong>e-n Artikel/Brief abfassen</strong> – napisati članak/pismo
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abfaulen  (neprelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abfaulen',
+  'abfaulen i.gl. (ist) istruliti, istrunuti',
+  $$
+  <div class="entry">
+    <h2>abfaulen</h2>
+    <div class="meta">
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (ist)
+    </div>
+    <ol>
+      <li>istruliti, istrunuti</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abfeilen  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abfeilen',
+  'abfeilen t.gl. (hat) isturpijati; stanjiti turpijanjem',
+  $$
+  <div class="entry">
+    <h2>abfeilen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>isturpijati; stanjiti turpijanjem</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abfertigen  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abfertigen',
+  'abfertigen t.gl. (hat) 1 obaviti, završiti 2 otpremiti 3 odbiti',
+  $$
+  <div class="entry">
+    <h2>abfertigen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>obaviti, završiti</li>
+      <li>otpremiti</li>
+      <li>odbiti</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abfertigung  (imenica, die Abfertigung, die Abfertigungen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abfertigung',
+  'Abfertigung (die] |-en| 1 otprema(nje) 2 otpremnina (novac) 3 (ekon.) (o)carinjenje',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abfertigung"
+            data-plural="Abfertigungen"
+            data-plural-suffix="-en">
+        Abfertigung
+      </span>
+    </h2>
+    <div class="meta">(die) |-en|</div>
+    <ol>
+      <li>otprema(nje)</li>
+      <li>otpremnina (novac)</li>
+      <li>
+        <span class="abbr" title="privreda, Wirtschaft">(ekon.)</span>
+        (o)carinjenje
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abfertigungs-  (prefiks)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abfertigungs-',
+  'Abfertigungs- pref. [der] Abfertigungsantrag zahtev za carinjenje; (die) Abfertigungsdeklaration carinska deklaracija; (die) Abfertigungsfrist rok otpremanja; (der) Abfertigungsschein potvrda o carinjenju; (die) Abfertigungsstelle otpremna služba isl.',
+  $$
+  <div class="entry">
+    <h2>Abfertigungs-</h2>
+    <div class="meta">pref.</div>
+    <ol>
+      <li>
+        <strong>Abfertigungsantrag</strong> – zahtev za carinjenje
+      </li>
+      <li>
+        <strong>Abfertigungsdeklaration</strong> – carinska deklaracija
+      </li>
+      <li>
+        <strong>Abfertigungsfrist</strong> – rok otpremanja
+      </li>
+      <li>
+        <strong>Abfertigungsschein</strong> – potvrda o carinjenju
+      </li>
+      <li>
+        <strong>Abfertigungsstelle</strong> – otpremna služba
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abfeuern  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abfeuern',
+  'abfeuern t.gl. (hat) opaliti (iz puške); ispaliti (raketu)',
+  $$
+  <div class="entry">
+    <h2>abfeuern</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>opaliti (iz puške); ispaliti (raketu)</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abfinden  (nepravilni + refleksivni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abfinden',
+  'abfinden nepr.t.gl. (hat) 1 namiriti, obeštetiti; zadovoljiti 2 (ekon.) obeštetiti; 3 r.gl. sich abfinden pomiriti se (s nečim), prihvatiti',
+  $$
+  <div class="entry">
+    <h2>abfinden</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni prelazni glagol, unregelmäßiges transitives Verb">nepr.t.gl.</span> (hat);
+      <span class="abbr" title="refleksivni glagol, reflexives Verb">r.gl.</span>
+    </div>
+    <ol>
+      <li>namiriti, obeštetiti; zadovoljiti</li>
+      <li>
+        <span class="abbr" title="privreda, Wirtschaft">(ekon.)</span>
+        obeštetiti
+      </li>
+      <li>
+        <span class="label">sich abfinden</span> – pomiriti se (s nečim), prihvatiti
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abfindung  (imenica, die Abfindung, die Abfindungen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abfindung',
+  'Abfindung (die] |,-en| 1 otpremnina 2 (ekon.) odšteta; poravnanje, nagodba',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abfindung"
+            data-plural="Abfindungen"
+            data-plural-suffix="-en">
+        Abfindung
+      </span>
+    </h2>
+    <div class="meta">(die) |-en|</div>
+    <ol>
+      <li>otpremnina</li>
+      <li>
+        <span class="abbr" title="privreda, Wirtschaft">(ekon.)</span>
+        odšteta; poravnanje, nagodba
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abflachen  (prelazni + neprelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abflachen',
+  'abflachen t.gl. (hat) 1 zaravnati; spljoštiti; i.gl. (ist) 2 izravnati/poravnati se; das Ufer flachte ab obala se poravnala 3 splasnuti; popustiti (u kvalitetu)',
+  $$
+  <div class="entry">
+    <h2>abflachen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat);
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (ist)
+    </div>
+    <ol>
+      <li>zaravnati; spljoštiti</li>
+      <li>
+        izravnati/poravnati se
+        <span class="example">
+          <strong>das Ufer flachte ab</strong> – obala se poravnala
+        </span>
+      </li>
+      <li>splasnuti; popustiti (u kvalitetu)</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abflachung  (imenica, die Abflachung, die Abflachungen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abflachung',
+  'Abflachung (die] |--en| ravnanje, zaravnavanje',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abflachung"
+            data-plural="Abflachungen"
+            data-plural-suffix="-en">
+        Abflachung
+      </span>
+    </h2>
+    <div class="meta">(die) |-en|</div>
+    <ol>
+      <li>ravnanje, zaravnavanje</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abfliegen  (nepravilni neprelazni + prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abfliegen',
+  'abfliegen nepr.i.gl. (ist) 1 odleteti, poleteti; die Maschine ist pünktlich abgeflogen avion je poleteo na vreme; t.gl. (hat) 2 obletati, obleteti; der Pilot hat zweimal den Wald abgeflogen pilot je dvaput obleteo šumu',
+  $$
+  <div class="entry">
+    <h2>abfliegen</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni neprelazni glagol, unregelmäßiges intransitives Verb">nepr.i.gl.</span> (ist);
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>
+        odleteti, poleteti
+        <span class="example">
+          <strong>die Maschine ist pünktlich abgeflogen</strong> – avion je poleteo na vreme
+        </span>
+      </li>
+      <li>
+        obletati, obleteti
+        <span class="example">
+          <strong>der Pilot hat zweimal den Wald abgeflogen</strong> – pilot je dvaput obleteo šumu
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abfließen  (nepravilni neprelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abfließen',
+  'abfließen nepr.i.gl. (ist) 1 isticati, oticati (tečnost), slivati se 2 (ekon.) odlivati se',
+  $$
+  <div class="entry">
+    <h2>abfließen</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni neprelazni glagol, unregelmäßiges intransitives Verb">nepr.i.gl.</span> (ist)
+    </div>
+    <ol>
+      <li>isticati, oticati (tečnost), slivati se</li>
+      <li>
+        <span class="abbr" title="privreda, Wirtschaft">(ekon.)</span>
+        odlivati se
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abflug  (imenica, der Abflug, die Abflüge)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abflug',
+  'Abflug (der] |-s,-ü-e| poletanje',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="der"
+            data-base="Abflug"
+            data-plural="Abflüge"
+            data-plural-suffix="-e">
+        Abflug
+      </span>
+    </h2>
+    <div class="meta">(der) |-s,-ü-e|</div>
+    <ol>
+      <li>poletanje</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abflugs-  (prefiks)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abflugs-',
+  'Abflugs- pref. (der) Abflugsort mesto poletanja; (die) Abflugszeit vreme poletanja isl.',
+  $$
+  <div class="entry">
+    <h2>Abflugs-</h2>
+    <div class="meta">pref.</div>
+    <ol>
+      <li>
+        <strong>Abflugsort</strong> – mesto poletanja
+      </li>
+      <li>
+        <strong>Abflugszeit</strong> – vreme poletanja
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abfluss  (imenica, der Abfluss, die Abflüsse)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abfluss',
+  'Abfluss (der] |-es,-ü-e| 1 oticanje; odlivanje 2 odvod 3 (ekon.) odliv',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="der"
+            data-base="Abfluss"
+            data-plural="Abflüsse"
+            data-plural-suffix="-e">
+        Abfluss
+      </span>
+    </h2>
+    <div class="meta">(der) |-es,-ü-e|</div>
+    <ol>
+      <li>oticanje; odlivanje</li>
+      <li>odvod</li>
+      <li>
+        <span class="abbr" title="privreda, Wirtschaft">(ekon.)</span>
+        odliv
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abfluss-  (prefiks)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abfluss-',
+  'Abfluss- pref. (der) Abflussgraben slivni jarak; (die) Abflussrinne slivni oluk; (das) Abflussrohr odlivna cev isl.',
+  $$
+  <div class="entry">
+    <h2>Abfluss-</h2>
+    <div class="meta">pref.</div>
+    <ol>
+      <li>
+        <strong>Abflussgraben</strong> – slivni jarak
+      </li>
+      <li>
+        <strong>Abflussrinne</strong> – slivni oluk
+      </li>
+      <li>
+        <strong>Abflussrohr</strong> – odlivna cev
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abfolge  (imenica, die Abfolge, die Abfolgen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abfolge',
+  'Abfolge (die] |--n| redosled; in logischer Abfolge po logičnom redosledu',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abfolge"
+            data-plural="Abfolgen"
+            data-plural-suffix="-n">
+        Abfolge
+      </span>
+    </h2>
+    <div class="meta">(die) |-n|</div>
+    <ol>
+      <li>
+        redosled
+        <span class="example">
+          <strong>in logischer Abfolge</strong> – po logičnom redosledu
+        </span>
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abfordern  (prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abfordern',
+  'abfordern t.gl. (hat) zahtevati, iziskivati',
+  $$
+  <div class="entry">
+    <h2>abfordern</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>zahtevati, iziskivati</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- Abfrage  (imenica, die Abfrage, die Abfragen)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'Abfrage',
+  'Abfrage (die] |--en| ispitivanje',
+  $$
+  <div class="entry">
+    <h2>
+      <span class="noun-headword"
+            data-gender="die"
+            data-base="Abfrage"
+            data-plural="Abfragen"
+            data-plural-suffix="-n">
+        Abfrage
+      </span>
+    </h2>
+    <div class="meta">(die) |-en|</div>
+    <ol>
+      <li>ispitivanje</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abfragen  (prelazni + neprelazni glagol, kompj.)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abfragen',
+  'abfragen t./i.gl. (hat) 1 ispitati 2 (kompj.) tražiti odgovor na upit; pretražiti',
+  $$
+  <div class="entry">
+    <h2>abfragen</h2>
+    <div class="meta">
+      <span class="abbr" title="prelazni glagol, transitives Verb">t.gl.</span> /
+      <span class="abbr" title="neprelazni glagol, intransitives Verb">i.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>ispitati</li>
+      <li>
+        <span class="abbr" title="računarstvo, Informatik">(kompj.)</span>
+        tražiti odgovor na upit; pretražiti
+      </li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+--------------------------------------------------------------------
+-- abfressen  (nepravilni prelazni glagol)
+--------------------------------------------------------------------
+INSERT INTO entries (direction, headword, plain_text, content_html, image_url)
+VALUES (
+  'DE_SR',
+  'abfressen',
+  'abfressen nepr.t.gl. (hat) odgrizati, odgristi',
+  $$
+  <div class="entry">
+    <h2>abfressen</h2>
+    <div class="meta">
+      <span class="abbr" title="nepravilni prelazni glagol, unregelmäßiges transitives Verb">nepr.t.gl.</span> (hat)
+    </div>
+    <ol>
+      <li>odgrizati, odgristi</li>
+    </ol>
+  </div>
+  $$,
+  NULL
+);
+
+
+
+
+
+

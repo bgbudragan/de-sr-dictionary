@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gramatika</title>
+  <style>
+    :root{
+      --bg: #f6f8fc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #475569;
+      --muted2:#64748b;
+      --line:#e7edf6;
+      --shadow: 0 10px 30px rgba(15, 23, 42, .06);
+      --shadow2: 0 6px 18px rgba(15, 23, 42, .07);
+      --radius: 16px;
+
+      --primary:#2563eb;
+      --primary2:#1d4ed8;
+
+      --good:#16a34a;
+      --warn:#f59e0b;
+
+      --chip:#eef2ff;
+      --chipText:#3730a3;
+
+      --barBg:#eef2f7;
+      --barFill:#2563eb;
+
+      --focus: rgba(37, 99, 235, .18);
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 700px at 20% -10%, #eef2ff 0%, transparent 60%),
+                  radial-gradient(1000px 600px at 90% 0%, #e0f2fe 0%, transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 18px 50px;
+    }
+
+    .top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom: 14px;
+    }
+
+    h1{
+      margin:0;
+      font-size: 34px;
+      letter-spacing:-.5px;
+      line-height:1.1;
+    }
+
+    .sub{
+      margin-top:6px;
+      color:var(--muted);
+      font-size: 14px;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      padding-top: 4px;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 1px 0 rgba(15,23,42,.04);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:14px;
+      line-height:1;
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); border-color:#dbe5f5; }
+    .btn:active{ transform: translateY(0px); box-shadow: 0 2px 8px rgba(15,23,42,.08); }
+    .btn.primary{
+      background: linear-gradient(180deg, #2f6cff 0%, var(--primary) 100%);
+      border-color: rgba(37,99,235,.35);
+      color:#fff;
+    }
+    .btn.primary:hover{ border-color: rgba(37,99,235,.55); }
+
+    .panel{
+      background: rgba(255,255,255,.75);
+      border:1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 10px 28px rgba(15,23,42,.05);
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width: 220px;
+      flex: 1 1 280px;
+    }
+    .label{
+      font-size:12px;
+      color:var(--muted2);
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .input, .select{
+      width:100%;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.95);
+      outline:none;
+      font-size:14px;
+      transition: box-shadow .12s ease, border-color .12s ease;
+    }
+    .input:focus, .select:focus{
+      border-color: rgba(37,99,235,.45);
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+
+    .toggles{
+      display:flex;
+      gap:12px;
+      align-items:flex-end;
+      flex: 0 0 auto;
+    }
+    .toggle{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.95);
+      border-radius: 14px;
+      padding: 10px 12px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      user-select:none;
+      min-height: 44px;
+    }
+    .toggle input{ width:18px; height:18px; margin:0; }
+
+    .sortField{
+      min-width: 210px;
+      flex: 0 0 240px;
+    }
+
+    .grid{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .sortField{ flex: 1 1 240px; min-width: 220px; }
+    }
+    @media (max-width: 640px){
+      .top{ flex-direction:column; align-items:stretch; }
+      .actions{ justify-content:flex-start; }
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px 14px 12px;
+      box-shadow: 0 1px 0 rgba(15,23,42,.03);
+      transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+      min-height: 172px;
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+      border-color:#d9e5f7;
+    }
+
+    .cardTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 6px;
+    }
+    .cardTitle{
+      font-size: 16px;
+      font-weight: 800;
+      margin:0;
+      letter-spacing:-.2px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: var(--chip);
+      color: var(--chipText);
+      border: 1px solid rgba(55,48,163,.14);
+      white-space:nowrap;
+      flex: 0 0 auto;
+    }
+    .chip.gray{
+      background:#f1f5f9;
+      color:#334155;
+      border-color:#e2e8f0;
+    }
+
+    .desc{
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      min-height: 34px;
+    }
+
+    .meta{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      color: var(--muted2);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .meta .ok{ color: var(--good); font-weight:700; }
+    .meta .warn{ color: var(--warn); font-weight:700; }
+
+    .bar{
+      height: 10px;
+      background: var(--barBg);
+      border-radius: 999px;
+      overflow:hidden;
+      border:1px solid #edf2f7;
+    }
+    .bar > span{
+      display:block;
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--barFill) 0%, #22c55e 140%);
+      border-radius: 999px;
+    }
+
+    .cardBottom{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px dashed #eef2f7;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+    .open{
+      color: var(--primary);
+      font-weight: 800;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .open:hover{ color: var(--primary2); text-decoration: underline; }
+
+    .empty{
+      margin-top: 18px;
+      padding: 18px;
+      border:1px dashed #dbe5f7;
+      border-radius: 16px;
+      background: rgba(255,255,255,.65);
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>Gramatika</h1>
+        <div class="sub">Izaberi oblast → lekciju → vežbaj kroz igre. (Primer UI skeleta)</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="btnContinue">▶ Nastavi</button>
+        <button class="btn" id="btnRandom">🎲 Random practice</button>
+        <button class="btn" id="btnMixed">🧪 Mešoviti test</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="field">
+        <div class="label">Pretraga oblasti</div>
+        <input class="input" id="q" placeholder="npr. Verben, Negation, Präpositionen..." />
+      </div>
+
+      <div class="field" style="flex:0 0 220px; min-width:220px;">
+        <div class="label">Nivo</div>
+        <select class="select" id="level">
+          <option value="ALL">Svi nivoi</option>
+          <option value="A1">A1</option>
+          <option value="A2">A2</option>
+          <option value="B1">B1</option>
+          <option value="B2">B2</option>
+          <option value="C1">C1</option>
+          <option value="C2">C2</option>
+        </select>
+      </div>
+
+      <div class="field sortField">
+        <div class="label">Sort</div>
+        <select class="select" id="sort">
+          <option value="order">Preporučeni redosled</option>
+          <option value="weak">Najslabije prvo</option>
+          <option value="progress">Najmanji % prvo</option>
+          <option value="az">A–Z</option>
+        </select>
+      </div>
+
+      <div class="toggles">
+        <label class="toggle" title="Prikaži samo oblasti ispod praga (npr. < 30%)">
+          <input type="checkbox" id="onlyWeak" />
+          <span><b>Slabe oblasti</b></span>
+        </label>
+        <label class="toggle" title="Prikaži samo oblasti koje su označene kao spremne">
+          <input type="checkbox" id="onlyReady" />
+          <span><b>Samo spremno</b></span>
+        </label>
+      </div>
+    </div>
+
+    <div id="grid" class="grid" aria-live="polite"></div>
+    <div id="empty" class="empty" style="display:none;">Nema rezultata za trenutne filtere.</div>
+  </div>
+
+  <script>
+    // --- Dummy data (našim rečima, bez kopiranja iz knjige) ---
+    const TOPICS = [
+      { id:"nomen", title:"Nomen", level:"A1+", ready:true, lessons:4, games:10, progress:42,
+        desc:"Rod, množina, padeži i n-deklinacija (osnovni pregled).", order:1 },
+
+      { id:"artikelwoerter", title:"Artikelwörter", level:"A1+", ready:true, lessons:5, games:12, progress:28,
+        desc:"Oblici i upotreba članova, kein i prisvojni oblici.", order:2 },
+
+      { id:"pronomen", title:"Pronomen", level:"A1+", ready:true, lessons:4, games:8, progress:18,
+        desc:"Lične, prisvojne, neodređene i pokazne zamenice.", order:3 },
+
+      { id:"adjektive", title:"Adjektive", level:"A2+", ready:false, lessons:6, games:14, progress:7,
+        desc:"Deklinacija, poređenje, particip kao pridev, nominalizacija.", order:4 },
+
+      { id:"verben", title:"Verben", level:"A1+", ready:false, lessons:25, games:30, progress:12,
+        desc:"Vremena, modalni, pasiv, Konjunktiv II, imperativ, valencija.", order:5 },
+
+      { id:"praepositionen", title:"Präpositionen", level:"A1+", ready:true, lessons:4, games:9, progress:55,
+        desc:"Vreme, mesto, lokalne, modalne i kauzalne prepozicije.", order:6 },
+
+      { id:"adverbien_partikeln", title:"Adverbien & Partikeln", level:"A2+", ready:false, lessons:4, games:6, progress:0,
+        desc:"Temporalni/lokalni prilozi i osnovne partikle.", order:7 },
+
+      { id:"zahlwoerter", title:"Zahlwörter", level:"A1+", ready:true, lessons:1, games:3, progress:80,
+        desc:"Brojevi i tipične upotrebe u rečenici.", order:8 },
+
+      { id:"negation", title:"Negation", level:"A1+", ready:true, lessons:1, games:6, progress:33,
+        desc:"nicht vs kein, negacija u različitim tipovima rečenice.", order:9 },
+
+      { id:"saetze", title:"Sätze & Satzverbindungen", level:"A2+", ready:false, lessons:14, games:20, progress:5,
+        desc:"Red reči, pitanja, veznici i zavisne rečenice (uvod + praksa).", order:10 },
+
+      { id:"wortbildung", title:"Wortbildung", level:"B1+", ready:false, lessons:2, games:4, progress:0,
+        desc:"Osnovna tvorba imenica i prideva.", order:11 },
+    ];
+
+    // --- State / elements ---
+    const elGrid = document.getElementById("grid");
+    const elEmpty = document.getElementById("empty");
+    const elQ = document.getElementById("q");
+    const elLevel = document.getElementById("level");
+    const elOnlyWeak = document.getElementById("onlyWeak");
+    const elOnlyReady = document.getElementById("onlyReady");
+    const elSort = document.getElementById("sort");
+
+    const WEAK_THRESHOLD = 30;
+
+    function matchesLevel(topic, selected){
+      if(selected === "ALL") return true;
+      const t = topic.level.toUpperCase();
+      return t.startsWith(selected);
+    }
+
+    function normalize(s){ return (s || "").toLowerCase().trim(); }
+
+    function computeWeakFlag(progress){
+      return progress < WEAK_THRESHOLD;
+    }
+
+    function render(){
+      const q = normalize(elQ.value);
+      const level = elLevel.value;
+      const onlyWeak = elOnlyWeak.checked;
+      const onlyReady = elOnlyReady.checked;
+      const sort = elSort.value;
+
+      let items = TOPICS.slice();
+
+      // filter
+      items = items.filter(t => {
+        const hay = normalize(t.title + " " + t.desc);
+        if(q && !hay.includes(q)) return false;
+        if(!matchesLevel(t, level)) return false;
+        if(onlyReady && !t.ready) return false;
+        if(onlyWeak && !computeWeakFlag(t.progress)) return false;
+        return true;
+      });
+
+      // sort
+      if(sort === "az"){
+        items.sort((a,b) => a.title.localeCompare(b.title));
+      } else if(sort === "progress"){
+        items.sort((a,b) => a.progress - b.progress);
+      } else if(sort === "weak"){
+        items.sort((a,b) => (computeWeakFlag(b.progress) - computeWeakFlag(a.progress)) || (a.progress - b.progress));
+      } else {
+        items.sort((a,b) => a.order - b.order);
+      }
+
+      elGrid.innerHTML = "";
+      elEmpty.style.display = items.length ? "none" : "block";
+
+      for(const t of items){
+        const chipClass = t.ready ? "" : " gray";
+        const weak = computeWeakFlag(t.progress);
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.setAttribute("role","button");
+        card.setAttribute("tabindex","0");
+        card.dataset.topicId = t.id;
+
+        card.innerHTML = `
+          <div class="cardTop">
+            <h3 class="cardTitle">${escapeHtml(t.title)}</h3>
+            <span class="chip${chipClass}">${escapeHtml(t.level)} • ${t.ready ? "spremno" : "u pripremi"}</span>
+          </div>
+          <p class="desc">${escapeHtml(t.desc)}</p>
+          <div class="meta">
+            <span>📚 <b>${t.lessons}</b> lekcija</span>
+            <span>🎮 <b>${t.games}</b> igara</span>
+            <span class="${weak ? "warn" : "ok"}">✅ <b>${t.progress}%</b> urađeno</span>
+          </div>
+          <div class="bar" aria-label="progress">
+            <span style="width:${t.progress}%;"></span>
+          </div>
+          <div class="cardBottom">
+            <span>${weak ? "Preporuka: vežbaj ovu oblast" : "Klikni za oblast"}</span>
+            <a class="open" href="${topicHref(t.id)}" onclick="event.stopPropagation();">Otvori →</a>
+          </div>
+        `;
+
+        card.addEventListener("click", () => openTopic(t.id));
+        card.addEventListener("keydown", (e) => {
+          if(e.key === "Enter" || e.key === " "){
+            e.preventDefault();
+            openTopic(t.id);
+          }
+        });
+
+        elGrid.appendChild(card);
+      }
+    }
+
+    function topicHref(id){
+      // Kasnije pravimo topic.html; za sada navigira na placeholder.
+      return `topic.html?topic=${encodeURIComponent(id)}`;
+    }
+
+    function openTopic(id){
+      localStorage.setItem("grammar_last_topic", id);
+      window.location.href = topicHref(id);
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // --- Actions ---
+    document.getElementById("btnContinue").addEventListener("click", () => {
+      const last = localStorage.getItem("grammar_last_topic");
+      if(last){
+        openTopic(last);
+      } else {
+        openTopic("nomen");
+      }
+    });
+
+    document.getElementById("btnRandom").addEventListener("click", () => {
+      alert("Random practice (UI placeholder) — ovde ćemo kasnije ubaciti modal za izbor oblasti/nivoa/broj pitanja.");
+    });
+
+    document.getElementById("btnMixed").addEventListener("click", () => {
+      alert("Mešoviti test (UI placeholder) — kasnije: kombinacija više oblasti + scoring.");
+    });
+
+    // --- Wire up filters ---
+    ["input","change"].forEach(ev => {
+      elQ.addEventListener(ev, render);
+      elLevel.addEventListener(ev, render);
+      elOnlyWeak.addEventListener(ev, render);
+      elOnlyReady.addEventListener(ev, render);
+      elSort.addEventListener(ev, render);
+    });
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8">
+  <title>Moj rečnik</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    /* Page layout – white, clean, centered like Google */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+      color: #202124;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .page {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 12vh;
+      padding: 0 1rem 2rem;
+    }
+
+    /* Simple "logo" text instead of real logo */
+    .logo {
+      font-size: 2.8rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      margin-bottom: 1.5rem;
+      color: #202124;
+    }
+
+    /* Container around search box + suggestions */
+    .search-area {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    /* Search box like Google */
+    .search-box {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid #dfe1e5;
+      box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+      border-radius: 999px;
+      padding: 0.35rem 0.9rem;
+    }
+
+    .search-box input[type="text"] {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      padding: 0.45rem 0.4rem;
+      background: transparent;
+      color: #202124;
+    }
+
+    .search-box input::placeholder {
+      color: #9aa0a6;
+    }
+
+    .search-button {
+      border: none;
+      background: #4285f4;
+      color: #fff;
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .search-button:active {
+      background: #3367d6;
+    }
+
+    /* Suggestions list (like autocomplete dropdown) */
+    .suggestions {
+      margin-top: 0.5rem;
+      border-radius: 0 0 8px 8px;
+      border: 1px solid #dfe1e5;
+      border-top: none;
+      background: #fff;
+      overflow: hidden;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    .suggestion-item {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .suggestion-item:hover {
+      background: #f1f3f4;
+    }
+
+    .suggestion-headword {
+      font-weight: 500;
+    }
+
+    .suggestion-gloss {
+      font-size: 0.8rem;
+      color: #5f6368;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* Entry detail area */
+    .entry-detail {
+      margin-top: 2rem;
+      width: 100%;
+      max-width: 600px;
+      font-size: 0.95rem;
+      color: #202124;
+      border-top: 1px solid #dadce0;
+      padding-top: 1rem;
+    }
+
+    .entry-headword {
+      font-size: 1.3rem;
+      font-weight: 500;
+      margin-bottom: 0.3rem;
+    }
+
+    .entry-meta {
+      font-size: 0.8rem;
+      color: #5f6368;
+      margin-bottom: 0.6rem;
+    }
+
+    .no-results {
+      font-size: 0.9rem;
+      color: #5f6368;
+    }
+
+    .entry-detail p {
+      margin: 0.2rem 0;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="logo">Rečnik</div>
+
+    <div class="search-area">
+      <div class="search-box">
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Ukucaj reč na nemačkom..."
+          autocomplete="off"
+        >
+        <button class="search-button" id="searchButton">Traži</button>
+      </div>
+
+      <div id="suggestions" class="suggestions" style="display:none;"></div>
+    </div>
+
+    <div id="entryDetail" class="entry-detail">
+      <span class="no-results">
+        Ukucaj reč iznad – ispod će se pojaviti predlozi, a onda i značenje izabrane reči.
+      </span>
+    </div>
+  </div>
+
+  <script>
+    // Demo data – replace later with API calls to your DB.
+    const entries = [
+      {
+        headword: "Faschismus",
+        main_gloss: "fašizam",
+        plain_text: "fašizam; politička ideologija...",
+        pos: "noun",
+        gender: "der",
+        level: "B2",
+        content_html: "<p><b>Faschismus</b> (der) – fašizam; politička ideologija...</p>"
+      },
+      {
+        headword: "Faschist",
+        main_gloss: "fašista",
+        plain_text: "fašista (pristalica fašizma)...",
+        pos: "noun",
+        gender: "der",
+        level: "B2",
+        content_html: "<p><b>Faschist</b> (der) – fašista...</p>"
+      },
+      {
+        headword: "Faser",
+        main_gloss: "vlakno, nit",
+        plain_text: "vlakno, nit; mišićna vlakna...",
+        pos: "noun",
+        gender: "die",
+        level: "B2",
+        content_html: "<p><b>Faser</b> (die) – vlakno, nit...</p>"
+      },
+      {
+        headword: "fassbar",
+        main_gloss: "razumljiv",
+        plain_text: "razumljiv, shvatljiv, pojmljiv.",
+        pos: "adj",
+        gender: null,
+        level: "B2",
+        content_html: "<p><b>fassbar</b> – razumljiv, shvatljiv, pojmljiv.</p>"
+      },
+      {
+        headword: "fassen",
+        main_gloss: "uhvatiti; shvatiti",
+        plain_text: "uhvatiti; shvatiti nešto; formulisati, izraziti.",
+        pos: "verb",
+        gender: null,
+        level: "B2",
+        content_html: "<p><b>fassen</b> – uhvatiti; shvatiti; izraziti.</p>"
+      }
+    ];
+
+    const searchInput   = document.getElementById("searchInput");
+    const searchButton  = document.getElementById("searchButton");
+    const suggestionsEl = document.getElementById("suggestions");
+    const entryDetailEl = document.getElementById("entryDetail");
+
+    function renderEntry(entry) {
+      if (!entry) {
+        entryDetailEl.innerHTML = '<span class="no-results">Nema rezultata.</span>';
+        return;
+      }
+
+      const genderLabel = entry.gender ? ` (${entry.gender})` : "";
+      const metaParts = [];
+      if (entry.pos)   metaParts.push(entry.pos);
+      if (entry.level) metaParts.push(entry.level);
+
+      entryDetailEl.innerHTML = `
+        <div class="entry-headword">${entry.headword}${genderLabel}</div>
+        <div class="entry-meta">${metaParts.join(" · ")}</div>
+        <div>${entry.content_html}</div>
+      `;
+    }
+
+    function renderSuggestions(list) {
+      if (!list.length) {
+        suggestionsEl.style.display = "none";
+        suggestionsEl.innerHTML = "";
+        return;
+      }
+
+      const itemsHtml = list.map(e => `
+        <div class="suggestion-item" data-headword="${e.headword}">
+          <span class="suggestion-headword">${e.headword}</span>
+          <span class="suggestion-gloss">${e.main_gloss || ""}</span>
+        </div>
+      `).join("");
+
+      suggestionsEl.innerHTML = itemsHtml;
+      suggestionsEl.style.display = "block";
+    }
+
+    // Simple case-insensitive prefix search
+    function search(prefix) {
+      const p = prefix.trim().toLowerCase();
+      if (!p) {
+        renderSuggestions([]);
+        return;
+      }
+
+      const matches = entries
+        .filter(e => e.headword.toLowerCase().startsWith(p))
+        .sort((a, b) => a.headword.localeCompare(b.headword))
+        .slice(0, 30);
+
+      renderSuggestions(matches);
+    }
+
+    searchInput.addEventListener("input", (e) => {
+      search(e.target.value);
+    });
+
+    searchButton.addEventListener("click", () => {
+      search(searchInput.value);
+    });
+
+    // Enter key: if jedan rezultat, odmah otvori
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const items = suggestionsEl.querySelectorAll(".suggestion-item");
+        if (items.length === 1) {
+          const hw = items[0].dataset.headword;
+          const entry = entries.find(e => e.headword === hw);
+          renderEntry(entry);
+        }
+      }
+    });
+
+    // Klik na sugestiju
+    suggestionsEl.addEventListener("click", (e) => {
+      const item = e.target.closest(".suggestion-item");
+      if (!item) return;
+      const hw = item.dataset.headword;
+      const entry = entries.find(e => e.headword === hw);
+      renderEntry(entry);
+    });
+  </script>
+</body>
+</html>

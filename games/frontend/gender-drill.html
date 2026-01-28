@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gender Drill</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
+    .card { max-width: 900px; margin: 0 auto; border: 1px solid #ddd; border-radius: 12px; padding: 18px; }
+    h1 { font-size: 22px; margin: 0 0 12px; }
+    .muted { color: #666; font-size: 13px; }
+
+    table.sheet {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 12px;
+      table-layout: fixed;
+    }
+    table.sheet td {
+      width: 50%;
+      vertical-align: top;
+      padding: 0 14px;
+    }
+    table.sheet tr td:first-child { padding-left: 0; }
+    table.sheet tr td:last-child { padding-right: 0; }
+
+    /* KEY FIX: flexible columns so nothing overlaps in narrow 50% cells */
+    .item {
+      display: grid;
+      grid-template-columns:
+        24px
+        minmax(90px, 1fr)   /* dotted blank, flexible */
+        minmax(140px, 2fr)  /* word, flexible */
+        150px;              /* buttons, fixed */
+      align-items: center;
+      column-gap: 10px;
+      row-gap: 6px;
+      padding: 10px 0;
+      border-bottom: 1px dashed #eee;
+    }
+
+    .letter { font-weight: 700; }
+
+    .blank {
+      border-bottom: 2px dotted #888;
+      height: 18px;
+      align-self: center;
+    }
+
+    .word {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.2;
+
+      /* IMPORTANT: allow grid to shrink this column without overflowing */
+      min-width: 0;
+
+      /* show full word by wrapping (no overlap) */
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+
+    .btns {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-start;
+      align-items: center;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+
+    button { padding: 6px 9px; border: 1px solid #bbb; background: #fff; border-radius: 10px; cursor: pointer; }
+    button.active { border-color: #222; font-weight: 700; }
+    button.correct { border-color: #1a7f37; }
+    button.wrong { border-color: #b42318; }
+
+    .footer { display: flex; gap: 10px; margin-top: 14px; align-items: center; }
+    .score { font-weight: 700; }
+
+    /* Responsive: stack columns */
+    @media (max-width: 900px) {
+      table.sheet, tbody, tr, td { display: block; width: 100%; }
+      table.sheet td { padding: 0; }
+      table.sheet tr { display: block; }
+    }
+
+    /* Extra safety for very narrow screens */
+    @media (max-width: 520px) {
+      .item {
+        grid-template-columns: 24px 1fr;
+        grid-template-areas:
+          "letter blank"
+          "word word"
+          "btns btns";
+      }
+      .letter { grid-area: letter; }
+      .blank { grid-area: blank; }
+      .word  { grid-area: word; }
+      .btns  { grid-area: btns; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="title">der, das oder die? Ergänzen Sie.</h1>
+    <div class="muted">Klikni der/die/das za svaku reč, pa “Proveri”.</div>
+
+    <table class="sheet">
+      <tbody id="grid"></tbody>
+    </table>
+
+    <div class="footer">
+      <button id="newBtn">Novi test</button>
+      <button id="checkBtn">Proveri</button>
+      <div class="score" id="score"></div>
+    </div>
+  </div>
+
+<script>
+  let state = { items: [], picks: new Map() };
+
+  function el(tag, attrs = {}, children = []) {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === "class") e.className = v;
+      else if (k === "text") e.textContent = v;
+      else e.setAttribute(k, v);
+    }
+    for (const c of children) e.appendChild(c);
+    return e;
+  }
+
+  function buildItem(it) {
+    const makeBtn = (g) => {
+      const b = el("button", { "data-g": g, text: g });
+      b.onclick = () => {
+        state.picks.set(it.id, g);
+        [...btns.children].forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+      };
+      return b;
+    };
+
+    const btns = el("div", { class: "btns" }, [
+      makeBtn("der"), makeBtn("die"), makeBtn("das")
+    ]);
+
+    return el("div", { class: "item", "data-id": it.id }, [
+      el("div", { class: "letter", text: it.letter + ")" }),
+      el("div", { class: "blank" }),
+      el("div", { class: "word", text: it.headword }),
+      btns
+    ]);
+  }
+
+  function render(items) {
+    const tbody = document.getElementById("grid");
+    tbody.innerHTML = "";
+    state.picks = new Map();
+    document.getElementById("score").textContent = "";
+
+    const rows = Math.ceil(items.length / 2);
+
+    for (let r = 0; r < rows; r++) {
+      const left = items[r];
+      const right = items[r + rows];
+
+      const tr = document.createElement("tr");
+
+      const tdL = document.createElement("td");
+      tdL.appendChild(buildItem(left));
+      tr.appendChild(tdL);
+
+      const tdR = document.createElement("td");
+      if (right) tdR.appendChild(buildItem(right));
+      else tdR.appendChild(document.createElement("div"));
+      tr.appendChild(tdR);
+
+      tbody.appendChild(tr);
+    }
+  }
+
+  async function load() {
+    const r = await fetch("/api/game/gender-drill?limit=10");
+    const data = await r.json();
+    document.getElementById("title").textContent = data.title;
+    state.items = data.items;
+    render(state.items);
+  }
+
+  function check() {
+    let correct = 0;
+
+    state.items.forEach((it) => {
+      const pick = state.picks.get(it.id);
+      const row = document.querySelector(`.item[data-id="${it.id}"]`);
+      const btns = row.querySelectorAll("button");
+
+      btns.forEach(b => {
+        b.classList.remove("correct", "wrong");
+        const g = b.getAttribute("data-g");
+        if (g === it.answer) b.classList.add("correct");
+        if (pick && g === pick && pick !== it.answer) b.classList.add("wrong");
+      });
+
+      if (pick === it.answer) correct++;
+    });
+
+    document.getElementById("score").textContent =
+      `Skor: ${correct} / ${state.items.length}`;
+  }
+
+  document.getElementById("newBtn").onclick = load;
+  document.getElementById("checkBtn").onclick = check;
+
+  load();
+</script>
+</body>
+</html>

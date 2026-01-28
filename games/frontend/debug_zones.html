@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Debug zones – face hotspots</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
+    .wrap { max-width: 980px; margin: 0 auto; }
+    .hint { color: #666; font-size: 14px; line-height: 1.35; margin-bottom: 14px; }
+
+    .stage {
+      display: inline-block;
+      position: relative;
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+      width: min(920px, 100%);
+    }
+    .stage img {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: #fff;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+    .overlay {
+      position: absolute;
+      left: 0; top: 0;
+      pointer-events: auto;
+    }
+
+    .controls { display:flex; gap:10px; margin: 12px 0 12px; flex-wrap: wrap; }
+    button {
+      border: 1px solid #ddd; background: #fff; border-radius: 10px;
+      padding: 8px 10px; cursor: pointer;
+    }
+    button:active { transform: translateY(1px); }
+
+    .legend {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 8px 14px;
+      margin-top: 14px;
+      font-size: 14px;
+    }
+    .pill {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid #eee;
+      border-radius: 999px;
+      background: #fff;
+    }
+    .swatch {
+      width: 14px; height: 14px; border-radius: 4px;
+      border: 1px solid rgba(0,0,0,0.15);
+      flex: 0 0 auto;
+    }
+    .small { font-size: 12px; color: #777; margin-top: 8px; line-height: 1.35; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.82);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      max-width: min(720px, 92vw);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hint">
+      <b>Kako da koristiš:</b> stavi sliku u isti folder i nazovi je <code>face.png</code>, pa otvori ovaj HTML.
+      Ovo je <b>samo debug overlay</b> – poligoni su poluprovidni da proveriš da li “pogađaju” delove.
+      <br/>Klikni na sliku: dobićeš naziv zone koja je kliknuta.
+    </div>
+
+    <div class="stage" id="stage">
+      <img id="faceImg" src="face.png" alt="face" />
+      <svg class="overlay" id="overlay" viewBox="0 0 1 1" preserveAspectRatio="none"></svg>
+    </div>
+
+    <div class="controls">
+      <button id="toggleFill">Toggle fill</button>
+      <button id="toggleStroke">Toggle stroke</button>
+      <button id="toggleLabels">Toggle labels</button>
+      <button id="toggleHitTest">Toggle hit-test (click)</button>
+    </div>
+
+    <div class="small">
+      Ako vidiš da overlay nije 1:1 preko slike (retko, ali može zbog resize/layout),
+      uradi refresh ili promeni veličinu prozora – JS će ponovo poravnati SVG preko slike.
+    </div>
+
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const zones = [
+      { id:"haar", lemma:"das Haar",
+        poly:[[0.401956,0.087891],[0.50386,0.087891],[0.50386,0.126953],[0.401956,0.126953]] },
+
+      { id:"haut", lemma:"die Haut",
+        poly:[[0.321668,0.187988],[0.423572,0.187988],[0.423572,0.227051],[0.321668,0.227051]] },
+
+      { id:"stirn", lemma:"die Stirn",
+        poly:[[0.392692,0.270508],[0.494596,0.270508],[0.494596,0.309082],[0.392692,0.309082]] },
+
+      { id:"schlaefe_rechts", lemma:"die Schläfe",
+        poly:[[0.606793,0.274902],[0.709725,0.274902],[0.709725,0.314941],[0.606793,0.314941]] },
+
+      { id:"augenbraue_links", lemma:"die Augenbraue",
+        poly:[[0.27895,0.313965],[0.392692,0.313965],[0.392692,0.353027],[0.27895,0.353027]] },
+
+      { id:"wimper_links", lemma:"die Wimper",
+        poly:[[0.262481,0.370605],[0.38547,0.370605],[0.38547,0.411133],[0.262481,0.411133]] },
+
+      { id:"auge_rechts", lemma:"das Auge",
+        poly:[[0.516212,0.382324],[0.637674,0.382324],[0.637674,0.425293],[0.516212,0.425293]] },
+
+      { id:"ohr_rechts", lemma:"das Ohr",
+        poly:[
+          [0.786241,0.407988],
+          [0.803354,0.443706],
+          [0.806336,0.485625],
+          [0.794797,0.527544],
+          [0.770708,0.558867],
+          [0.740912,0.569609],
+          [0.713798,0.533891],
+          [0.710816,0.491973],
+          [0.722355,0.450054],
+          [0.746444,0.418731]
+        ] },
+
+      { id:"nase", lemma:"die Nase",
+        poly:[[0.392692,0.473145],[0.495111,0.473145],[0.495111,0.511719],[0.392692,0.511719]] },
+
+      { id:"nasenloch", lemma:"das Nasenloch",
+        poly:[[0.470635,0.517578],[0.484828,0.526509],[0.488853,0.539551],[0.481887,0.552593],[0.467152,0.561523],[0.450813,0.561523],[0.436619,0.552593],[0.432594,0.539551],[0.439561,0.526509],[0.454296,0.517578]] },
+
+      { id:"muttermal", lemma:"das Muttermal",
+        poly:[[0.625835,0.51709],[0.638764,0.526367],[0.64286,0.539307],[0.636609,0.552246],[0.623242,0.561523],[0.607816,0.561523],[0.594887,0.552246],[0.590791,0.539307],[0.597043,0.526367],[0.61041,0.51709]] },
+
+      { id:"mund", lemma:"der Mund",
+        poly:[[0.302625,0.586426],[0.604217,0.586426],[0.604217,0.612793],[0.302625,0.612793]] },
+
+      /* UPDATED: lippe moved UP (Y - 0.03) */
+      { id:"lippe", lemma:"die Lippe",
+        poly:[
+          [0.434881,0.595254],
+          [0.481231,0.608096],
+          [0.512064,0.632969],
+          [0.509139,0.662383],
+          [0.473697,0.688256],
+          [0.426997,0.697238],
+          [0.390647,0.684396],
+          [0.369814,0.659523],
+          [0.372739,0.630109],
+          [0.408181,0.602236]
+        ] },
+
+      { id:"kinnlade_rechts", lemma:"die Kinnlade",
+        poly:[
+          [0.604068,0.603535],
+          [0.636726,0.629855],
+          [0.65445,0.669824],
+          [0.651911,0.713676],
+          [0.629895,0.751645],
+          [0.596891,0.777965],
+          [0.564232,0.751645],
+          [0.546508,0.713676],
+          [0.549047,0.669824],
+          [0.571063,0.629855]
+        ] },
+
+      { id:"kinn", lemma:"das Kinn",
+        poly:[[0.458711,0.694336],[0.488705,0.708984],[0.505299,0.730957],[0.503082,0.756348],[0.482797,0.77832],[0.452803,0.792969],[0.422809,0.77832],[0.406215,0.756348],[0.408432,0.730957],[0.428717,0.708984]] }
+    ];
+
+    const palette = [
+      "rgba(0, 120, 255, 0.22)",
+      "rgba(0, 200, 140, 0.22)",
+      "rgba(255, 140, 0, 0.22)",
+      "rgba(190, 90, 255, 0.22)",
+      "rgba(255, 80, 120, 0.22)",
+      "rgba(120, 120, 120, 0.18)"
+    ];
+
+    const img = document.getElementById("faceImg");
+    const overlay = document.getElementById("overlay");
+    const legend = document.getElementById("legend");
+    const toast = document.getElementById("toast");
+
+    let showFill = true;
+    let showStroke = true;
+    let showLabels = true;
+    let hitTestEnabled = true;
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.classList.remove("show"), 1200);
+    }
+
+    function syncOverlayToImage() {
+      const w = img.clientWidth;
+      const h = img.clientHeight;
+      overlay.style.width = w + "px";
+      overlay.style.height = h + "px";
+    }
+
+    function toPoints01(poly) {
+      return poly.map(([x,y]) => `${x},${y}`).join(" ");
+    }
+
+    function centroid(poly) {
+      const cx = poly.reduce((s,p)=>s+p[0],0)/poly.length;
+      const cy = poly.reduce((s,p)=>s+p[1],0)/poly.length;
+      return [cx, cy];
+    }
+
+    function render() {
+      overlay.innerHTML = "";
+      legend.innerHTML = "";
+
+      zones.forEach((z, i) => {
+        const color = palette[i % palette.length];
+
+        const p = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        p.setAttribute("points", toPoints01(z.poly));
+        p.setAttribute("fill", showFill ? color : "transparent");
+        p.setAttribute("stroke", showStroke ? color.replace("0.22","0.70").replace("0.18","0.55") : "transparent");
+        p.setAttribute("stroke-width", "0.004");
+        p.dataset.zoneIndex = String(i);
+        p.style.pointerEvents = hitTestEnabled ? "auto" : "none";
+        overlay.appendChild(p);
+
+        if (showLabels) {
+          const [cx, cy] = centroid(z.poly);
+          const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+          t.setAttribute("x", cx);
+          t.setAttribute("y", cy);
+          t.setAttribute("font-size", "0.03");
+          t.setAttribute("font-family", "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif");
+          t.setAttribute("fill", "rgba(0,0,0,0.70)");
+          t.setAttribute("text-anchor", "middle");
+          t.setAttribute("dominant-baseline", "middle");
+          t.textContent = z.id;
+          t.style.pointerEvents = "none";
+          overlay.appendChild(t);
+        }
+
+        const pill = document.createElement("div");
+        pill.className = "pill";
+        const sw = document.createElement("div");
+        sw.className = "swatch";
+        sw.style.background = color;
+        const txt = document.createElement("div");
+        txt.innerHTML = `<b>${z.id}</b> <span style="color:#666">— ${z.lemma}</span>`;
+        pill.appendChild(sw);
+        pill.appendChild(txt);
+        legend.appendChild(pill);
+      });
+    }
+
+    overlay.addEventListener("click", (e) => {
+      if (!hitTestEnabled) return;
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      if (!el || el.tagName.toLowerCase() !== "polygon" || !el.dataset.zoneIndex) {
+        showToast("Nema zone ovde.");
+        return;
+      }
+      const z = zones[Number(el.dataset.zoneIndex)];
+      showToast(`Zona: ${z.id} — ${z.lemma}`);
+    });
+
+    document.getElementById("toggleFill").addEventListener("click", () => {
+      showFill = !showFill; render();
+    });
+    document.getElementById("toggleStroke").addEventListener("click", () => {
+      showStroke = !showStroke; render();
+    });
+    document.getElementById("toggleLabels").addEventListener("click", () => {
+      showLabels = !showLabels; render();
+    });
+    document.getElementById("toggleHitTest").addEventListener("click", () => {
+      hitTestEnabled = !hitTestEnabled; render();
+      showToast(hitTestEnabled ? "Hit-test uključen" : "Hit-test isključen");
+    });
+
+    img.addEventListener("load", () => {
+      syncOverlayToImage();
+      render();
+    });
+    window.addEventListener("resize", () => {
+      syncOverlayToImage();
+    });
+
+    if (img.complete) {
+      syncOverlayToImage();
+      render();
+    }
+  </script>
+</body>
+</html>
