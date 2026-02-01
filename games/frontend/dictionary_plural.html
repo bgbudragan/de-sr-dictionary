@@ -55,6 +55,25 @@
       scrollbar-gutter: stable;
     }
 
+    /* ✅ image block (above word) */
+    .imgWrap{
+      width:100%;
+      border:1px solid var(--sep);
+      border-bottom-width:2px;
+      border-radius:14px;
+      background:#fff;
+      overflow:hidden;
+      margin:2px 0 12px;
+    }
+    .entryImg{
+      display:block;
+      width:100%;
+      height:auto;
+      max-height:210px;     /* keeps it small */
+      object-fit:contain;   /* no cropping */
+      background:#fff;
+    }
+
     .wordRow{
       display:flex;
       flex-direction:column;
@@ -288,18 +307,46 @@
     return "";
   }
 
+  // ✅ image renderer (shows only if image_url exists)
+  function renderImageHtml(item){
+    const url = (item?.image_url ?? "").toString().trim();
+    if(!url) return "";
+    return `
+      <div class="imgWrap">
+        <img class="entryImg"
+             src="${escapeHtml(url)}"
+             alt=""
+             loading="lazy"
+             onerror="this.closest('.imgWrap').style.display='none';" />
+      </div>
+    `;
+  }
+
+  // ✅ FIX: remove "abazur (noun, m)" / "abažur (noun, m)" header line even if followed by ¶
   function stripRawCleanHeaderLine(rawText, item){
     const t = (rawText ?? "").toString().replace(/\r\n/g, "\n");
     const hw = (item?.headword ?? "").toString().trim();
     const pos = (item?.pos ?? "").toString().trim();
     if(!t || !hw || !pos) return t;
 
+    const hwAscii = hw
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim();
+
+    const hwAlt = (hwAscii && hwAscii.toLowerCase() !== hw.toLowerCase())
+      ? `(?:${escapeRegExp(hw)}|${escapeRegExp(hwAscii)})`
+      : escapeRegExp(hw);
+
     const re = new RegExp(
-      "^\\s*" + escapeRegExp(hw) +
-      "\\s*\\(\\s*" + escapeRegExp(pos) + "\\s*\\)\\s*" +
-      "(?:\\(\\s*(?:der|die|das)\\s*\\)|\\[\\s*(?:der|die|das)\\s*\\])?\\s*\\n+",
+      "^\\s*" + hwAlt +
+      "\\s*\\(\\s*" + escapeRegExp(pos) +
+      "(?:\\s*,\\s*[^)]*)?\\s*\\)\\s*" +
+      "(?:\\(\\s*(?:der|die|das)\\s*\\)|\\[\\s*(?:der|die|das)\\s*\\])?\\s*" +
+      "(?:\\n+|¶+)",
       "i"
     );
+
     return t.replace(re, "").trim();
   }
 
@@ -441,7 +488,6 @@
     if(!t) return;
     if(!TTS.supported) return;
 
-    // ONLY German (guard)
     const lang = (langTag || "").toLowerCase();
     if(!(lang.startsWith("de"))) return;
 
@@ -458,7 +504,6 @@
 
     const u = new SpeechSynthesisUtterance(t);
 
-    // voice may still be empty at first; it's ok
     const v = pickVoice(langTag);
     if(v) u.voice = v;
 
@@ -821,8 +866,7 @@
 
     const inner = blocks.map(b=>{
       if(b.type==="pair"){
-        const langTag = b.lang; // "de" or "sr"
-        // ONLY DE gets speaker button
+        const langTag = b.lang;
         const speak = (langTag === "de")
           ? `<button class="speakBtn" type="button" title="Aussprache" aria-label="Beispiel sprechen"
               data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(b.txt)}">🔊</button>`
@@ -920,13 +964,13 @@
     const pluralHtml = renderPluralTag(item) || `<span class="plTag plEmpty">Pl: —</span>`;
     const hwCls = headwordGenderClass(item);
 
-    // Headword speaker: ONLY when DE_SR (German headword)
     const headwordSpeak = (dir === "DE_SR")
       ? `<button class="speakBtn" type="button" title="Aussprache" aria-label="Wort sprechen"
           data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(item.headword)}">🔊</button>`
       : "";
 
     detail.innerHTML = `
+      ${renderImageHtml(item)}
       <div class="wordRow">
         <div class="wordLine">
           <div class="word ${hwCls}">${escapeHtml(item.headword)}</div>
