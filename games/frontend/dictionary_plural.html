@@ -41,10 +41,49 @@
     .suggestItem[data-active="true"] .hw{color:#666}
     .suggestItem[data-active="true"] .tr{color:#7a7a7a}
 
-    .detail{border:2px solid var(--border);border-radius:16px;padding:18px;height:calc(100vh - 120px);max-height:720px;overflow:auto;position:sticky;top:20px;background:#fff}
+    .detail{
+      border:2px solid var(--border);
+      border-radius:16px;
+      padding:18px;
+      height:calc(100vh - 120px);
+      max-height:720px;
+      overflow:auto;
+      overflow-x:hidden;
+      position:sticky;
+      top:20px;
+      background:#fff;
+      scrollbar-gutter: stable;
+    }
 
-    .wordRow{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
-    .word{font-size:40px;font-weight:800;margin:4px 0 6px;color:#000;letter-spacing:.2px}
+    .wordRow{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:6px;
+    }
+
+    .wordLine{
+      display:flex;
+      align-items:flex-end;
+      gap:10px;
+      width:100%;
+      max-width:100%;
+    }
+
+    .word{
+      font-size:40px;
+      font-weight:800;
+      margin:4px 0 6px;
+      color:#000;
+      letter-spacing:.2px;
+      max-width:100%;
+      white-space:nowrap;
+      line-height:1.05;
+    }
+
+    .word.der{color:#1f6feb;}
+    .word.die{color:#d1242f;}
+    .word.das{color:#2da44e;}
 
     .plTag{
       font-size:14px;
@@ -55,19 +94,20 @@
       border-radius:999px;
       padding:4px 10px;
       font-weight:700;
-      margin-top:6px;
+      margin-top:2px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
     }
+
+    .plEmpty{visibility:hidden}
+
+    .plHi{color:#7c3aed;font-weight:800;}
 
     .meta{color:var(--faint);font-size:14px;margin-bottom:10px;line-height:1.35}
     .wordUnderline{height:4px;width:160px;background:#000;border-radius:2px;margin:10px 0 12px}
 
-    .quick{
-      font-size:18px;
-      font-weight:650;
-      color:#111;
-      margin:0 0 14px;
-      line-height:1.35;
-    }
+    .quick{font-size:18px;font-weight:650;color:#111;margin:0 0 14px;line-height:1.35;}
 
     .explain{font-size:18px;line-height:1.6;color:var(--text)}
     .explain .sense{margin:14px 0 16px}
@@ -80,9 +120,11 @@
       border-bottom-width:2px;
       border-radius:12px;
       background:#fcfcfc;
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
     }
 
-    /* badge (flag + code fallback) */
     .explain .langTag{
       display:inline-flex;
       align-items:center;
@@ -95,10 +137,11 @@
       border-radius:999px;
       border:1px solid #e7e7e7;
       border-bottom-width:2px;
-      margin-right:10px;
+      margin-right:0;
       vertical-align:top;
       line-height:1;
       white-space:nowrap;
+      flex:0 0 auto;
     }
     .explain .langTag .flag{font-size:14px; line-height:1;}
     .explain .langTag .code{font-size:11px; opacity:.75; letter-spacing:.6px;}
@@ -106,6 +149,14 @@
     .explain .langTag.de{background:#f3f7ff}
     .explain .langTag.sr{background:#fff6f3}
     .explain .langTxt{display:inline; color:#222}
+
+    .pairMain{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      flex:1 1 auto;
+      min-width:0;
+    }
 
     .art{font-weight:700}
     .art.der{color:#1f6feb;}
@@ -118,6 +169,24 @@
 
     .err{margin-top:10px;color:#b00020;font-size:12px;display:none}
     .loading{margin-top:10px;color:#c9c9c9;font-size:12px;display:none}
+
+    .speakBtn{
+      border:1px solid #e7e7e7;
+      border-bottom-width:2px;
+      background:#fff;
+      border-radius:999px;
+      padding:4px 8px;
+      font-size:14px;
+      line-height:1;
+      cursor:pointer;
+      user-select:none;
+      color:#444;
+      flex:0 0 auto;
+    }
+    .speakBtn:hover{background:#fafafa}
+    .speakBtn:active{transform:translateY(1px)}
+    .speakBtn[disabled]{opacity:.45; cursor:not-allowed}
+    .pair .speakBtn{padding:3px 7px;font-size:13px;margin-left:auto}
 
     @media (max-width:920px){
       .grid{grid-template-columns:1fr}
@@ -214,10 +283,8 @@
   function getExplanationText(item){
     const rc = (item?.raw_clean ?? "").toString().trim();
     if(rc) return rc;
-
     const mg = (item?.main_gloss ?? "").toString().trim();
     if(mg) return mg;
-
     return "";
   }
 
@@ -251,18 +318,12 @@
       if(s.trim()==="") continue;
       if(isDashOnlyLine(s)) continue;
 
-      // normalize "- DE:" / "- SR:" (but keep plain bullets separate)
       s = s.replace(/^\s*[-–—]\s*(DE|SR)\s*:\s*/i, (_, tag) => tag.toUpperCase() + ": ");
-
-      // strip ONLY list dashes, not "•" bullets
       s = s.replace(/^\s*[-–—]\s+/,"");
-
-      // remove "1. " numbering at line start
       s = s.replace(/^\s*\d+\.\s+/, "");
 
       if(s.trim()==="") continue;
 
-      // NEW: split "… / SR: …" even if it is embedded in a plain line
       {
         const m = s.match(/^(.*?)(?:\s*\/\s*SR\s*:\s*)(.+)$/i);
         if (m) {
@@ -295,7 +356,6 @@
     return out;
   }
 
-  // Sense split by "1) 2) ..." OR "1. 2. ..."
   function splitIntoSenses(lines){
     const joined = lines.join("\n");
     if(!/\n?\s*\d+[\)\.]\s+/.test(joined)) return [lines];
@@ -312,25 +372,20 @@
     });
   }
 
-  // Only treat DE:/SR: as language lines (case-insensitive)
   function lineIsLang(line){
     return /^\s*(DE|SR)\s*:\s*/i.test(line || "");
   }
 
-  // support inline "DE — SR" (one line) -> render as two language cards
   function splitInlinePair(line){
     const s = (line ?? "").toString().trim();
     if(!s) return null;
 
-    // separator: em dash or en dash with spaces around
     const m = s.match(/^(.*?)(?:\s+[—–]\s+)(.*)$/);
     if(!m) return null;
 
     const left = (m[1] || "").trim();
     const right = (m[2] || "").trim();
     if(!left || !right) return null;
-
-    // avoid splitting tiny left fragments like "NE — ovde ..."
     if(left.length <= 3) return null;
 
     return { de: left, sr: right };
@@ -341,6 +396,366 @@
     const flag = (L === "de") ? "🇩🇪" : "🇷🇸";
     const code = (L === "de") ? "DE" : "SR";
     return `<span class="flag" aria-hidden="true">${flag}</span><span class="code">${code}</span>`;
+  }
+
+  // -------------------------
+  // Speech (ONLY German enabled)
+  // -------------------------
+  const TTS = {
+    voices: [],
+    supported: ("speechSynthesis" in window) && ("SpeechSynthesisUtterance" in window),
+    currentKey: "",
+    speaking: false
+  };
+
+  function loadVoices(){
+    if(!TTS.supported) return;
+    TTS.voices = window.speechSynthesis.getVoices() || [];
+  }
+
+  if(TTS.supported){
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = () => loadVoices();
+  }
+
+  function pickVoice(langTag){
+    if(!TTS.supported) return null;
+    const want = (langTag || "").toLowerCase();
+
+    let v = TTS.voices.find(x => (x.lang || "").toLowerCase() === want);
+    if(v) return v;
+
+    const pref = want.split("-")[0];
+    v = TTS.voices.find(x => (x.lang || "").toLowerCase().startsWith(pref));
+    if(v) return v;
+
+    return null;
+  }
+
+  function normalizeTtsText(s){
+    return (s ?? "").toString().replace(/\s+/g, " ").trim();
+  }
+
+  function speakText(text, langTag){
+    const t = normalizeTtsText(text);
+    if(!t) return;
+    if(!TTS.supported) return;
+
+    // ONLY German (guard)
+    const lang = (langTag || "").toLowerCase();
+    if(!(lang.startsWith("de"))) return;
+
+    const key = (langTag || "") + "|" + t;
+
+    if(TTS.speaking && TTS.currentKey === key){
+      window.speechSynthesis.cancel();
+      TTS.speaking = false;
+      TTS.currentKey = "";
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const u = new SpeechSynthesisUtterance(t);
+
+    // voice may still be empty at first; it's ok
+    const v = pickVoice(langTag);
+    if(v) u.voice = v;
+
+    u.lang = langTag || "de-DE";
+
+    u.onstart = () => { TTS.speaking = true; TTS.currentKey = key; };
+    u.onend = () => { TTS.speaking = false; if(TTS.currentKey === key) TTS.currentKey = ""; };
+    u.onerror = () => { TTS.speaking = false; if(TTS.currentKey === key) TTS.currentKey = ""; };
+
+    window.speechSynthesis.speak(u);
+  }
+
+  function deLang(){ return "de-DE"; }
+
+  detail.addEventListener("click", (e)=>{
+    const btn = e.target.closest(".speakBtn");
+    if(!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    const say = btn.getAttribute("data-say") || "";
+    const lang = btn.getAttribute("data-lang") || "";
+    speakText(say, lang);
+  });
+
+  // -------------------------
+  // plural logic
+  // -------------------------
+  function parsePluralFieldNew(pluralField){
+    const raw = (pluralField ?? "").toString().trim();
+    if(!raw) return { raw:"", kind:"none" };
+    if(raw === "-" || raw === "–" || raw === "—") return { raw, kind:"same" };
+
+    const low = raw.toLowerCase();
+    if(low === "samosg") return { raw, kind:"no_plural" };
+
+    const mDip = raw.match(/^([äÄ])([uU])\-?(e|er|en|n|s)$/);
+    if(mDip){
+      const first = mDip[1];
+      const second = mDip[2];
+      const diph = (first === "Ä" ? "Ä" : "ä") + (second === "U" ? "U" : "u");
+      return { raw, kind:"umlaut_diphthong", diphthong: diph, suffix: mDip[3].toLowerCase() };
+    }
+
+    const mU = raw.match(/^([äöüÄÖÜ])\-?(e|er|en|n|s)$/);
+    if(mU){
+      return { raw, kind:"umlaut_suffix", umlautChar:mU[1], suffix:mU[2].toLowerCase() };
+    }
+
+    if(/^(e|er|en|n|s)$/i.test(raw)){
+      return { raw, kind:"suffix", suffix: raw.toLowerCase() };
+    }
+
+    return { raw, kind:"append", append: raw };
+  }
+
+  function applyUmlautToLastComponent(word, umlautChar){
+    const hw = (word ?? "").toString();
+    if(!hw) return hw;
+
+    const map = { "ä":"a", "ö":"o", "ü":"u", "Ä":"A", "Ö":"O", "Ü":"U" };
+    const base = map[umlautChar];
+    if(!base) return hw;
+
+    const dashIdx = hw.lastIndexOf("-");
+    const prefix = dashIdx >= 0 ? hw.slice(0, dashIdx + 1) : "";
+    const last = dashIdx >= 0 ? hw.slice(dashIdx + 1) : hw;
+
+    const idx = last.lastIndexOf(base);
+    if(idx < 0) return hw;
+
+    const newLast = last.slice(0, idx) + umlautChar + last.slice(idx + 1);
+    return prefix + newLast;
+  }
+
+  function applyAeuToLastComponent(word){
+    const hw = (word ?? "").toString();
+    if(!hw) return hw;
+
+    const dashIdx = hw.lastIndexOf("-");
+    const prefix = dashIdx >= 0 ? hw.slice(0, dashIdx + 1) : "";
+    const last = dashIdx >= 0 ? hw.slice(dashIdx + 1) : hw;
+
+    const idxLower = last.lastIndexOf("au");
+    const idxUpper = last.lastIndexOf("Au");
+
+    let idx = -1;
+    let from = "";
+    let to = "";
+
+    if(idxLower >= 0 && idxUpper >= 0){
+      if(idxLower > idxUpper){ idx = idxLower; from="au"; to="äu"; }
+      else { idx = idxUpper; from="Au"; to="Äu"; }
+    }else if(idxLower >= 0){
+      idx = idxLower; from="au"; to="äu";
+    }else if(idxUpper >= 0){
+      idx = idxUpper; from="Au"; to="Äu";
+    }else{
+      return hw;
+    }
+
+    const newLast = last.slice(0, idx) + to + last.slice(idx + from.length);
+    return prefix + newLast;
+  }
+
+  function buildPluralFormNew(headword, pluralField){
+    const hw = (headword ?? "").toString().trim();
+    if(!hw) return "";
+
+    const info = parsePluralFieldNew(pluralField);
+
+    if(info.kind === "none") return "";
+    if(info.kind === "no_plural") return "";
+    if(info.kind === "same") return hw;
+
+    if(info.kind === "suffix") return hw + info.suffix;
+    if(info.kind === "umlaut_suffix") return applyUmlautToLastComponent(hw, info.umlautChar) + info.suffix;
+    if(info.kind === "umlaut_diphthong") return applyAeuToLastComponent(hw) + info.suffix;
+    if(info.kind === "append") return hw + info.append;
+
+    return "";
+  }
+
+  function wrapSuffix(fullWord, suffix){
+    const s = (suffix ?? "").toString();
+    if(!s) return escapeHtml(fullWord);
+    const base = fullWord.slice(0, fullWord.length - s.length);
+    return `${escapeHtml(base)}<span class="plHi">${escapeHtml(s)}</span>`;
+  }
+
+  function wrapRange(word, start, len){
+    const w = (word ?? "").toString();
+    if(start == null || len == null || start < 0 || len <= 0) return escapeHtml(w);
+    const a = w.slice(0, start);
+    const b = w.slice(start, start + len);
+    const c = w.slice(start + len);
+    return `${escapeHtml(a)}<span class="plHi">${escapeHtml(b)}</span>${escapeHtml(c)}`;
+  }
+
+  function applyUmlautToLastComponentMarked(word, umlautChar){
+    const hw = (word ?? "").toString();
+    if(!hw) return { word: hw, hiStart: -1, hiLen: 0 };
+
+    const map = { "ä":"a", "ö":"o", "ü":"u", "Ä":"A", "Ö":"O", "Ü":"U" };
+    const base = map[umlautChar];
+    if(!base) return { word: hw, hiStart: -1, hiLen: 0 };
+
+    const dashIdx = hw.lastIndexOf("-");
+    const prefix = dashIdx >= 0 ? hw.slice(0, dashIdx + 1) : "";
+    const last = dashIdx >= 0 ? hw.slice(dashIdx + 1) : hw;
+
+    const idxBase = last.lastIndexOf(base);
+    if(idxBase >= 0){
+      const newLast = last.slice(0, idxBase) + umlautChar + last.slice(idxBase + 1);
+      const newWord = prefix + newLast;
+      const absStart = prefix.length + idxBase;
+      return { word: newWord, hiStart: absStart, hiLen: 1 };
+    }
+
+    const idxU = last.lastIndexOf(umlautChar);
+    if(idxU >= 0){
+      const absStart = prefix.length + idxU;
+      return { word: hw, hiStart: absStart, hiLen: 1 };
+    }
+
+    return { word: hw, hiStart: -1, hiLen: 0 };
+  }
+
+  function applyAeuToLastComponentMarked(word){
+    const hw = (word ?? "").toString();
+    if(!hw) return { word: hw, hiStart: -1, hiLen: 0 };
+
+    const dashIdx = hw.lastIndexOf("-");
+    const prefix = dashIdx >= 0 ? hw.slice(0, dashIdx + 1) : "";
+    const last = dashIdx >= 0 ? hw.slice(dashIdx + 1) : hw;
+
+    const idxLower = last.lastIndexOf("au");
+    const idxUpper = last.lastIndexOf("Au");
+
+    if(idxLower >= 0 || idxUpper >= 0){
+      let idx = -1, from = "", to = "";
+      if(idxLower >= 0 && idxUpper >= 0){
+        if(idxLower > idxUpper){ idx = idxLower; from="au"; to="äu"; }
+        else { idx = idxUpper; from="Au"; to="Äu"; }
+      }else if(idxLower >= 0){
+        idx = idxLower; from="au"; to="äu";
+      }else{
+        idx = idxUpper; from="Au"; to="Äu";
+      }
+
+      const newLast = last.slice(0, idx) + to + last.slice(idx + from.length);
+      const newWord = prefix + newLast;
+      const absStart = prefix.length + idx;
+      return { word: newWord, hiStart: absStart, hiLen: 2 };
+    }
+
+    const idxAeu = Math.max(last.lastIndexOf("äu"), last.lastIndexOf("Äu"));
+    if(idxAeu >= 0){
+      const absStart = prefix.length + idxAeu;
+      return { word: hw, hiStart: absStart, hiLen: 2 };
+    }
+
+    return { word: hw, hiStart: -1, hiLen: 0 };
+  }
+
+  function buildPluralHtml(headword, pluralField){
+    const hw = (headword ?? "").toString().trim();
+    if(!hw) return "";
+
+    const info = parsePluralFieldNew(pluralField);
+    if(info.kind === "none" || info.kind === "no_plural") return "";
+
+    if(info.kind === "same") return escapeHtml(hw);
+
+    if(info.kind === "suffix"){
+      const full = hw + info.suffix;
+      return wrapSuffix(full, info.suffix);
+    }
+
+    if(info.kind === "append"){
+      const full = hw + info.append;
+      return wrapSuffix(full, info.append);
+    }
+
+    if(info.kind === "umlaut_suffix"){
+      const r = applyUmlautToLastComponentMarked(hw, info.umlautChar);
+      const wordHtml = wrapRange(r.word, r.hiStart, r.hiLen);
+      const suffixHtml = `<span class="plHi">${escapeHtml(info.suffix)}</span>`;
+      return `${wordHtml}${suffixHtml}`;
+    }
+
+    if(info.kind === "umlaut_diphthong"){
+      const r = applyAeuToLastComponentMarked(hw);
+      const wordHtml = wrapRange(r.word, r.hiStart, r.hiLen);
+      const suffixHtml = `<span class="plHi">${escapeHtml(info.suffix)}</span>`;
+      return `${wordHtml}${suffixHtml}`;
+    }
+
+    const full = buildPluralFormNew(hw, pluralField);
+    if(!full) return "";
+    return escapeHtml(full);
+  }
+
+  // German plural tag: ONLY for DE_SR (German nouns)
+  function renderPluralTag(item){
+    if(dir !== "DE_SR") return "";
+    const pos = (item?.pos ?? "").toString().trim().toLowerCase();
+    const plRaw = (item?.plural ?? "").toString().trim();
+    if(pos !== "noun" || !plRaw) return "";
+
+    const info = parsePluralFieldNew(plRaw);
+    if(info.kind === "no_plural") return "";
+
+    const htmlPlural = buildPluralHtml(item.headword, plRaw);
+    if(!htmlPlural) return "";
+
+    const pluralText = buildPluralFormNew(item.headword, plRaw) || "";
+
+    return `<span class="plTag">
+      <span>Pl: ${htmlPlural}</span>
+      <button class="speakBtn" type="button" title="Aussprache" aria-label="Plural sprechen"
+        data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(pluralText)}">🔊</button>
+    </span>`;
+  }
+
+  function headwordGenderClass(item){
+    const pos = (item?.pos ?? "").toString().trim().toLowerCase();
+    if(pos !== "noun") return "";
+    const g = (item?.gender ?? "").toString().trim().toLowerCase();
+    return (g === "der" || g === "die" || g === "das") ? g : "";
+  }
+
+  function fitHeadword(){
+    const el = detail.querySelector(".word");
+    if(!el) return;
+
+    el.style.whiteSpace = "nowrap";
+    el.style.overflowWrap = "";
+    el.style.wordBreak = "";
+    el.style.fontSize = "40px";
+
+    const min = 24;
+    let size = 40;
+    let guard = 0;
+
+    while(el.scrollWidth > el.clientWidth && size > min && guard < 80){
+      size -= 1;
+      el.style.fontSize = size + "px";
+      guard++;
+    }
+
+    if(el.scrollWidth > el.clientWidth){
+      el.style.whiteSpace = "normal";
+      el.style.overflowWrap = "anywhere";
+      el.style.wordBreak = "break-word";
+      el.style.fontSize = Math.max(size, min) + "px";
+    }
   }
 
   function renderSense(lines, quick){
@@ -363,13 +778,11 @@
     for(let i=idx;i<nonEmpty.length;i++){
       const line = nonEmpty[i];
 
-      // DE:/SR: explicit (plus split embedded SR inside DE line)
       const m = line.match(/^\s*(DE|SR)\s*:\s*(.*)$/i);
       if (m) {
         const lang = m[1].toLowerCase();
         const txt = (m[2] || "").trim();
 
-        // Split inside DE line: "… — SR: …"
         if (lang === "de") {
           const md = txt.match(/^(.*?)(?:\s*[—–]\s*SR\s*:\s*)(.+)$/i);
           if (md) {
@@ -380,7 +793,6 @@
             continue;
           }
 
-          // Split inside DE line: "… / SR: …"
           const ms = txt.match(/^(.*?)(?:\s*\/\s*SR\s*:\s*)(.+)$/i);
           if (ms) {
             const left = (ms[1] || "").trim();
@@ -395,7 +807,6 @@
         continue;
       }
 
-      // inline "… — …" pair
       const p = splitInlinePair(line);
       if(p){
         blocks.push({ type:"pair", lang:"de", txt: p.de });
@@ -403,7 +814,6 @@
         continue;
       }
 
-      // plain line
       blocks.push({ type:"plain", txt: line });
     }
 
@@ -411,9 +821,19 @@
 
     const inner = blocks.map(b=>{
       if(b.type==="pair"){
+        const langTag = b.lang; // "de" or "sr"
+        // ONLY DE gets speaker button
+        const speak = (langTag === "de")
+          ? `<button class="speakBtn" type="button" title="Aussprache" aria-label="Beispiel sprechen"
+              data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(b.txt)}">🔊</button>`
+          : "";
+
         return `<div class="pair">
-          <span class="langTag ${b.lang}">${langBadgeHtml(b.lang)}</span>
-          <span class="langTxt">${escapeHtml(b.txt).replace(/\n/g,"<br>")}</span>
+          <div class="pairMain">
+            <span class="langTag ${langTag}">${langBadgeHtml(langTag)}</span>
+            <span class="langTxt">${escapeHtml(b.txt).replace(/\n/g,"<br>")}</span>
+          </div>
+          ${speak}
         </div>`;
       }
       return `<div class="plain">${escapeHtml(b.txt).replace(/\n/g,"<br>")}</div>`;
@@ -474,67 +894,6 @@
     return `${escapeHtml(posSr)}${genderHtml}${lvl}${t}`;
   }
 
-  function applyUmlautHeuristic(stem){
-    const variants = [];
-    if(stem.includes("au")) variants.push(stem.replace("au","äu"));
-    if(stem.includes("Au")) variants.push(stem.replace("Au","Äu"));
-    if(stem.includes("a")) variants.push(stem.replace("a","ä"));
-    if(stem.includes("A")) variants.push(stem.replace("A","Ä"));
-    if(stem.includes("o")) variants.push(stem.replace("o","ö"));
-    if(stem.includes("O")) variants.push(stem.replace("O","Ö"));
-    if(stem.includes("u")) variants.push(stem.replace("u","ü"));
-    if(stem.includes("U")) variants.push(stem.replace("U","Ü"));
-    for(const v of variants){ if(v && v !== stem) return v; }
-    return stem;
-  }
-
-  function parsePluralField(pluralField){
-    const raw = (pluralField ?? "").toString().trim();
-    if(!raw) return { raw: "", suffix: "", umlaut: false };
-    let umlaut = false;
-    let s = raw;
-    if(s.startsWith("¨-")){ umlaut = true; s = s.slice(2); }
-    else if(s.startsWith("¨")){ umlaut = true; s = s.slice(1); if(s.startsWith("-")) s = s.slice(1); }
-    else if(s.startsWith("-")){ s = s.slice(1); }
-    s = s.trim();
-    const m = s.match(/^([äöüÄÖÜ])\-?(e|er|en|n|s)$/);
-    if(m){ umlaut = true; s = m[2]; }
-    return { raw, suffix: s, umlaut };
-  }
-
-  function isLikelySuffix(pluralField){
-    const { suffix } = parsePluralField(pluralField);
-    if(suffix === "") return true;
-    return ["e","er","en","n","s"].includes(suffix);
-  }
-
-  function buildPluralForm(headword, pluralField){
-    const hw = (headword ?? "").toString().trim();
-    const { raw, suffix, umlaut } = parsePluralField(pluralField);
-    if(!hw || raw === "") return "";
-    if(!isLikelySuffix(pluralField)) return raw;
-    let base = hw;
-    if(umlaut || ["e","er","en","n"].includes(suffix)){
-      base = applyUmlautHeuristic(base);
-    }
-    return base + suffix;
-  }
-
-  function renderPluralTag(item){
-    if(dir !== "DE_SR") return "";
-    const pos = (item?.pos ?? "").toString().trim().toLowerCase();
-    const plFieldRaw = (item?.plural ?? "").toString().trim();
-    if(pos !== "noun" || !plFieldRaw) return "";
-    const fullPlural = buildPluralForm(item.headword, plFieldRaw);
-    if(!fullPlural) return "";
-    const { suffix, umlaut } = parsePluralField(plFieldRaw);
-    const suffixMode = isLikelySuffix(plFieldRaw) && suffix;
-    const suffixInfo = suffixMode
-      ? ` <span style="opacity:.65">(${escapeHtml(umlaut ? "¨-" + suffix : "-" + suffix)})</span>`
-      : "";
-    return `<span class="plTag">Pl: ${escapeHtml(fullPlural)}${suffixInfo}</span>`;
-  }
-
   function renderDetail(item){
     if(!item){
       detail.innerHTML = `
@@ -546,10 +905,11 @@
       return;
     }
 
-    const quick = getQuickGloss(item);
-    let explanation = getExplanationText(item) || "—";
+    const hasRawClean = !!((item?.raw_clean ?? "").toString().trim());
+    const quick = hasRawClean ? "" : getQuickGloss(item);
 
-    if((item?.raw_clean ?? "").toString().trim()){
+    let explanation = getExplanationText(item) || "—";
+    if(hasRawClean){
       explanation = stripRawCleanHeaderLine(explanation, item);
     }
 
@@ -557,16 +917,30 @@
     lines = dropLeadingQuickDuplicate(lines, quick);
     explanation = lines.join("\n");
 
+    const pluralHtml = renderPluralTag(item) || `<span class="plTag plEmpty">Pl: —</span>`;
+    const hwCls = headwordGenderClass(item);
+
+    // Headword speaker: ONLY when DE_SR (German headword)
+    const headwordSpeak = (dir === "DE_SR")
+      ? `<button class="speakBtn" type="button" title="Aussprache" aria-label="Wort sprechen"
+          data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(item.headword)}">🔊</button>`
+      : "";
+
     detail.innerHTML = `
       <div class="wordRow">
-        <div class="word">${escapeHtml(item.headword)}</div>
-        ${renderPluralTag(item)}
+        <div class="wordLine">
+          <div class="word ${hwCls}">${escapeHtml(item.headword)}</div>
+          ${headwordSpeak}
+        </div>
+        ${pluralHtml}
       </div>
       <div class="meta">${renderMetaHtml(item)}</div>
       <div class="wordUnderline"></div>
-      <div class="quick">${escapeHtml(quick || "—")}</div>
+      ${hasRawClean ? "" : `<div class="quick">${escapeHtml(quick || "—")}</div>`}
       ${renderExplanationRich(explanation, item, quick)}
     `;
+
+    requestAnimationFrame(fitHeadword);
   }
 
   function renderList(){
@@ -630,6 +1004,8 @@
     else if(e.key==="Enter"){ e.preventDefault(); renderDetail(results[active]); }
     else if(e.key==="Escape"){ e.preventDefault(); q.value=""; q.focus(); search(); }
   });
+
+  window.addEventListener("resize", ()=> requestAnimationFrame(fitHeadword));
 
   renderDetail(null);
   q.focus();
