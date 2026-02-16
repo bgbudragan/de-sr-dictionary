@@ -3,8 +3,12 @@
 // No changes to backend/server.js or frontend/index.html.
 
 const path = require("path");
-app.use("/images", express.static("/var/data/images"));
 const express = require("express");
+
+const app = express();
+
+// Serve images from Render persistent disk
+app.use("/images", express.static("/var/data/images"));
 
 // Try to load existing DB module from your backend
 const dbMod = require(path.resolve(__dirname, "../../backend/db.js"));
