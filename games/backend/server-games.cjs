@@ -6,6 +6,13 @@ const path = require("path");
 const express = require("express");
 
 const app = express();
+onst IMAGES_DIR =
+  process.env.IMAGES_DIR || path.resolve(__dirname, "../frontend/images");
+
+app.use("/images", express.static(IMAGES_DIR));
+app.use(express.json());
+
+app.use(express.static(path.resolve(__dirname, "../frontend")));
 
 // Serve images from Render persistent disk
 app.use("/images", express.static("/var/data/images"));
@@ -42,14 +49,7 @@ function clampInt(n, min, max, fallback) {
   return Math.max(min, Math.min(max, x));
 }
 
-const app = express();
-app.use(express.json());
 
-// Serve games frontend (static html) from games/frontend
-app.use(express.static(path.resolve(__dirname, "../frontend")));
-
-// ✅ Serve entry images from games/frontend/images as /images/...
-app.use("/images", express.static(path.resolve(__dirname, "../frontend/images")));
 
 // ---------------------------------------------------------------------
 // Dictionary API (v0): suggestions + minimal detail
