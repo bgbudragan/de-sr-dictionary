@@ -3,6 +3,7 @@
 // No changes to backend/server.js or frontend/index.html.
 
 const path = require("path");
+app.use("/images", express.static("/var/data/images"));
 const express = require("express");
 
 // Try to load existing DB module from your backend
@@ -43,6 +44,9 @@ app.use(express.json());
 // Serve games frontend (static html) from games/frontend
 app.use(express.static(path.resolve(__dirname, "../frontend")));
 
+// ✅ Serve entry images from games/frontend/images as /images/...
+app.use("/images", express.static(path.resolve(__dirname, "../frontend/images")));
+
 // ---------------------------------------------------------------------
 // Dictionary API (v0): suggestions + minimal detail
 // ---------------------------------------------------------------------
@@ -61,7 +65,7 @@ app.get("/api/dict/search", async (req, res) => {
     // Prazan upit: vrati prvih N po abecedi
     if (!q) {
       const r = await query(
-        `SELECT id, headword, main_gloss, raw_clean, pos, gender, level, topics, plural
+        `SELECT id, headword, main_gloss, raw_clean, pos, gender, level, topics, plural, image_url
          FROM public.entries
          WHERE direction = $1
          ORDER BY headword
@@ -73,7 +77,7 @@ app.get("/api/dict/search", async (req, res) => {
 
     // Prefix match (fast autocomplete)
     const r = await query(
-      `SELECT id, headword, main_gloss, raw_clean, pos, gender, level, topics, plural
+      `SELECT id, headword, main_gloss, raw_clean, pos, gender, level, topics, plural, image_url
        FROM public.entries
        WHERE direction = $1
          AND headword ILIKE $2
@@ -95,7 +99,7 @@ app.get("/api/dict/entry/:id", async (req, res) => {
     const id = req.params.id;
 
     const r = await query(
-      `SELECT id, direction, headword, main_gloss, raw_clean, pos, gender, level, topics, plural
+      `SELECT id, direction, headword, main_gloss, raw_clean, pos, gender, level, topics, plural, image_url
        FROM public.entries
        WHERE id = $1`,
       [id]
