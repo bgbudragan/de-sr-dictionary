@@ -6,7 +6,7 @@ const path = require("path");
 const express = require("express");
 
 const app = express();
-onst IMAGES_DIR =
+const IMAGES_DIR =
   process.env.IMAGES_DIR || path.resolve(__dirname, "../frontend/images");
 
 app.use("/images", express.static(IMAGES_DIR));
