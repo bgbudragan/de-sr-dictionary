@@ -3,3 +3,17 @@ node_modules/
 .env
 .env.*
 *.log
+.DS_Store
+
+# macOS
+.DS_Store
+
+# backups/copies
+*.bak
+*.backup
+*.original
+* copy *
+
+# generated/temp
+API_Leonardo_images/
+.DS_Store
