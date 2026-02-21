@@ -17,3 +17,13 @@ node_modules/
 # generated/temp
 API_Leonardo_images/
 .DS_Store
+
+# local-only artifacts
+games/frontend/Anna*.png
+games/frontend/teorija_768x512.png
+games/frontend/images/backup/
+games/frontend/dictionary_plural_izmenaPrikazaKadaImamoRAW_clean*.html
+
+# scripts (ako su samo lokalne kopije; ako su bitne, ne ignoriši)
+games/frontend/compress_webp.sh
+games/frontend/jpg_to_webp.sh
