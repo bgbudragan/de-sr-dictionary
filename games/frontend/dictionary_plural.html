@@ -19,25 +19,76 @@
     .grid{display:grid;grid-template-columns:1fr 420px;gap:28px;padding-top:18px}
 
     .searchRow{display:flex;align-items:flex-end;gap:14px}
-    .inputWrap{flex:1;min-width:220px;position:relative;padding-bottom:10px}
+    .inputWrap{flex:1;min-width:220px;position:relative;padding-bottom:0;}
     input[type="text"]{width:100%;border:0;outline:none;font-size:22px;padding:0;background:transparent;color:#000}
     input::placeholder{color:#bdbdbd}
-    .underline{position:absolute;left:0;right:0;bottom:0;height:4px;background:#000;border-radius:2px}
+    .underline{position:relative;width:100%;height:3px;background:#000;border-radius:2px;margin-top:6px}
 
     .dir{display:flex;align-items:center;gap:8px;padding-bottom:6px;user-select:none}
     .dir button{
       border:1px solid #e6e6e6;border-bottom-width:2px;
       background:#fff;color:#666;border-radius:999px;
       padding:6px 10px;font-size:12px;cursor:pointer;
+      font-weight:600;
     }
-    .dir button[data-active="true"]{color:#111;border-color:#dcdcdc;background:#fafafa}
+    .dir button[data-active="true"]{color:#111;border-color:#111;background:#eaeaea;font-weight:800;transform:translateY(-1px)}
+    .dir button:focus-visible{outline:2px solid #5a8cff;outline-offset:2px}
+
+    /* Character helper (diacritics) */
+    .charwrap{display:none;align-items:center;gap:4px;margin:6px 0 0 0}
+    .charwrap.show{display:flex}
+.charbar{display:flex;gap:3px;flex-wrap:wrap;align-items:center}
+    .charbtn{
+      border:1px solid #efefef;
+      background:#fff;
+      color:#111;
+      border-radius:999px;
+      padding:2px 7px;
+      font-size:12px;
+      line-height:1.2;
+      cursor:pointer;
+      user-select:none;
+      transition:background .12s ease, border-color .12s ease, box-shadow .12s ease;
+    }
+    .charbtn:hover{background:#fbfbfb;border-color:#e6e6e6}
+    .charbtn:active{transform:translateY(1px)}
+
+    /* Results list focus ring: show only for keyboard navigation */
+    #list:focus, #list:focus-visible{outline:none}
+
 
     .suggestList{margin:14px 0 0 0;padding:0;list-style:none}
-    .suggestItem{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:12px 0;border-top:2px solid var(--sep);cursor:pointer}
+    .suggestItem{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:12px 10px;border-top:2px solid var(--sep);cursor:pointer}
     .suggestItem:first-child{border-top:0}
     .suggestItem .hw{font-size:18px;color:var(--faint)}
+    .suggestItem.hasMatch .hw{color:var(--text);font-weight:500}
     .suggestItem .tr{font-size:18px;color:var(--fainter);text-align:right;min-width:120px}
-    .suggestItem[data-active="true"]{background:#fafafa;border-radius:10px;padding-left:10px;padding-right:10px}
+
+    .suggestItem .match{font-weight:700;color:inherit;background:none;padding:0;border-radius:0}
+    .suggestItem .tr .match{font-weight:inherit;color:inherit;background:linear-gradient(transparent 65%, rgba(0,0,0,.18) 65%);padding:0 0.5px;border-radius:2px}
+    /* Hover is subtle; Selected is clearly stronger */
+    .suggestItem:not([data-active="true"]):hover{background:#fafafa;border-radius:10px}
+    .suggestItem[data-active="true"]{
+      background:#f1f1f1;
+      border-radius:10px;
+      padding-left:12px;
+      padding-right:10px;
+      border:1px solid #dcdcdc;
+      border-bottom-width:2px;
+      box-shadow:0 1px 0 rgba(0,0,0,.03);
+      position:relative;
+    }
+    .suggestItem[data-active="true"]::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:8px;
+      bottom:8px;
+      width:3px;
+      background:#111;
+      border-radius:3px;
+      opacity:.25;
+    }
     .suggestItem[data-active="true"] .hw{color:#666}
     .suggestItem[data-active="true"] .tr{color:#7a7a7a}
 
@@ -58,19 +109,55 @@
     /* ✅ image block (above word) */
     .imgWrap{
       width:100%;
+      height:210px;              /* reserve space -> stable layout */
       border:1px solid var(--sep);
       border-bottom-width:2px;
       border-radius:14px;
       background:#fff;
       overflow:hidden;
       margin:2px 0 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+        /* Placeholder inside image area (when entry has no image yet or image fails) */
+    .imgWrap{
+      position: relative;
+    }
+    .imgWrap .imgPlaceholder{
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #c0c0c0;
+      font-size: 14px;
+      letter-spacing: .2px;
+      user-select: none;
+      transition: opacity .15s ease;
+    }
+    .imgWrap .imgPlaceholder svg{
+      width: 26px;
+      height: 26px;
+      opacity: .65;
+    }
+    .imgWrap.loaded .imgPlaceholder{
+      opacity: 0;
+      pointer-events: none;
+    }
+    .imgWrap .entryImg{
+      position: relative;
+      z-index: 1;
+    }
+@media (max-width: 900px){
+      .imgWrap{ height:180px; }
     }
     .entryImg{
       display:block;
       width:100%;
-      height:auto;
-      max-height:210px;     /* keeps it small */
-      object-fit:contain;   /* no cropping */
+      height:100%;
+      object-fit:contain;        /* no cropping */
       background:#fff;
     }
 
@@ -211,7 +298,65 @@
       .grid{grid-template-columns:1fr}
       .detail{position:relative;top:auto;height:auto;max-height:none}
     }
-  </style>
+  
+/* --- v12 tweak: make hover much lighter than selected --- */
+.result-item{
+  transition: background 0.08s ease, border-color 0.08s ease, box-shadow 0.08s ease;
+}
+
+/* Hover is subtle and never overrides a selected row */
+.result-item:not(.selected):hover{
+  background:#fafafa;
+}
+
+/* Selected is clearly stronger than hover */
+.result-item.selected{
+  background:#ececec;
+  border-color:#c7c7c7;
+  position:relative;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.04);
+}
+.result-item.selected:hover{
+  background:#ececec;
+}
+
+/* Keep the left indicator, but slightly calmer */
+.result-item.selected::before{
+  content:'';
+  position:absolute;
+  left:0;
+  top:8px;
+  bottom:8px;
+  width:3px;
+  background:#111;
+  border-radius:2px;
+  opacity:0.45;
+}
+
+
+/* Sticky left header (search + helper letters) */
+.leftHeader{
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #fff;
+  padding-top: 6px;
+  padding-bottom: 8px;
+}
+.leftHeader::after{
+  content:"";
+  display:block;
+  height:1px;
+  background: rgba(0,0,0,0.06);
+  margin-top: 10px;
+}
+
+/* Make sure helper chips don't wrap awkwardly on small widths */
+.charWrap{
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+</style>
 </head>
 <body>
   <div class="wrap">
@@ -221,10 +366,14 @@
 
     <div class="grid">
       <section>
-        <div class="searchRow">
+        <div class="leftHeader">
+<div class="searchRow">
           <div class="inputWrap">
-            <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Search" />
+            <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Upiši srpsku reč…" />
             <div class="underline"></div>
+            <div id="charwrap" class="charwrap" aria-label="Character helper">
+              <div id="charbar" class="charbar" aria-label="Character buttons"></div>
+            </div>
           </div>
 
           <div class="dir" aria-label="Direction">
@@ -233,7 +382,7 @@
           </div>
         </div>
 
-        <ul id="list" class="suggestList"></ul>
+        <ul id="list" class="suggestList" tabindex="0" role="listbox" aria-label="Results"></ul>
         <div class="loading" id="loading">Loading…</div>
         <div class="err" id="err"></div>
         <div class="keys"><kbd>↑</kbd> <kbd>↓</kbd> <kbd>Enter</kbd> <kbd>Esc</kbd></div>
@@ -252,14 +401,122 @@
   const errBox = document.getElementById("err");
   const loading = document.getElementById("loading");
 
+  const charwrap = document.getElementById("charwrap");
+const charbar = document.getElementById("charbar");
+
+  // Character sets shown above the search input depending on direction
+  const CHARSETS = {
+    "SR_DE": ["č","ć","đ","š","ž"],
+    "DE_SR": ["ä","ö","ü","ß"]
+  };
+
+  function updateCharBar(){
+    if(!charwrap || !charbar) return;
+    const chars = CHARSETS[dir] || [];
+    if(!chars.length){
+      charwrap.classList.remove("show");
+      charbar.innerHTML = "";
+      return;
+    }
+    charwrap.classList.add("show");
+charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-ch="${escapeHtml(ch)}">${escapeHtml(ch)}</button>`).join("");
+  }
+
+
+  function updatePlaceholder(){
+    if(!q) return;
+    q.placeholder = (dir==="SR_DE") ? "Upiši srpsku reč…" : "Upiši nemačku reč…";
+  }
+
+  function insertAtCursor(input, text){
+    if(!input) return;
+    const start = input.selectionStart ?? input.value.length;
+    const end = input.selectionEnd ?? input.value.length;
+
+    // Prefer setRangeText when available (keeps undo stack nicely)
+    if(typeof input.setRangeText === "function"){
+      input.setRangeText(text, start, end, "end");
+    } else {
+      const v = input.value;
+      input.value = v.slice(0, start) + text + v.slice(end);
+      const pos = start + text.length;
+      try { input.setSelectionRange(pos, pos); } catch {}
+    }
+
+    input.focus({preventScroll:true});
+    // Trigger your existing input listener (so search updates)
+    input.dispatchEvent(new Event("input", {bubbles:true}));
+  }
+
+  if(charbar){
+    // Keep focus in the search input when clicking diacritics
+    charbar.addEventListener("mousedown", (e) => {
+      const btn = e.target.closest(".charbtn");
+      if(!btn) return;
+      e.preventDefault();
+      insertAtCursor(q, btn.dataset.ch || btn.textContent || "");
+    });
+  }
+
+
   let dir = "SR_DE";
   let results = [];
   let active = 0;
+  let selectedId = null;
+
+  // Permalink support: keep direction/query/selected id in the URL
+  const __urlParams = new URLSearchParams(window.location.search);
+  const __initDir = (__urlParams.get("dir") || "").toUpperCase();
+  const __initQ = __urlParams.get("q") || "";
+  let __pendingSelectId = __urlParams.get("id"); // string
+  let __isInit = true;
+
+  function syncUrl(){
+    const p = new URLSearchParams();
+    p.set("dir", dir);
+    p.set("q", q.value.trim());
+    if (selectedId != null && String(selectedId).trim() !== "") p.set("id", String(selectedId));
+    const newUrl = `${window.location.pathname}?${p.toString()}`;
+    window.history.replaceState(null, "", newUrl);
+  }
+
+  // Make the results list keyboard-focusable so ArrowUp/ArrowDown work after refocusing
+  if (list) {
+    list.tabIndex = 0;
+
+    // When user clicks inside the list, move focus to the list (so keyboard navigation continues)
+    list.addEventListener("mousedown", () => {
+      list.focus({ preventScroll: true });
+    });
+
+    // Enable keyboard navigation when the list itself has focus
+    list.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (results.length) { active = Math.min(active + 1, results.length - 1); renderList(); }
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (results.length) { active = Math.max(active - 1, 0); renderList(); }
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (results.length) renderDetail(results[active]);
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        q.focus();
+      }
+    });
+  }
 
   function setDir(next){
     dir = next;
+        updatePlaceholder();
+    updateCharBar();
+// direction changed → reflect in URL
+    syncUrl();
     btnSRDE.dataset.active = (dir==="SR_DE") ? "true" : "false";
     btnDESR.dataset.active = (dir==="DE_SR") ? "true" : "false";
+    btnSRDE.setAttribute("aria-pressed", dir==="SR_DE" ? "true" : "false");
+    btnDESR.setAttribute("aria-pressed", dir==="DE_SR" ? "true" : "false");
     search();
     q.focus();
   }
@@ -277,6 +534,27 @@
 
   function escapeRegExp(s){
     return (s ?? "").toString().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function highlightHtml(text, needle){
+    const src = (text ?? "").toString();
+    const qv = (needle ?? "").toString().trim();
+    if(!qv) return escapeHtml(src);
+    const re = new RegExp(escapeRegExp(qv), "ig");
+    let out = "";
+    let last = 0;
+    let m;
+    while((m = re.exec(src)) !== null){
+      const start = m.index;
+      const end = start + m[0].length;
+      out += escapeHtml(src.slice(last, start));
+      out += `<span class="match">${escapeHtml(src.slice(start, end))}</span>`;
+      last = end;
+      // prevent zero-length infinite loops
+      if(re.lastIndex === m.index) re.lastIndex++;
+    }
+    out += escapeHtml(src.slice(last));
+    return out;
   }
 
   function normalizeCmp(s){
@@ -309,45 +587,35 @@
 
   // ✅ image renderer (shows only if image_url exists)
   function renderImageHtml(item){
-    const url = (item?.image_url ?? "").toString().trim();
-    if(!url) return "";
+    const url = item && item.image_url ? item.image_url : '';
+    const placeholder = `
+      <div class="imgPlaceholder" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3.5" y="5" width="17" height="14" rx="2"></rect>
+          <path d="M7.5 14l2.8-3.2a1 1 0 0 1 1.5 0l2.2 2.5a1 1 0 0 0 1.5 0l1.9-2.1"></path>
+          <path d="M9 9.5h.01"></path>
+        </svg>
+        <span>Nema slike</span>
+      </div>`;
+
+    if(!url){
+      return `<div class="imgWrap">${placeholder}</div>`;
+    }
+
+    // We add the placeholder always; on load we hide it, on error we remove the image and keep the placeholder.
+    const safeUrl = String(url).replaceAll('"','&quot;');
     return `
       <div class="imgWrap">
-        <img class="entryImg"
-             src="${escapeHtml(url)}"
-             alt=""
-             loading="lazy"
-             onerror="this.closest('.imgWrap').style.display='none';" />
+        ${placeholder}
+        <img
+          class="entryImg"
+          src="${safeUrl}"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
       </div>
     `;
-  }
-
-  // ✅ FIX: remove "abazur (noun, m)" / "abažur (noun, m)" header line even if followed by ¶
-  function stripRawCleanHeaderLine(rawText, item){
-    const t = (rawText ?? "").toString().replace(/\r\n/g, "\n");
-    const hw = (item?.headword ?? "").toString().trim();
-    const pos = (item?.pos ?? "").toString().trim();
-    if(!t || !hw || !pos) return t;
-
-    const hwAscii = hw
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .trim();
-
-    const hwAlt = (hwAscii && hwAscii.toLowerCase() !== hw.toLowerCase())
-      ? `(?:${escapeRegExp(hw)}|${escapeRegExp(hwAscii)})`
-      : escapeRegExp(hw);
-
-    const re = new RegExp(
-      "^\\s*" + hwAlt +
-      "\\s*\\(\\s*" + escapeRegExp(pos) +
-      "(?:\\s*,\\s*[^)]*)?\\s*\\)\\s*" +
-      "(?:\\(\\s*(?:der|die|das)\\s*\\)|\\[\\s*(?:der|die|das)\\s*\\])?\\s*" +
-      "(?:\\n+|¶+)",
-      "i"
-    );
-
-    return t.replace(re, "").trim();
   }
 
   function isDashOnlyLine(s){
@@ -938,7 +1206,98 @@
     return `${escapeHtml(posSr)}${genderHtml}${lvl}${t}`;
   }
 
-  function renderDetail(item){
+  
+
+  // Remove the duplicated "header" line from raw_clean (often starts with headword),
+  // since headword is already rendered as the main title on the right panel.
+  function stripRawCleanHeaderLine(rawCleanText, item) {
+    if (!rawCleanText) return rawCleanText;
+
+    const lines = String(rawCleanText).split(/\r?\n/);
+
+    // find first non-empty line
+    let i = 0;
+    while (i < lines.length && lines[i].trim() === "") i++;
+
+    if (i >= lines.length) return rawCleanText;
+
+    const first = lines[i].trim();
+    const hw = (item && item.headword ? String(item.headword) : "").trim();
+
+    if (!hw) return rawCleanText;
+
+    const hwLower = hw.toLowerCase();
+    const firstLower = first.toLowerCase();
+
+    const startsWithHeadword =
+      firstLower === hwLower ||
+      firstLower.startsWith(hwLower + " ") ||
+      firstLower.startsWith(hwLower + "(") ||
+      firstLower.startsWith(hwLower + " -") ||
+      firstLower.startsWith(hwLower + " –") ||
+      firstLower.startsWith(hwLower + ":");
+
+    if (!startsWithHeadword) return rawCleanText;
+
+    // drop that header line and one optional blank line that follows
+    lines.splice(i, 1);
+    if (i < lines.length && lines[i].trim() === "") lines.splice(i, 1);
+
+    return lines.join("\n");
+  }
+
+  // Image UX:
+  // - Show placeholder until the image is confirmed loaded
+  // - If image fails, remove <img> so the broken-image icon never appears
+  function wireDetailImage(detailEl){
+    const wrap = detailEl.querySelector(".imgWrap");
+    if(!wrap) return;
+
+    const img = wrap.querySelector("img.entryImg");
+    const ph  = wrap.querySelector(".imgPlaceholder");
+
+    if(!img){
+      // no image element => keep placeholder visible
+      if(ph) ph.style.display = "flex";
+      wrap.classList.remove("loaded");
+      return;
+    }
+
+    // Hide the <img> until it successfully loads, so broken-image icons never flash.
+    img.style.visibility = "hidden";
+    img.style.opacity = "0";
+    img.style.transition = "opacity 140ms ease";
+
+    const showPh = () => { if(ph) ph.style.display = "flex"; };
+    const hidePh = () => { if(ph) ph.style.display = "none"; };
+
+    const markLoaded = () => {
+      wrap.classList.add("loaded");
+      hidePh();
+      img.style.visibility = "visible";
+      img.style.opacity = "1";
+    };
+
+    const markError = () => {
+      wrap.classList.remove("loaded");
+      // Prevent the browser from showing a broken-image icon
+      try { img.removeAttribute("src"); } catch(e) {}
+      img.style.visibility = "hidden";
+      img.style.opacity = "0";
+      showPh();
+    };
+
+    img.addEventListener("load", markLoaded, { once: true });
+    img.addEventListener("error", markError, { once: true });
+
+    // Cached images / immediate failures: events may not fire
+    if(img.complete){
+      if(img.naturalWidth > 0) markLoaded();
+      else markError();
+    }
+  }
+
+function renderDetail(item){
     if(!item){
       detail.innerHTML = `
         <div class="word">—</div>
@@ -946,6 +1305,11 @@
         <div class="wordUnderline"></div>
         <div class="quick">—</div>
         <div class="explain"><div class="plain">raw_clean će se prikazati ovde.</div></div>`;
+
+      wireDetailImage(detail);
+
+      selectedId = null;
+      syncUrl();
       return;
     }
 
@@ -984,6 +1348,11 @@
       ${renderExplanationRich(explanation, item, quick)}
     `;
 
+    wireDetailImage(detail);
+
+    selectedId = item.id;
+    syncUrl();
+
     requestAnimationFrame(fitHeadword);
   }
 
@@ -993,14 +1362,16 @@
       const li = document.createElement("li");
       li.className = "suggestItem";
       li.dataset.active = (idx===active) ? "true" : "false";
+      li.setAttribute("aria-selected", (idx===active) ? "true" : "false");
       li.innerHTML = `
-        <div class="hw">${escapeHtml(item.headword)}</div>
+        <div class="hw">${highlightHtml(item.headword, q.value)}</div>
         <div class="tr">${escapeHtml(normalizeGloss(item.main_gloss || ""))}</div>
       `;
-      li.addEventListener("mouseenter", ()=>{ active=idx; renderList(); renderDetail(results[active]); });
       li.addEventListener("click", ()=>{ active=idx; renderList(); renderDetail(results[active]); });
       list.appendChild(li);
     });
+    const activeEl = list.querySelector('.suggestItem[data-active="true"]');
+    if(activeEl){ activeEl.scrollIntoView({ block: "nearest" }); }
     renderDetail(results[active]);
   }
 
@@ -1023,7 +1394,21 @@
       const data = await fetchJson(`/api/dict/search?${params.toString()}`);
 
       results = Array.isArray(data) ? data : (data?.rows || []);
-      active = 0;
+
+      // If URL contains an entry id, try to keep that entry selected (refresh / shared link)
+      const desiredId = (__pendingSelectId != null && String(__pendingSelectId).trim() !== "")
+        ? String(__pendingSelectId).trim()
+        : null;
+
+      if (desiredId && results.length) {
+        const idx = results.findIndex(r => String(r.id) === desiredId);
+        if (idx >= 0) active = idx;
+        // Clear pending id after first successful attempt so normal typing behaves as usual
+        __pendingSelectId = null;
+      } else {
+        active = 0;
+      }
+
       renderList();
     }catch(e){
       results = [];
@@ -1049,11 +1434,67 @@
     else if(e.key==="Escape"){ e.preventDefault(); q.value=""; q.focus(); search(); }
   });
 
+
+
+// Global keyboard navigation: allow ArrowUp/ArrowDown/Enter even if focus moved elsewhere,
+// as long as the user isn't typing in another input/textarea/contenteditable.
+document.addEventListener("keydown", (e) => {
+  // Global navigation (optional): use Ctrl + ArrowUp/ArrowDown/Ctrl+Enter from anywhere
+  // so normal Arrow keys can scroll/read the right panel without being hijacked.
+  const navKeys = ["ArrowUp","ArrowDown","Enter"];
+  if (!navKeys.includes(e.key)) return;
+  if (!e.ctrlKey) return;
+
+  const ae = document.activeElement;
+  // Don't steal keys when user is typing in an input/textarea/contenteditable.
+  const tag = (ae && ae.tagName) ? ae.tagName.toLowerCase() : "";
+  const isTypingField = (tag === "input" || tag === "textarea" || (ae && ae.isContentEditable));
+  if (isTypingField) return;
+
+  if (!results.length) return;
+
+  e.preventDefault();
+
+  if (e.key === "ArrowDown") {
+    active = Math.min(active + 1, results.length - 1);
+    renderList();
+  } else if (e.key === "ArrowUp") {
+    active = Math.max(active - 1, 0);
+    renderList();
+  } else if (e.key === "Enter") {
+    renderDetail(results[active]);
+  }
+});
+
+
   window.addEventListener("resize", ()=> requestAnimationFrame(fitHeadword));
 
-  renderDetail(null);
-  q.focus();
-  search();
+  async function initFromUrl(){
+    // apply URL params once on initial load
+    updateCharBar();
+    if (__initQ) q.value = __initQ;
+
+    if (__initDir === "DE_SR" || __initDir === "SR_DE") {
+      dir = __initDir;
+      btnSRDE.dataset.active = (dir==="SR_DE") ? "true" : "false";
+      btnDESR.dataset.active = (dir==="DE_SR") ? "true" : "false";
+      btnSRDE.setAttribute("aria-pressed", dir==="SR_DE" ? "true" : "false");
+      btnDESR.setAttribute("aria-pressed", dir==="DE_SR" ? "true" : "false");
+    }
+
+    updateCharBar();
+    updatePlaceholder();
+
+    // reflect initial state in URL (normalizes casing, etc.)
+    syncUrl();
+
+    __isInit = false;
+    renderDetail(null);
+    q.focus();
+    await search();
+  }
+
+  initFromUrl();
 </script>
 </body>
 </html>
