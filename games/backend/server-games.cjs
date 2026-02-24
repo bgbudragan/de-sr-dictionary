@@ -49,8 +49,6 @@ function clampInt(n, min, max, fallback) {
   return Math.max(min, Math.min(max, x));
 }
 
-
-
 // ---------------------------------------------------------------------
 // Dictionary API (v0): suggestions + minimal detail
 // ---------------------------------------------------------------------
@@ -59,6 +57,9 @@ app.get("/api/dict/search", async (req, res) => {
   const q = String(req.query.q || "").trim();
   const limit = clampInt(req.query.limit, 1, 50, 20);
 
+  // NEW: pagination
+  const offset = clampInt(req.query.offset, 0, 1000000, 0);
+
   if (!["DE_SR", "SR_DE"].includes(dir)) {
     return res
       .status(400)
@@ -66,28 +67,28 @@ app.get("/api/dict/search", async (req, res) => {
   }
 
   try {
-    // Prazan upit: vrati prvih N po abecedi
+    // Prazan upit: vrati prvih N po abecedi (+ offset)
     if (!q) {
       const r = await query(
         `SELECT id, headword, main_gloss, raw_clean, pos, gender, level, topics, plural, image_url
          FROM public.entries
          WHERE direction = $1
          ORDER BY headword
-         LIMIT $2`,
-        [dir, limit]
+         LIMIT $2 OFFSET $3`,
+        [dir, limit, offset]
       );
       return res.json(r.rows || r);
     }
 
-    // Prefix match (fast autocomplete)
+    // Prefix match (fast autocomplete) (+ offset)
     const r = await query(
       `SELECT id, headword, main_gloss, raw_clean, pos, gender, level, topics, plural, image_url
        FROM public.entries
        WHERE direction = $1
          AND headword ILIKE $2
        ORDER BY headword
-       LIMIT $3`,
-      [dir, q + "%", limit]
+       LIMIT $3 OFFSET $4`,
+      [dir, q + "%", limit, offset]
     );
 
     res.json(r.rows || r);

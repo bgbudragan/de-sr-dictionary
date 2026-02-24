@@ -57,7 +57,7 @@
     #list:focus, #list:focus-visible{outline:none}
 
 
-    .suggestList{margin:14px 0 0 0;padding:0;list-style:none}
+    .suggestList{margin:14px 0 0 0;padding:0;list-style:none;max-height:600px;overflow-y:auto}
     .suggestItem{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:12px 10px;border-top:2px solid var(--sep);cursor:pointer}
     .suggestItem:first-child{border-top:0}
     .suggestItem .hw{font-size:18px;color:var(--faint)}
@@ -275,6 +275,19 @@
 
     .err{margin-top:10px;color:#b00020;font-size:12px;display:none}
     .loading{margin-top:10px;color:#c9c9c9;font-size:12px;display:none}
+    .loadingMore{text-align:center;padding:12px;color:#999;font-size:13px;display:none}
+    .emptyState{
+      margin-top:24px;
+      padding:32px 20px;
+      text-align:center;
+      color:#999;
+      font-size:15px;
+      line-height:1.6;
+      border:2px dashed #e8e8e8;
+      border-radius:12px;
+      background:#fafafa;
+    }
+    .emptyState strong{color:#666}
 
     .speakBtn{
       border:1px solid #e7e7e7;
@@ -356,6 +369,25 @@
   flex-wrap: wrap;
   row-gap: 4px;
 }
+
+/* LEFT PANEL: enable scroll like the right detail panel */
+.grid > section{
+  height: calc(100vh - 120px);
+  max-height: 720px;
+  overflow: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+}
+
+/* On small screens keep normal flow (like your existing @media rule for .detail) */
+@media (max-width:920px){
+  .grid > section{
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -369,7 +401,7 @@
         <div class="leftHeader">
 <div class="searchRow">
           <div class="inputWrap">
-            <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Upiši srpsku reč…" />
+            <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="🔍 Pretraži..." />
             <div class="underline"></div>
             <div id="charwrap" class="charwrap" aria-label="Character helper">
               <div id="charbar" class="charbar" aria-label="Character buttons"></div>
@@ -383,6 +415,8 @@
         </div>
 
         <ul id="list" class="suggestList" tabindex="0" role="listbox" aria-label="Results"></ul>
+        <div class="emptyState" id="emptyState" style="display:none"></div>
+        <div class="loadingMore" id="loadingMore">⏳ Učitavam...</div>
         <div class="loading" id="loading">Loading…</div>
         <div class="err" id="err"></div>
         <div class="keys"><kbd>↑</kbd> <kbd>↓</kbd> <kbd>Enter</kbd> <kbd>Esc</kbd></div>
@@ -400,6 +434,13 @@
   const btnDESR = document.getElementById("btnDESR");
   const errBox = document.getElementById("err");
   const loading = document.getElementById("loading");
+  const loadingMore = document.getElementById("loadingMore");
+  const emptyState = document.getElementById("emptyState");
+
+  // Pagination for suggestions
+  const PAGE_SIZE = 20;
+  let offset = 0;
+  let hasMore = false;
 
   const charwrap = document.getElementById("charwrap");
 const charbar = document.getElementById("charbar");
@@ -407,7 +448,7 @@ const charbar = document.getElementById("charbar");
   // Character sets shown above the search input depending on direction
   const CHARSETS = {
     "SR_DE": ["č","ć","đ","š","ž"],
-    "DE_SR": ["ä","ö","ü","ß"]
+    "DE_SR": ["ä","ö","ü","ß","Ä","Ö","Ü"]
   };
 
   function updateCharBar(){
@@ -425,7 +466,7 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
 
   function updatePlaceholder(){
     if(!q) return;
-    q.placeholder = (dir==="SR_DE") ? "Upiši srpsku reč…" : "Upiši nemačku reč…";
+    q.placeholder = "🔍 Pretraži...";
   }
 
   function insertAtCursor(input, text){
@@ -523,6 +564,54 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
 
   btnSRDE.addEventListener("click", ()=> setDir("SR_DE"));
   btnDESR.addEventListener("click", ()=> setDir("DE_SR"));
+
+  // Infinite scroll: load more when scrolling near bottom
+  let isLoadingMore = false;
+  
+  list.addEventListener("scroll", async ()=>{
+    if(isLoadingMore || !hasMore) return;
+    
+    const scrollTop = list.scrollTop;
+    const scrollHeight = list.scrollHeight;
+    const clientHeight = list.clientHeight;
+    
+    // Trigger when 100px from bottom
+    if(scrollTop + clientHeight >= scrollHeight - 100){
+      const term = q.value.trim();
+      if(!term && term !== "") return;
+      
+      const prevActive = active;
+      
+      try{
+        isLoadingMore = true;
+        loadingMore.style.display = "block"; // Show loading indicator
+        offset += PAGE_SIZE;
+        
+        const params = new URLSearchParams({
+          direction: dir,
+          q: term,
+          limit: String(PAGE_SIZE),
+          offset: String(offset)
+        });
+        
+        const data = await fetchJson(`/api/dict/search?${params.toString()}`);
+        const next = Array.isArray(data) ? data : (data?.rows || []);
+        
+        if(next && next.length){
+          results = results.concat(next);
+        }
+        
+        hasMore = Array.isArray(next) && next.length === PAGE_SIZE;
+        active = Math.min(prevActive, Math.max(results.length - 1, 0));
+        renderList();
+      }catch(e){
+        console.error(e);
+      }finally{
+        isLoadingMore = false;
+        loadingMore.style.display = "none"; // Hide loading indicator
+      }
+    }
+  });
 
   function escapeHtml(s){
     return (s ?? "").toString()
@@ -1304,7 +1393,7 @@ function renderDetail(item){
         <div class="meta">Kucaj za pretragu (${dir==="SR_DE" ? "SR→DE" : "DE→SR"})</div>
         <div class="wordUnderline"></div>
         <div class="quick">—</div>
-        <div class="explain"><div class="plain">raw_clean će se prikazati ovde.</div></div>`;
+        <div class="explain"><div class="plain">Upiši reč da počneš pretragu</div></div>`;
 
       wireDetailImage(detail);
 
@@ -1358,18 +1447,31 @@ function renderDetail(item){
 
   function renderList(){
     list.innerHTML = "";
-    results.forEach((item, idx) => {
-      const li = document.createElement("li");
-      li.className = "suggestItem";
-      li.dataset.active = (idx===active) ? "true" : "false";
-      li.setAttribute("aria-selected", (idx===active) ? "true" : "false");
-      li.innerHTML = `
-        <div class="hw">${highlightHtml(item.headword, q.value)}</div>
-        <div class="tr">${escapeHtml(normalizeGloss(item.main_gloss || ""))}</div>
-      `;
-      li.addEventListener("click", ()=>{ active=idx; renderList(); renderDetail(results[active]); });
-      list.appendChild(li);
-    });
+    
+    // Show empty state if no results and user has typed something
+    const term = q.value.trim();
+    if(results.length === 0 && term){
+      emptyState.innerHTML = `Nema rezultata za <strong>"${escapeHtml(term)}"</strong><br><span style="font-size:13px;color:#aaa">Pokušaj sa drugim terminom</span>`;
+      emptyState.style.display = "block";
+      list.style.display = "none";
+    } else {
+      emptyState.style.display = "none";
+      list.style.display = "block";
+      
+      results.forEach((item, idx) => {
+        const li = document.createElement("li");
+        li.className = "suggestItem";
+        li.dataset.active = (idx===active) ? "true" : "false";
+        li.setAttribute("aria-selected", (idx===active) ? "true" : "false");
+        li.innerHTML = `
+          <div class="hw">${highlightHtml(item.headword, q.value)}</div>
+          <div class="tr">${escapeHtml(normalizeGloss(item.main_gloss || ""))}</div>
+        `;
+        li.addEventListener("click", ()=>{ active=idx; renderList(); renderDetail(results[active]); });
+        list.appendChild(li);
+      });
+    }
+    
     const activeEl = list.querySelector('.suggestItem[data-active="true"]');
     if(activeEl){ activeEl.scrollIntoView({ block: "nearest" }); }
     renderDetail(results[active]);
@@ -1390,10 +1492,19 @@ function renderDetail(item){
     loading.style.display = "block";
 
     try{
-      const params = new URLSearchParams({ direction: dir, q: term, limit: "20" });
+      // reset pagination on a new search
+      offset = 0;
+
+      const params = new URLSearchParams({
+        direction: dir,
+        q: term,
+        limit: String(PAGE_SIZE),
+        offset: String(offset)
+      });
       const data = await fetchJson(`/api/dict/search?${params.toString()}`);
 
       results = Array.isArray(data) ? data : (data?.rows || []);
+      hasMore = Array.isArray(results) && results.length === PAGE_SIZE;
 
       // If URL contains an entry id, try to keep that entry selected (refresh / shared link)
       const desiredId = (__pendingSelectId != null && String(__pendingSelectId).trim() !== "")
