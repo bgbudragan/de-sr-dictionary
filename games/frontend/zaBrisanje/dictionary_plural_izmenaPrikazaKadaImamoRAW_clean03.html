@@ -1,0 +1,723 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dictionary (Plural Forming)</title>
+  <style>
+    :root{--black:#000;--text:#1a1a1a;--muted:#8a8a8a;--faint:#b5b5b5;--fainter:#d1d1d1;--sep:#f3f3f3;--border:#e3e3e3;--bg:#fff;}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--text);background:var(--bg);}
+    .wrap{max-width:1180px;margin:0 auto;padding:24px}
+
+    header{display:flex;align-items:center;justify-content:flex-end;padding:6px 0 10px;border-bottom:2px solid #ebebeb}
+    header .menu{width:36px;height:36px;border:0;background:transparent;display:grid;place-items:center;cursor:pointer}
+    .burger{width:22px;height:14px;position:relative}
+    .burger::before,.burger::after,.burger span{content:"";position:absolute;left:0;right:0;height:2px;background:#000;border-radius:2px}
+    .burger::before{top:0} .burger span{top:6px} .burger::after{bottom:0}
+
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:28px;padding-top:18px}
+
+    .searchRow{display:flex;align-items:flex-end;gap:14px}
+    .inputWrap{flex:1;min-width:220px;position:relative;padding-bottom:10px}
+    input[type="text"]{width:100%;border:0;outline:none;font-size:22px;padding:0;background:transparent;color:#000}
+    input::placeholder{color:#bdbdbd}
+    .underline{position:absolute;left:0;right:0;bottom:0;height:4px;background:#000;border-radius:2px}
+
+    .dir{display:flex;align-items:center;gap:8px;padding-bottom:6px;user-select:none}
+    .dir button{
+      border:1px solid #e6e6e6;border-bottom-width:2px;
+      background:#fff;color:#666;border-radius:999px;
+      padding:6px 10px;font-size:12px;cursor:pointer;
+    }
+    .dir button[data-active="true"]{color:#111;border-color:#dcdcdc;background:#fafafa}
+
+    .suggestList{margin:14px 0 0 0;padding:0;list-style:none}
+    .suggestItem{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:12px 0;border-top:2px solid var(--sep);cursor:pointer}
+    .suggestItem:first-child{border-top:0}
+    .suggestItem .hw{font-size:18px;color:var(--faint)}
+    .suggestItem .tr{font-size:18px;color:var(--fainter);text-align:right;min-width:120px}
+    .suggestItem[data-active="true"]{background:#fafafa;border-radius:10px;padding-left:10px;padding-right:10px}
+    .suggestItem[data-active="true"] .hw{color:#666}
+    .suggestItem[data-active="true"] .tr{color:#7a7a7a}
+
+    .detail{border:2px solid var(--border);border-radius:16px;padding:18px;height:calc(100vh - 120px);max-height:720px;overflow:auto;position:sticky;top:20px;background:#fff}
+
+    .wordRow{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+    .word{font-size:40px;font-weight:800;margin:4px 0 6px;color:#000;letter-spacing:.2px}
+
+    .plTag{
+      font-size:14px;
+      color:var(--muted);
+      border:1px solid #eee;
+      border-bottom-width:2px;
+      background:#fff;
+      border-radius:999px;
+      padding:4px 10px;
+      font-weight:700;
+      margin-top:6px;
+    }
+
+    .meta{color:var(--faint);font-size:14px;margin-bottom:10px;line-height:1.35}
+    .wordUnderline{height:4px;width:160px;background:#000;border-radius:2px;margin:10px 0 12px}
+
+    .quick{
+      font-size:18px;
+      font-weight:650;
+      color:#111;
+      margin:0 0 14px;
+      line-height:1.35;
+    }
+
+    .explain{font-size:18px;line-height:1.6;color:var(--text)}
+    .explain .sense{margin:14px 0 16px}
+    .explain .head{font-size:18px;font-weight:800;margin:0 0 8px 0}
+    .explain .plain{margin:8px 0 10px;color:#222}
+    .explain .pair{
+      margin:8px 0;
+      padding:10px 12px;
+      border:1px solid var(--sep);
+      border-bottom-width:2px;
+      border-radius:12px;
+      background:#fcfcfc;
+    }
+
+    /* badge (flag + code fallback) */
+    .explain .langTag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      min-width:auto;
+      font-weight:800;
+      font-size:12px;
+      letter-spacing:.3px;
+      padding:3px 10px;
+      border-radius:999px;
+      border:1px solid #e7e7e7;
+      border-bottom-width:2px;
+      margin-right:10px;
+      vertical-align:top;
+      line-height:1;
+      white-space:nowrap;
+    }
+    .explain .langTag .flag{font-size:14px; line-height:1;}
+    .explain .langTag .code{font-size:11px; opacity:.75; letter-spacing:.6px;}
+
+    .explain .langTag.de{background:#f3f7ff}
+    .explain .langTag.sr{background:#fff6f3}
+    .explain .langTxt{display:inline; color:#222}
+
+    .art{font-weight:700}
+    .art.der{color:#1f6feb;}
+    .art.die{color:#d1242f;}
+    .art.das{color:#2da44e;}
+    .meta .art{font-weight:700}
+
+    .keys{margin-top:10px;color:var(--fainter);font-size:12px;user-select:none}
+    kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;border:1px solid #e6e6e6;border-bottom-width:2px;border-radius:6px;padding:2px 6px;background:#fff;color:#777}
+
+    .err{margin-top:10px;color:#b00020;font-size:12px;display:none}
+    .loading{margin-top:10px;color:#c9c9c9;font-size:12px;display:none}
+
+    @media (max-width:920px){
+      .grid{grid-template-columns:1fr}
+      .detail{position:relative;top:auto;height:auto;max-height:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <button class="menu" aria-label="Menu" title="Menu"><div class="burger"><span></span></div></button>
+    </header>
+
+    <div class="grid">
+      <section>
+        <div class="searchRow">
+          <div class="inputWrap">
+            <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Search" />
+            <div class="underline"></div>
+          </div>
+
+          <div class="dir" aria-label="Direction">
+            <button id="btnSRDE" data-active="true" title="Serbian → German">SR→DE</button>
+            <button id="btnDESR" data-active="false" title="German → Serbian">DE→SR</button>
+          </div>
+        </div>
+
+        <ul id="list" class="suggestList"></ul>
+        <div class="loading" id="loading">Loading…</div>
+        <div class="err" id="err"></div>
+        <div class="keys"><kbd>↑</kbd> <kbd>↓</kbd> <kbd>Enter</kbd> <kbd>Esc</kbd></div>
+      </section>
+
+      <aside class="detail" id="detail"></aside>
+    </div>
+  </div>
+
+<script>
+  const q = document.getElementById("q");
+  const list = document.getElementById("list");
+  const detail = document.getElementById("detail");
+  const btnSRDE = document.getElementById("btnSRDE");
+  const btnDESR = document.getElementById("btnDESR");
+  const errBox = document.getElementById("err");
+  const loading = document.getElementById("loading");
+
+  let dir = "SR_DE";
+  let results = [];
+  let active = 0;
+
+  function setDir(next){
+    dir = next;
+    btnSRDE.dataset.active = (dir==="SR_DE") ? "true" : "false";
+    btnDESR.dataset.active = (dir==="DE_SR") ? "true" : "false";
+    search();
+    q.focus();
+  }
+
+  btnSRDE.addEventListener("click", ()=> setDir("SR_DE"));
+  btnDESR.addEventListener("click", ()=> setDir("DE_SR"));
+
+  function escapeHtml(s){
+    return (s ?? "").toString()
+      .replaceAll("&","&amp;").replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function escapeRegExp(s){
+    return (s ?? "").toString().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function normalizeCmp(s){
+    return (s ?? "").toString()
+      .replace(/\s+/g," ")
+      .trim()
+      .toLowerCase()
+      .replace(/[.,;:!?\-–—]+$/,"");
+  }
+
+  function normalizeGloss(s){
+    const t = (s ?? "").toString().trim();
+    return t.replace(/^\((der|die|das)\)\s+/i, (_, art) => art.toLowerCase() + " ");
+  }
+
+  function getQuickGloss(item){
+    const mg = normalizeGloss(item?.main_gloss ?? "").trim();
+    if(!mg) return "";
+    const first = mg.split(/[;,]/)[0].trim();
+    return first || mg;
+  }
+
+  function getExplanationText(item){
+    const rc = (item?.raw_clean ?? "").toString().trim();
+    if(rc) return rc;
+
+    const mg = (item?.main_gloss ?? "").toString().trim();
+    if(mg) return mg;
+
+    return "";
+  }
+
+  function stripRawCleanHeaderLine(rawText, item){
+    const t = (rawText ?? "").toString().replace(/\r\n/g, "\n");
+    const hw = (item?.headword ?? "").toString().trim();
+    const pos = (item?.pos ?? "").toString().trim();
+    if(!t || !hw || !pos) return t;
+
+    const re = new RegExp(
+      "^\\s*" + escapeRegExp(hw) +
+      "\\s*\\(\\s*" + escapeRegExp(pos) + "\\s*\\)\\s*" +
+      "(?:\\(\\s*(?:der|die|das)\\s*\\)|\\[\\s*(?:der|die|das)\\s*\\])?\\s*\\n+",
+      "i"
+    );
+    return t.replace(re, "").trim();
+  }
+
+  function isDashOnlyLine(s){
+    const t = (s ?? "").toString().trim();
+    return t === "-" || t === "–" || t === "—";
+  }
+
+  function normalizeRawLines(text){
+    const lines = (text ?? "").toString().replace(/\r\n/g, "\n").split("\n");
+    const out = [];
+
+    for(let line of lines){
+      if(line == null) continue;
+      let s = String(line).replace(/\s+$/,"");
+      if(s.trim()==="") continue;
+      if(isDashOnlyLine(s)) continue;
+
+      // normalize "- DE:" / "- SR:" (but keep plain bullets separate)
+      s = s.replace(/^\s*[-–—]\s*(DE|SR)\s*:\s*/i, (_, tag) => tag.toUpperCase() + ": ");
+
+      // strip ONLY list dashes, not "•" bullets
+      s = s.replace(/^\s*[-–—]\s+/,"");
+
+      // remove "1. " numbering at line start
+      s = s.replace(/^\s*\d+\.\s+/, "");
+
+      if(s.trim()==="") continue;
+
+      // split "… / SR: …" even if embedded in a plain line
+      {
+        const m = s.match(/^(.*?)(?:\s*\/\s*SR\s*:\s*)(.+)$/i);
+        if (m) {
+          const left = (m[1] || "").trim();
+          const right = (m[2] || "").trim();
+          if (left) out.push(`DE: ${left}`);
+          if (right) out.push(`SR: ${right}`);
+          continue;
+        }
+      }
+
+      out.push(s);
+    }
+
+    return out;
+  }
+
+  function dropLeadingQuickDuplicate(lines, quick){
+    const qn = normalizeCmp(quick);
+    if(!qn) return lines;
+
+    const out = [...lines];
+    for(let i=0;i<out.length;i++){
+      if(out[i].trim()==="") continue;
+      if(normalizeCmp(out[i]) === qn){
+        out.splice(i,1);
+      }
+      break;
+    }
+    return out;
+  }
+
+  // Sense split by "1) 2) ..." OR "1. 2. ..."
+  function splitIntoSenses(lines){
+    const joined = lines.join("\n");
+    if(!/\n?\s*\d+[\)\.]\s+/.test(joined)) return [lines];
+
+    const t = joined.replace(/(\s)(\d+[\)\.])\s+/g, "\n$2 ");
+
+    const parts = t.split(/(?=(?:^|\n)\s*\d+[\)\.]\s*)/m)
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    return parts.map(p => {
+      const cleaned = p.replace(/^\s*\d+[\)\.]\s*/,"");
+      return normalizeRawLines(cleaned);
+    });
+  }
+
+  // Only treat DE:/SR: as language lines (case-insensitive)
+  function lineIsLang(line){
+    return /^\s*(DE|SR)\s*:\s*/i.test(line || "");
+  }
+
+  // support inline "DE — SR" (one line) -> render as two language cards
+  function splitInlinePair(line){
+    const s = (line ?? "").toString().trim();
+    if(!s) return null;
+
+    // separator: em dash or en dash with spaces around
+    const m = s.match(/^(.*?)(?:\s+[—–]\s+)(.*)$/);
+    if(!m) return null;
+
+    const left = (m[1] || "").trim();
+    const right = (m[2] || "").trim();
+    if(!left || !right) return null;
+
+    // avoid splitting tiny left fragments like "NE — ovde ..."
+    if(left.length <= 3) return null;
+
+    return { de: left, sr: right };
+  }
+
+  function langBadgeHtml(lang){
+    const L = (lang || "").toLowerCase();
+    const flag = (L === "de") ? "🇩🇪" : "🇷🇸";
+    const code = (L === "de") ? "DE" : "SR";
+    return `<span class="flag" aria-hidden="true">${flag}</span><span class="code">${code}</span>`;
+  }
+
+  function renderSense(lines, quick){
+    if(!lines || !lines.length) return "";
+
+    const nonEmpty = lines.map(x=>x.trim()).filter(Boolean);
+    if(nonEmpty.length === 1 && normalizeCmp(nonEmpty[0]) === normalizeCmp(quick)) return "";
+
+    let idx = 0;
+    let heading = "";
+    if(nonEmpty.length >= 2 && !lineIsLang(nonEmpty[0]) && lineIsLang(nonEmpty[1])){
+      if(normalizeCmp(nonEmpty[0]) !== normalizeCmp(quick)){
+        heading = nonEmpty[0];
+      }
+      idx = 1;
+    }
+
+    const blocks = [];
+
+    for(let i=idx;i<nonEmpty.length;i++){
+      const line = nonEmpty[i];
+
+      // DE:/SR: explicit (plus split embedded SR inside DE line)
+      const m = line.match(/^\s*(DE|SR)\s*:\s*(.*)$/i);
+      if (m) {
+        const lang = m[1].toLowerCase();
+        const txt = (m[2] || "").trim();
+
+        // Split inside DE line: "… — SR: …"
+        if (lang === "de") {
+          const md = txt.match(/^(.*?)(?:\s*[—–]\s*SR\s*:\s*)(.+)$/i);
+          if (md) {
+            const left = (md[1] || "").trim();
+            const right = (md[2] || "").trim();
+            if (left) blocks.push({ type: "pair", lang: "de", txt: left });
+            if (right) blocks.push({ type: "pair", lang: "sr", txt: right });
+            continue;
+          }
+
+          // Split inside DE line: "… / SR: …"
+          const ms = txt.match(/^(.*?)(?:\s*\/\s*SR\s*:\s*)(.+)$/i);
+          if (ms) {
+            const left = (ms[1] || "").trim();
+            const right = (ms[2] || "").trim();
+            if (left) blocks.push({ type: "pair", lang: "de", txt: left });
+            if (right) blocks.push({ type: "pair", lang: "sr", txt: right });
+            continue;
+          }
+        }
+
+        blocks.push({ type:"pair", lang, txt });
+        continue;
+      }
+
+      // inline "… — …" pair
+      const p = splitInlinePair(line);
+      if(p){
+        blocks.push({ type:"pair", lang:"de", txt: p.de });
+        blocks.push({ type:"pair", lang:"sr", txt: p.sr });
+        continue;
+      }
+
+      // plain line
+      blocks.push({ type:"plain", txt: line });
+    }
+
+    const headHtml = heading ? `<div class="head">${escapeHtml(heading)}</div>` : "";
+
+    const inner = blocks.map(b=>{
+      if(b.type==="pair"){
+        return `<div class="pair">
+          <span class="langTag ${b.lang}">${langBadgeHtml(b.lang)}</span>
+          <span class="langTxt">${escapeHtml(b.txt).replace(/\n/g,"<br>")}</span>
+        </div>`;
+      }
+      return `<div class="plain">${escapeHtml(b.txt).replace(/\n/g,"<br>")}</div>`;
+    }).join("");
+
+    return `<div class="sense">${headHtml}${inner}</div>`;
+  }
+
+  function renderExplanationRich(rawText, item, quick){
+    const baseLines = normalizeRawLines(rawText ?? "");
+    const senses = splitIntoSenses(baseLines);
+
+    const sensesHtml = senses.map(sLines=>{
+      const s2 = dropLeadingQuickDuplicate(sLines, quick);
+      return renderSense(s2, quick);
+    }).filter(Boolean).join("");
+
+    return `<div class="explain">${sensesHtml || `<div class="plain">—</div>`}</div>`;
+  }
+
+  const POS_MAP_SR = {
+    "noun": "imenica",
+    "verb": "glagol",
+    "adj":  "pridev",
+    "adv":  "prilog",
+    "prep": "predlog",
+    "pron": "zamenica",
+    "num":  "broj",
+    "conj": "veznik",
+    "intj": "uzvik",
+    "part": "rečca",
+    "prefix": "prefiks"
+  };
+
+  function toSrPos(pos){
+    const p = (pos || "").toString().trim().toLowerCase();
+    return POS_MAP_SR[p] || (pos || "");
+  }
+
+  function firstTopic(topics){
+    if(!topics) return "";
+    if(Array.isArray(topics) && topics.length) return topics[0];
+    return String(topics);
+  }
+
+  function renderMetaHtml(item){
+    const posSr = toSrPos(item.pos);
+    const gender = (item.gender || "").toString().trim().toLowerCase();
+
+    const genderHtml = (gender === "der" || gender === "die" || gender === "das")
+      ? ` • <span class="art ${gender}">${escapeHtml(gender)}</span>`
+      : (gender ? ` • ${escapeHtml(gender)}` : "");
+
+    const lvl = item.level ? ` | ${escapeHtml(item.level)}` : "";
+    const t0 = firstTopic(item.topics);
+    const t = t0 ? ` | tema: ${escapeHtml(t0)}` : "";
+
+    return `${escapeHtml(posSr)}${genderHtml}${lvl}${t}`;
+  }
+
+  // -------------------------
+  // NEW plural logic (based on "plural" column)
+  // Format examples:
+  // - e / er / en / n / s           -> append suffix
+  // - ä-e, ö-er, ü-en, Ä-E, Ö-ER... -> apply umlaut to last component, then append suffix
+  // - äu-e / ÄU-ER / äu-en ...      -> apply "au" -> "äu" (or "Au" -> "Äu") in last component, then append suffix
+  // - samosg                        -> no plural (hide tag)
+  // - toren, nen, chen, Kinder ...  -> append as-is (fallback)
+  // -------------------------
+
+  function parsePluralFieldNew(pluralField){
+    const raw = (pluralField ?? "").toString().trim();
+    if(!raw) return { raw:"", kind:"none" };
+
+    const low = raw.toLowerCase();
+
+    if(low === "samosg") return { raw, kind:"no_plural" };
+
+    // diphthong umlaut: "äu-e", "ÄU-er", optional hyphen
+    const mDip = raw.match(/^([äÄ])([uU])\-?(e|er|en|n|s)$/);
+    if(mDip){
+      // we keep exact case intent for "äu/Äu"
+      const first = mDip[1];
+      const second = mDip[2];
+      const diph = (first === "Ä" ? "Ä" : "ä") + (second === "U" ? "U" : "u");
+      return { raw, kind:"umlaut_diphthong", diphthong: diph, suffix: mDip[3].toLowerCase() };
+    }
+
+    // single-char umlaut: "ü-e", "ö-er", "ä-en" (optional hyphen)
+    const mU = raw.match(/^([äöüÄÖÜ])\-?(e|er|en|n|s)$/);
+    if(mU){
+      return { raw, kind:"umlaut_suffix", umlautChar:mU[1], suffix:mU[2].toLowerCase() };
+    }
+
+    // pure suffix
+    if(/^(e|er|en|n|s)$/i.test(raw)){
+      return { raw, kind:"suffix", suffix: raw.toLowerCase() };
+    }
+
+    // anything else: append as-is
+    return { raw, kind:"append", append: raw };
+  }
+
+  function applyUmlautToLastComponent(word, umlautChar){
+    const hw = (word ?? "").toString();
+    if(!hw) return hw;
+
+    const map = { "ä":"a", "ö":"o", "ü":"u", "Ä":"A", "Ö":"O", "Ü":"U" };
+    const base = map[umlautChar];
+    if(!base) return hw;
+
+    const dashIdx = hw.lastIndexOf("-");
+    const prefix = dashIdx >= 0 ? hw.slice(0, dashIdx + 1) : "";
+    const last = dashIdx >= 0 ? hw.slice(dashIdx + 1) : hw;
+
+    const idx = last.lastIndexOf(base);
+    if(idx < 0) return hw;
+
+    const newLast = last.slice(0, idx) + umlautChar + last.slice(idx + 1);
+    return prefix + newLast;
+  }
+
+  function applyAeuToLastComponent(word){
+    const hw = (word ?? "").toString();
+    if(!hw) return hw;
+
+    const dashIdx = hw.lastIndexOf("-");
+    const prefix = dashIdx >= 0 ? hw.slice(0, dashIdx + 1) : "";
+    const last = dashIdx >= 0 ? hw.slice(dashIdx + 1) : hw;
+
+    // replace last occurrence of "au" or "Au" (prefer matching case)
+    const idxLower = last.lastIndexOf("au");
+    const idxUpper = last.lastIndexOf("Au");
+
+    let idx = -1;
+    let from = "";
+    let to = "";
+
+    if(idxLower >= 0 && idxUpper >= 0){
+      // choose the later one
+      if(idxLower > idxUpper){ idx = idxLower; from="au"; to="äu"; }
+      else { idx = idxUpper; from="Au"; to="Äu"; }
+    }else if(idxLower >= 0){
+      idx = idxLower; from="au"; to="äu";
+    }else if(idxUpper >= 0){
+      idx = idxUpper; from="Au"; to="Äu";
+    }else{
+      return hw;
+    }
+
+    const newLast = last.slice(0, idx) + to + last.slice(idx + from.length);
+    return prefix + newLast;
+  }
+
+  function buildPluralFormNew(headword, pluralField){
+    const hw = (headword ?? "").toString().trim();
+    if(!hw) return "";
+
+    const info = parsePluralFieldNew(pluralField);
+
+    if(info.kind === "none") return "";
+    if(info.kind === "no_plural") return "";
+
+    if(info.kind === "suffix"){
+      return hw + info.suffix;
+    }
+
+    if(info.kind === "umlaut_suffix"){
+      const mutated = applyUmlautToLastComponent(hw, info.umlautChar);
+      return mutated + info.suffix;
+    }
+
+    if(info.kind === "umlaut_diphthong"){
+      const mutated = applyAeuToLastComponent(hw);
+      return mutated + info.suffix;
+    }
+
+    if(info.kind === "append"){
+      return hw + info.append;
+    }
+
+    return "";
+  }
+
+  function renderPluralTag(item){
+    if(dir !== "DE_SR") return "";
+    const pos = (item?.pos ?? "").toString().trim().toLowerCase();
+    const plRaw = (item?.plural ?? "").toString().trim();
+    if(pos !== "noun" || !plRaw) return "";
+
+    const info = parsePluralFieldNew(plRaw);
+    if(info.kind === "no_plural") return ""; // samosg
+
+    const fullPlural = buildPluralFormNew(item.headword, plRaw);
+    if(!fullPlural) return "";
+
+    // show raw plural hint (useful for debugging)
+    const hint = ` <span style="opacity:.65">(${escapeHtml(plRaw)})</span>`;
+    return `<span class="plTag">Pl: ${escapeHtml(fullPlural)}${hint}</span>`;
+  }
+
+  function renderDetail(item){
+    if(!item){
+      detail.innerHTML = `
+        <div class="word">—</div>
+        <div class="meta">Kucaj za pretragu (${dir==="SR_DE" ? "SR→DE" : "DE→SR"})</div>
+        <div class="wordUnderline"></div>
+        <div class="quick">—</div>
+        <div class="explain"><div class="plain">raw_clean će se prikazati ovde.</div></div>`;
+      return;
+    }
+
+    const hasRawClean = !!((item?.raw_clean ?? "").toString().trim());
+
+    // Show quick (short main_gloss) ONLY if raw_clean is missing
+    const quick = hasRawClean ? "" : getQuickGloss(item);
+
+    let explanation = getExplanationText(item) || "—";
+
+    if(hasRawClean){
+      explanation = stripRawCleanHeaderLine(explanation, item);
+    }
+
+    let lines = normalizeRawLines(explanation);
+    lines = dropLeadingQuickDuplicate(lines, quick);
+    explanation = lines.join("\n");
+
+    detail.innerHTML = `
+      <div class="wordRow">
+        <div class="word">${escapeHtml(item.headword)}</div>
+        ${renderPluralTag(item)}
+      </div>
+      <div class="meta">${renderMetaHtml(item)}</div>
+      <div class="wordUnderline"></div>
+      ${hasRawClean ? "" : `<div class="quick">${escapeHtml(quick || "—")}</div>`}
+      ${renderExplanationRich(explanation, item, quick)}
+    `;
+  }
+
+  function renderList(){
+    list.innerHTML = "";
+    results.forEach((item, idx) => {
+      const li = document.createElement("li");
+      li.className = "suggestItem";
+      li.dataset.active = (idx===active) ? "true" : "false";
+      li.innerHTML = `
+        <div class="hw">${escapeHtml(item.headword)}</div>
+        <div class="tr">${escapeHtml(normalizeGloss(item.main_gloss || ""))}</div>
+      `;
+      li.addEventListener("mouseenter", ()=>{ active=idx; renderList(); renderDetail(results[active]); });
+      li.addEventListener("click", ()=>{ active=idx; renderList(); renderDetail(results[active]); });
+      list.appendChild(li);
+    });
+    renderDetail(results[active]);
+  }
+
+  async function fetchJson(url){
+    const r = await fetch(url, { headers: { "Accept": "application/json" }});
+    if(!r.ok){
+      const t = await r.text().catch(()=> "");
+      throw new Error(`HTTP ${r.status} ${r.statusText}${t ? " — " + t : ""}`);
+    }
+    return r.json();
+  }
+
+  async function search(){
+    const term = q.value.trim();
+    errBox.style.display = "none";
+    loading.style.display = "block";
+
+    try{
+      const params = new URLSearchParams({ direction: dir, q: term, limit: "20" });
+      const data = await fetchJson(`/api/dict/search?${params.toString()}`);
+
+      results = Array.isArray(data) ? data : (data?.rows || []);
+      active = 0;
+      renderList();
+    }catch(e){
+      results = [];
+      active = 0;
+      list.innerHTML = "";
+      renderDetail(null);
+      errBox.textContent = String(e.message || e);
+      errBox.style.display = "block";
+    }finally{
+      loading.style.display = "none";
+    }
+  }
+
+  q.addEventListener("input", ()=>{
+    clearTimeout(window.__t);
+    window.__t = setTimeout(search, 120);
+  });
+
+  q.addEventListener("keydown", (e)=>{
+    if(e.key==="ArrowDown"){ e.preventDefault(); if(results.length){ active=Math.min(active+1, results.length-1); renderList(); } }
+    else if(e.key==="ArrowUp"){ e.preventDefault(); if(results.length){ active=Math.max(active-1, 0); renderList(); } }
+    else if(e.key==="Enter"){ e.preventDefault(); renderDetail(results[active]); }
+    else if(e.key==="Escape"){ e.preventDefault(); q.value=""; q.focus(); search(); }
+  });
+
+  renderDetail(null);
+  q.focus();
+  search();
+</script>
+</body>
+</html>
