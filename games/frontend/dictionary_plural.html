@@ -388,6 +388,139 @@
   }
 }
 
+/* Clickable words in examples */
+.dict-word{
+  cursor:pointer;
+  border-bottom:1.5px dotted transparent;
+  border-radius:1px;
+  transition: border-color .15s ease, color .15s ease, background .15s ease;
+}
+.dict-word:hover{
+  border-bottom-color:#888;
+  background:rgba(0,0,0,.04);
+  border-radius:3px;
+}
+.dict-word.loading{
+  opacity:.5;
+  pointer-events:none;
+}
+.dict-word.not-found{
+  cursor:default;
+  border-bottom-color:transparent;
+}
+.dict-word.found{
+  background:rgba(0,0,0,.035);
+  border-radius:3px;
+  padding:0 2px;
+  border-bottom-color:transparent;
+}
+.dict-word.found:hover{
+  background:rgba(0,0,0,.08);
+  border-bottom-color:transparent;
+}
+
+/* Tooltip for word preview */
+.dict-tooltip{
+  position:absolute;
+  z-index:100;
+  background:#222;
+  color:#fff;
+  font-size:13px;
+  font-weight:500;
+  line-height:1.35;
+  padding:6px 10px;
+  border-radius:8px;
+  max-width:240px;
+  white-space:normal;
+  pointer-events:none;
+  opacity:0;
+  transform:translateY(4px);
+  transition:opacity .15s ease, transform .15s ease;
+  box-shadow:0 2px 8px rgba(0,0,0,.18);
+}
+.dict-tooltip.visible{
+  opacity:1;
+  transform:translateY(0);
+}
+.dict-tooltip::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:-5px;
+  border-left:6px solid transparent;
+  border-right:6px solid transparent;
+  border-top:5px solid #222;
+}
+
+/* Search history */
+.history{
+  display:none;
+  margin:14px 0 0 0;
+  padding:0;
+}
+.history.show{
+  display:block;
+}
+.historyTitle{
+  font-size:12px;
+  color:#aaa;
+  letter-spacing:.3px;
+  margin:0 0 8px 2px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.historyClear{
+  border:none;
+  background:none;
+  color:#ccc;
+  font-size:11px;
+  cursor:pointer;
+  padding:2px 4px;
+}
+.historyClear:hover{
+  color:#888;
+}
+.historyChips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.historyChip{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  border:1px solid #e8e8e8;
+  border-bottom-width:2px;
+  background:#fff;
+  border-radius:999px;
+  padding:4px 10px;
+  font-size:13px;
+  color:#444;
+  cursor:pointer;
+  user-select:none;
+  transition:background .12s ease, border-color .12s ease;
+}
+.historyChip:hover{
+  background:#f5f5f5;
+  border-color:#ddd;
+}
+.historyChip .chipDir{
+  font-size:10px;
+  color:#aaa;
+  font-weight:600;
+}
+.historyChip .chipX{
+  font-size:11px;
+  color:#ccc;
+  margin-left:2px;
+  line-height:1;
+}
+.historyChip .chipX:hover{
+  color:#888;
+}
+
 </style>
 </head>
 <body>
@@ -415,6 +548,7 @@
         </div>
 
         <ul id="list" class="suggestList" tabindex="0" role="listbox" aria-label="Results"></ul>
+        <div id="historyBox" class="history"></div>
         <div class="emptyState" id="emptyState" style="display:none"></div>
         <div class="loadingMore" id="loadingMore">⏳ Učitavam...</div>
         <div class="loading" id="loading">Loading…</div>
@@ -436,6 +570,109 @@
   const loading = document.getElementById("loading");
   const loadingMore = document.getElementById("loadingMore");
   const emptyState = document.getElementById("emptyState");
+  const historyBox = document.getElementById("historyBox");
+
+  // -------------------------
+  // Search history (localStorage)
+  // -------------------------
+  const HISTORY_KEY = "dict_search_history";
+  const HISTORY_MAX = 15;
+
+  function loadHistory(){
+    try{
+      const raw = localStorage.getItem(HISTORY_KEY);
+      if(!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    }catch(e){ return []; }
+  }
+
+  function saveHistory(arr){
+    try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }catch(e){}
+  }
+
+  function addToHistory(word, direction){
+    if(!word || word.trim().length < 4) return;
+    let hist = loadHistory();
+    hist = hist.filter(h => !(h.word.toLowerCase() === word.toLowerCase() && h.dir === direction));
+    hist.unshift({ word, dir: direction });
+    if(hist.length > HISTORY_MAX) hist = hist.slice(0, HISTORY_MAX);
+    saveHistory(hist);
+  }
+
+  function removeFromHistory(index){
+    let hist = loadHistory();
+    hist.splice(index, 1);
+    saveHistory(hist);
+    renderHistory();
+  }
+
+  function clearHistory(){
+    saveHistory([]);
+    renderHistory();
+  }
+
+  function renderHistory(){
+    const term = q.value.trim();
+    const hist = loadHistory();
+
+    if(term || hist.length === 0){
+      historyBox.classList.remove("show");
+      return;
+    }
+
+    historyBox.classList.add("show");
+    historyBox.innerHTML = `
+      <div class="historyTitle">
+        <span>Nedavno traženo</span>
+        <button class="historyClear" title="Obriši istoriju">obriši sve</button>
+      </div>
+      <div class="historyChips">
+        ${hist.map((h, i) => `
+          <span class="historyChip" data-idx="${i}" data-word="${escapeHtml(h.word)}" data-dir="${escapeHtml(h.dir)}">
+            <span class="chipDir">${h.dir === "SR_DE" ? "SR→DE" : "DE→SR"}</span>
+            ${escapeHtml(h.word)}
+            <span class="chipX" data-remove="${i}" title="Ukloni">✕</span>
+          </span>
+        `).join("")}
+      </div>
+    `;
+
+    historyBox.querySelector(".historyClear")?.addEventListener("click", (e)=>{
+      e.preventDefault();
+      clearHistory();
+    });
+
+    historyBox.querySelectorAll(".historyChip").forEach(chip =>{
+      chip.addEventListener("click", (e)=>{
+        if(e.target.closest(".chipX")) return;
+        const word = chip.dataset.word;
+        const chipDir = chip.dataset.dir;
+
+        if(chipDir && chipDir !== dir){
+          dir = chipDir;
+          btnSRDE.dataset.active = (dir==="SR_DE") ? "true" : "false";
+          btnDESR.dataset.active = (dir==="DE_SR") ? "true" : "false";
+          btnSRDE.setAttribute("aria-pressed", dir==="SR_DE" ? "true" : "false");
+          btnDESR.setAttribute("aria-pressed", dir==="DE_SR" ? "true" : "false");
+          updateCharBar();
+          updatePlaceholder();
+        }
+
+        q.value = word;
+        q.focus();
+        search();
+      });
+    });
+
+    historyBox.querySelectorAll(".chipX").forEach(x =>{
+      x.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        const idx = parseInt(x.dataset.remove, 10);
+        if(!isNaN(idx)) removeFromHistory(idx);
+      });
+    });
+  }
 
   // Pagination for suggestions
   const PAGE_SIZE = 20;
@@ -543,7 +780,9 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
         if (results.length) renderDetail(results[active]);
       } else if (e.key === "Escape") {
         e.preventDefault();
+        q.value = "";
         q.focus();
+        search();
       }
     });
   }
@@ -759,6 +998,239 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
     }
     return out;
   }
+
+  // -------------------------
+  // Clickable words in examples
+  // -------------------------
+  const lookupCache = new Map();
+
+  function wordLookupDir(lang){
+    if(lang === "de") return "DE_SR";
+    if(lang === "sr") return "SR_DE";
+    return dir;
+  }
+
+  function wrapWordsClickable(text, lang){
+    const escaped = escapeHtml(text);
+    return escaped.replace(/([a-zA-ZäöüÄÖÜßčćđšžČĆĐŠŽa-zA-Z\u00C0-\u024F]+)/g, (match) => {
+      if(match.length < 4) return match;
+      const lookupDir = wordLookupDir(lang);
+      return `<span class="dict-word" data-word="${match}" data-lookup-dir="${lookupDir}">${match}</span>`;
+    });
+  }
+
+  async function lookupWord(word, lookupDir){
+    const cacheKey = `${lookupDir}|${word.toLowerCase()}`;
+    if(lookupCache.has(cacheKey)) return lookupCache.get(cacheKey);
+
+    try{
+      const params = new URLSearchParams({ word, direction: lookupDir });
+      const data = await fetchJson(`/api/dict/lookup?${params.toString()}`);
+      lookupCache.set(cacheKey, data);
+      return data;
+    }catch(e){
+      console.error("Lookup error:", e);
+      return { found: false };
+    }
+  }
+
+  async function handleWordClick(e){
+    const span = e.target.closest(".dict-word");
+    if(!span || span.classList.contains("not-found") || span.classList.contains("loading")) return;
+
+    const word = span.dataset.word;
+    const lookupDir = span.dataset.lookupDir;
+    if(!word || !lookupDir) return;
+
+    span.classList.add("loading");
+
+    const result = await lookupWord(word, lookupDir);
+
+    span.classList.remove("loading");
+
+    if(!result.found){
+      span.classList.add("not-found");
+      return;
+    }
+
+    // Push current state to history so Back button works
+    const currentParams = new URLSearchParams();
+    currentParams.set("dir", dir);
+    currentParams.set("q", q.value.trim());
+    if(selectedId != null) currentParams.set("id", String(selectedId));
+    window.history.pushState(null, "", `${window.location.pathname}?${currentParams.toString()}`);
+
+    if(lookupDir !== dir){
+      dir = lookupDir;
+      btnSRDE.dataset.active = (dir==="SR_DE") ? "true" : "false";
+      btnDESR.dataset.active = (dir==="DE_SR") ? "true" : "false";
+      btnSRDE.setAttribute("aria-pressed", dir==="SR_DE" ? "true" : "false");
+      btnDESR.setAttribute("aria-pressed", dir==="DE_SR" ? "true" : "false");
+      updateCharBar();
+      updatePlaceholder();
+    }
+
+    q.value = result.headword;
+    __pendingSelectId = String(result.id);
+    addToHistory(result.headword, lookupDir);
+    await search();
+  }
+
+  // -------------------------
+  // Tooltip on hover
+  // -------------------------
+  let tooltipEl = null;
+  let tooltipTimer = null;
+  let tooltipCurrentSpan = null;
+
+  function ensureTooltip(){
+    if(!tooltipEl){
+      tooltipEl = document.createElement("div");
+      tooltipEl.className = "dict-tooltip";
+      document.body.appendChild(tooltipEl);
+    }
+    return tooltipEl;
+  }
+
+  function hideTooltip(){
+    clearTimeout(tooltipTimer);
+    tooltipTimer = null;
+    tooltipCurrentSpan = null;
+    if(tooltipEl){
+      tooltipEl.classList.remove("visible");
+    }
+  }
+
+  function positionTooltip(span){
+    const tip = ensureTooltip();
+    const rect = span.getBoundingClientRect();
+    const tipRect = tip.getBoundingClientRect();
+
+    let left = rect.left + rect.width / 2 - tipRect.width / 2;
+    let top = rect.top - tipRect.height - 8;
+
+    if(left < 6) left = 6;
+    if(left + tipRect.width > window.innerWidth - 6) left = window.innerWidth - tipRect.width - 6;
+    if(top < 6){
+      top = rect.bottom + 8;
+    }
+
+    tip.style.left = left + window.scrollX + "px";
+    tip.style.top = top + window.scrollY + "px";
+  }
+
+  function showTooltipFor(span){
+    const word = span.dataset.word;
+    const lookupDir = span.dataset.lookupDir;
+    if(!word || !lookupDir) return;
+
+    tooltipCurrentSpan = span;
+
+    tooltipTimer = setTimeout(async ()=>{
+      if(tooltipCurrentSpan !== span) return;
+
+      const result = await lookupWord(word, lookupDir);
+
+      if(tooltipCurrentSpan !== span) return;
+      if(!result.found){
+        span.classList.add("not-found");
+        return;
+      }
+
+      const tip = ensureTooltip();
+      tip.textContent = result.main_gloss || result.headword;
+      tip.classList.remove("visible");
+
+      requestAnimationFrame(()=>{
+        if(tooltipCurrentSpan !== span) return;
+        positionTooltip(span);
+        tip.classList.add("visible");
+      });
+    }, 300);
+  }
+
+  detail.addEventListener("mouseenter", (e)=>{
+    const span = e.target.closest(".dict-word");
+    if(!span || span.classList.contains("not-found")) return;
+    showTooltipFor(span);
+  }, true);
+
+  detail.addEventListener("mouseleave", (e)=>{
+    const span = e.target.closest(".dict-word");
+    if(!span) return;
+    hideTooltip();
+  }, true);
+
+  detail.addEventListener("scroll", hideTooltip);
+
+  // -------------------------
+  // Batch prefetch clickable words
+  // -------------------------
+  async function prefetchClickableWords(){
+    const spans = detail.querySelectorAll(".dict-word:not(.found):not(.not-found)");
+    if(!spans.length) return;
+
+    const byDir = {};
+    for(const span of spans){
+      const lookupDir = span.dataset.lookupDir;
+      const word = span.dataset.word;
+      if(!lookupDir || !word) continue;
+      if(!byDir[lookupDir]) byDir[lookupDir] = new Set();
+      byDir[lookupDir].add(word);
+    }
+
+    for(const [lookupDir, wordSet] of Object.entries(byDir)){
+      const uncached = [...wordSet].filter(w => !lookupCache.has(`${lookupDir}|${w.toLowerCase()}`));
+
+      if(uncached.length > 0){
+        try{
+          const resp = await fetch("/api/dict/lookup-batch", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify({ words: uncached, direction: lookupDir })
+          });
+          if(resp.ok){
+            const data = await resp.json();
+            const results = data.results || {};
+
+            for(const w of uncached){
+              const key = `${lookupDir}|${w.toLowerCase()}`;
+              const match = results[w.toLowerCase()];
+              if(match){
+                lookupCache.set(key, { found: true, id: match.id, headword: match.headword, main_gloss: match.main_gloss });
+              } else {
+                lookupCache.set(key, { found: false });
+              }
+            }
+          }
+        }catch(e){
+          console.error("Batch lookup error:", e);
+        }
+      }
+
+      for(const span of spans){
+        if(span.dataset.lookupDir !== lookupDir) continue;
+        const word = span.dataset.word;
+        if(!word) continue;
+        const cacheKey = `${lookupDir}|${word.toLowerCase()}`;
+        const cached = lookupCache.get(cacheKey);
+        if(!cached) continue;
+        if(cached.found){
+          span.classList.add("found");
+        } else {
+          span.classList.add("not-found");
+        }
+      }
+    }
+  }
+
+  // Delegate clicks on detail panel
+  detail.addEventListener("click", (e)=>{
+    if(e.target.closest(".dict-word")){
+      hideTooltip();
+      handleWordClick(e);
+    }
+  });
 
   function splitIntoSenses(lines){
     const joined = lines.join("\n");
@@ -1232,7 +1704,7 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
         return `<div class="pair">
           <div class="pairMain">
             <span class="langTag ${langTag}">${langBadgeHtml(langTag)}</span>
-            <span class="langTxt">${escapeHtml(b.txt).replace(/\n/g,"<br>")}</span>
+            <span class="langTxt">${wrapWordsClickable(b.txt, langTag)}</span>
           </div>
           ${speak}
         </div>`;
@@ -1443,13 +1915,30 @@ function renderDetail(item){
     syncUrl();
 
     requestAnimationFrame(fitHeadword);
+
+    // Prefetch which words in examples are clickable
+    prefetchClickableWords();
   }
 
   function renderList(){
     list.innerHTML = "";
     
-    // Show empty state if no results and user has typed something
     const term = q.value.trim();
+    
+    // If input is empty and we have history, show history instead of results
+    const hist = loadHistory();
+    if(!term && hist.length > 0){
+      emptyState.style.display = "none";
+      list.style.display = "none";
+      renderHistory();
+      renderDetail(results[active]);
+      return;
+    }
+    
+    // Hide history when typing
+    historyBox.classList.remove("show");
+    
+    // Show empty state if no results and user has typed something
     if(results.length === 0 && term){
       emptyState.innerHTML = `Nema rezultata za <strong>"${escapeHtml(term)}"</strong><br><span style="font-size:13px;color:#aaa">Pokušaj sa drugim terminom</span>`;
       emptyState.style.display = "block";
@@ -1467,7 +1956,7 @@ function renderDetail(item){
           <div class="hw">${highlightHtml(item.headword, q.value)}</div>
           <div class="tr">${escapeHtml(normalizeGloss(item.main_gloss || ""))}</div>
         `;
-        li.addEventListener("click", ()=>{ active=idx; renderList(); renderDetail(results[active]); });
+        li.addEventListener("click", ()=>{ active=idx; addToHistory(item.headword, dir); renderList(); renderDetail(results[active]); });
         list.appendChild(li);
       });
     }
@@ -1489,6 +1978,17 @@ function renderDetail(item){
   async function search(){
     const term = q.value.trim();
     errBox.style.display = "none";
+
+    // If input is empty and we have history, skip API call and show history immediately
+    const hist = loadHistory();
+    if(!term && hist.length > 0){
+      results = [];
+      active = 0;
+      loading.style.display = "none";
+      renderList();
+      return;
+    }
+
     loading.style.display = "block";
 
     try{
@@ -1541,7 +2041,7 @@ function renderDetail(item){
   q.addEventListener("keydown", (e)=>{
     if(e.key==="ArrowDown"){ e.preventDefault(); if(results.length){ active=Math.min(active+1, results.length-1); renderList(); } }
     else if(e.key==="ArrowUp"){ e.preventDefault(); if(results.length){ active=Math.max(active-1, 0); renderList(); } }
-    else if(e.key==="Enter"){ e.preventDefault(); renderDetail(results[active]); }
+    else if(e.key==="Enter"){ e.preventDefault(); if(results[active]){ addToHistory(results[active].headword, dir); } renderDetail(results[active]); }
     else if(e.key==="Escape"){ e.preventDefault(); q.value=""; q.focus(); search(); }
   });
 
@@ -1550,6 +2050,15 @@ function renderDetail(item){
 // Global keyboard navigation: allow ArrowUp/ArrowDown/Enter even if focus moved elsewhere,
 // as long as the user isn't typing in another input/textarea/contenteditable.
 document.addEventListener("keydown", (e) => {
+  // Global Escape: always clear search and focus input
+  if (e.key === "Escape") {
+    e.preventDefault();
+    q.value = "";
+    q.focus();
+    search();
+    return;
+  }
+
   // Global navigation (optional): use Ctrl + ArrowUp/ArrowDown/Ctrl+Enter from anywhere
   // so normal Arrow keys can scroll/read the right panel without being hijacked.
   const navKeys = ["ArrowUp","ArrowDown","Enter"];
@@ -1604,6 +2113,27 @@ document.addEventListener("keydown", (e) => {
     q.focus();
     await search();
   }
+
+  // Handle browser Back/Forward buttons
+  window.addEventListener("popstate", async () => {
+    const params = new URLSearchParams(window.location.search);
+    const newDir = (params.get("dir") || "").toUpperCase();
+    const newQ = params.get("q") || "";
+    __pendingSelectId = params.get("id");
+
+    if(newDir === "DE_SR" || newDir === "SR_DE"){
+      dir = newDir;
+      btnSRDE.dataset.active = (dir==="SR_DE") ? "true" : "false";
+      btnDESR.dataset.active = (dir==="DE_SR") ? "true" : "false";
+      btnSRDE.setAttribute("aria-pressed", dir==="SR_DE" ? "true" : "false");
+      btnDESR.setAttribute("aria-pressed", dir==="DE_SR" ? "true" : "false");
+      updateCharBar();
+      updatePlaceholder();
+    }
+
+    q.value = newQ;
+    await search();
+  });
 
   initFromUrl();
 </script>

@@ -91,7 +91,26 @@ app.get("/api/dict/search", async (req, res) => {
       [dir, q + "%", limit, offset]
     );
 
-    res.json(r.rows || r);
+    const rows = r.rows || r;
+
+    // If prefix match found results, return them
+    if (rows && rows.length > 0) {
+      return res.json(rows);
+    }
+
+    // Fuzzy fallback (% operator uses GIN trigram index) — only when prefix returns nothing
+    const fuzzy = await query(
+      `SELECT id, headword, main_gloss, raw_clean, pos, gender, level, topics, plural, image_url,
+              similarity(lower(headword), lower($2)) AS sim
+       FROM public.entries
+       WHERE direction = $1
+         AND lower(headword) % lower($2)
+       ORDER BY sim DESC, headword
+       LIMIT $3`,
+      [dir, q, limit]
+    );
+
+    res.json(fuzzy.rows || fuzzy);
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: String(e.message || e) });
@@ -116,6 +135,88 @@ app.get("/api/dict/entry/:id", async (req, res) => {
     }
 
     res.json(rows[0]);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: String(e.message || e) });
+  }
+});
+
+// ---------------------------------------------------------------------
+// Dictionary API: lookup single word (for tooltip/click on words in examples)
+// ---------------------------------------------------------------------
+app.get("/api/dict/lookup", async (req, res) => {
+  const word = String(req.query.word || "").trim();
+  const dir = String(req.query.direction || "").toUpperCase();
+
+  if (!word) {
+    return res.status(400).json({ error: "Missing 'word' parameter." });
+  }
+  if (!["DE_SR", "SR_DE"].includes(dir)) {
+    return res.status(400).json({ error: "Invalid direction. Use DE_SR or SR_DE." });
+  }
+
+  try {
+    const r = await query(
+      `SELECT id, headword, main_gloss
+       FROM public.entries
+       WHERE direction = $1
+         AND lower(headword) = lower($2)
+       LIMIT 1`,
+      [dir, word]
+    );
+
+    const rows = r.rows || r;
+    if (rows && rows.length > 0) {
+      return res.json({ found: true, id: rows[0].id, headword: rows[0].headword, main_gloss: rows[0].main_gloss });
+    }
+
+    res.json({ found: false });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: String(e.message || e) });
+  }
+});
+
+// ---------------------------------------------------------------------
+// Dictionary API: batch lookup words (for prefetch clickable words)
+// Exact match only — fast, no fuzzy overhead
+// ---------------------------------------------------------------------
+app.post("/api/dict/lookup-batch", async (req, res) => {
+  const words = req.body.words;
+  const dir = String(req.body.direction || "").toUpperCase();
+
+  if (!Array.isArray(words) || words.length === 0) {
+    return res.status(400).json({ error: "Missing 'words' array." });
+  }
+  if (!["DE_SR", "SR_DE"].includes(dir)) {
+    return res.status(400).json({ error: "Invalid direction. Use DE_SR or SR_DE." });
+  }
+
+  const cleaned = [...new Set(words.map(w => String(w).trim().toLowerCase()).filter(Boolean))].slice(0, 200);
+
+  if (cleaned.length === 0) {
+    return res.json({ results: {} });
+  }
+
+  try {
+    const r = await query(
+      `SELECT id, headword, main_gloss
+       FROM public.entries
+       WHERE direction = $1
+         AND lower(headword) = ANY($2)`,
+      [dir, cleaned]
+    );
+
+    const rows = r.rows || r;
+    const results = {};
+    for (const row of rows) {
+      const key = row.headword.toLowerCase();
+      if (!results[key]) {
+        results[key] = { id: row.id, headword: row.headword, main_gloss: row.main_gloss };
+      }
+    }
+
+    res.json({ results });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: String(e.message || e) });
