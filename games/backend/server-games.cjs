@@ -123,6 +123,42 @@ app.get("/api/dict/entry/:id", async (req, res) => {
 });
 
 // ---------------------------------------------------------------------
+// Dictionary API: lookup word (for clickable words in examples)
+// ---------------------------------------------------------------------
+app.get("/api/dict/lookup", async (req, res) => {
+  const word = String(req.query.word || "").trim();
+  const dir = String(req.query.direction || "").toUpperCase();
+
+  if (!word) {
+    return res.status(400).json({ error: "Missing 'word' parameter." });
+  }
+  if (!["DE_SR", "SR_DE"].includes(dir)) {
+    return res.status(400).json({ error: "Invalid direction. Use DE_SR or SR_DE." });
+  }
+
+  try {
+    const r = await query(
+      `SELECT id, headword, main_gloss
+       FROM public.entries
+       WHERE direction = $1
+         AND lower(headword) = lower($2)
+       LIMIT 1`,
+      [dir, word]
+    );
+
+    const rows = r.rows || r;
+    if (!rows || rows.length === 0) {
+      return res.json({ found: false });
+    }
+
+    res.json({ found: true, id: rows[0].id, headword: rows[0].headword, main_gloss: rows[0].main_gloss });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: String(e.message || e) });
+  }
+});
+
+// ---------------------------------------------------------------------
 // API: Gender Drill (like your test sheet)
 // ---------------------------------------------------------------------
 app.get("/api/game/gender-drill", async (req, res) => {

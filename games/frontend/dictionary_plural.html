@@ -388,6 +388,27 @@
   }
 }
 
+/* Clickable words in examples */
+.dict-word{
+  cursor:pointer;
+  border-bottom:1.5px dotted transparent;
+  border-radius:1px;
+  transition: border-color .15s ease, color .15s ease, background .15s ease;
+}
+.dict-word:hover{
+  border-bottom-color:#888;
+  background:rgba(0,0,0,.04);
+  border-radius:3px;
+}
+.dict-word.loading{
+  opacity:.5;
+  pointer-events:none;
+}
+.dict-word.not-found{
+  cursor:default;
+  border-bottom-color:transparent;
+}
+
 </style>
 </head>
 <body>
@@ -759,6 +780,89 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
     }
     return out;
   }
+
+  // -------------------------
+  // Clickable words in examples
+  // -------------------------
+  const lookupCache = new Map();
+
+  function wordLookupDir(lang){
+    if(lang === "de") return "DE_SR";
+    if(lang === "sr") return "SR_DE";
+    return dir;
+  }
+
+  function wrapWordsClickable(text, lang){
+    const escaped = escapeHtml(text);
+    return escaped.replace(/([a-zA-ZäöüÄÖÜßčćđšžČĆĐŠŽa-zA-Z\u00C0-\u024F]+)/g, (match) => {
+      const lookupDir = wordLookupDir(lang);
+      return `<span class="dict-word" data-word="${match}" data-lookup-dir="${lookupDir}">${match}</span>`;
+    });
+  }
+
+  async function lookupWord(word, lookupDir){
+    const cacheKey = `${lookupDir}|${word.toLowerCase()}`;
+    if(lookupCache.has(cacheKey)) return lookupCache.get(cacheKey);
+
+    try{
+      const params = new URLSearchParams({ word, direction: lookupDir });
+      const data = await fetchJson(`/api/dict/lookup?${params.toString()}`);
+      lookupCache.set(cacheKey, data);
+      return data;
+    }catch(e){
+      console.error("Lookup error:", e);
+      return { found: false };
+    }
+  }
+
+  async function handleWordClick(e){
+    const span = e.target.closest(".dict-word");
+    if(!span || span.classList.contains("not-found") || span.classList.contains("loading")) return;
+
+    const word = span.dataset.word;
+    const lookupDir = span.dataset.lookupDir;
+    if(!word || !lookupDir) return;
+
+    span.classList.add("loading");
+
+    const result = await lookupWord(word, lookupDir);
+
+    span.classList.remove("loading");
+
+    if(!result.found){
+      span.classList.add("not-found");
+      return;
+    }
+
+    // Push current state to history so Back button works
+    const currentParams = new URLSearchParams();
+    currentParams.set("dir", dir);
+    currentParams.set("q", q.value.trim());
+    if(selectedId != null) currentParams.set("id", String(selectedId));
+    window.history.pushState(null, "", `${window.location.pathname}?${currentParams.toString()}`);
+
+    // Navigate: switch direction if needed, set search term, trigger search
+    if(lookupDir !== dir){
+      dir = lookupDir;
+      btnSRDE.dataset.active = (dir==="SR_DE") ? "true" : "false";
+      btnDESR.dataset.active = (dir==="DE_SR") ? "true" : "false";
+      btnSRDE.setAttribute("aria-pressed", dir==="SR_DE" ? "true" : "false");
+      btnDESR.setAttribute("aria-pressed", dir==="DE_SR" ? "true" : "false");
+      updateCharBar();
+      updatePlaceholder();
+    }
+
+    q.value = result.headword;
+    __pendingSelectId = String(result.id);
+    await search();
+  }
+
+  // Delegate click on detail panel for dict-word spans
+  detail.addEventListener("click", (e)=>{
+    if(e.target.closest(".dict-word")){
+      handleWordClick(e);
+    }
+  });
 
   function splitIntoSenses(lines){
     const joined = lines.join("\n");
@@ -1232,7 +1336,7 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
         return `<div class="pair">
           <div class="pairMain">
             <span class="langTag ${langTag}">${langBadgeHtml(langTag)}</span>
-            <span class="langTxt">${escapeHtml(b.txt).replace(/\n/g,"<br>")}</span>
+            <span class="langTxt">${wrapWordsClickable(b.txt, langTag)}</span>
           </div>
           ${speak}
         </div>`;
@@ -1604,6 +1708,27 @@ document.addEventListener("keydown", (e) => {
     q.focus();
     await search();
   }
+
+  // Handle browser Back/Forward buttons
+  window.addEventListener("popstate", async () => {
+    const params = new URLSearchParams(window.location.search);
+    const newDir = (params.get("dir") || "").toUpperCase();
+    const newQ = params.get("q") || "";
+    __pendingSelectId = params.get("id");
+
+    if(newDir === "DE_SR" || newDir === "SR_DE"){
+      dir = newDir;
+      btnSRDE.dataset.active = (dir==="SR_DE") ? "true" : "false";
+      btnDESR.dataset.active = (dir==="DE_SR") ? "true" : "false";
+      btnSRDE.setAttribute("aria-pressed", dir==="SR_DE" ? "true" : "false");
+      btnDESR.setAttribute("aria-pressed", dir==="DE_SR" ? "true" : "false");
+      updateCharBar();
+      updatePlaceholder();
+    }
+
+    q.value = newQ;
+    await search();
+  });
 
   initFromUrl();
 </script>
