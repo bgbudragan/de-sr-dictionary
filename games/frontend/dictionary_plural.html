@@ -1996,6 +1996,17 @@ function renderDetail(item){
   async function search(){
     const term = q.value.trim();
     errBox.style.display = "none";
+
+    // If input is empty and we have history, skip API call and show history immediately
+    const hist = loadHistory();
+    if(!term && hist.length > 0){
+      results = [];
+      active = 0;
+      loading.style.display = "none";
+      renderList();
+      return;
+    }
+
     loading.style.display = "block";
 
     try{
