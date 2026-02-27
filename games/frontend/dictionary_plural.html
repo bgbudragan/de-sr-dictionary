@@ -1082,7 +1082,17 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
     q.value = result.headword;
     __pendingSelectId = String(result.id);
     addToHistory(result.headword, lookupDir);
-    await search();
+
+    // Show the entry immediately (do not wait for /api/dict/search)
+    try{
+      const entry = await fetchJson(`/api/dict/entry/${result.id}`);
+      renderDetail(entry);
+    }catch(err){
+      console.error("entry fetch failed:", err);
+    }
+
+    // Refresh the left list in the background (do not block UI)
+    search().catch(console.error);
   }
 
   // -------------------------
@@ -1180,7 +1190,9 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
   // Batch prefetch clickable words
   // -------------------------
   async function prefetchClickableWords(){
-    const spans = detail.querySelectorAll(".dict-word:not(.found):not(.not-found)");
+    const spans = Array.from(
+      detail.querySelectorAll(".dict-word:not(.found):not(.not-found)")
+    ).slice(0, 80);
     if(!spans.length) return;
 
     // Group words by lookup direction
@@ -1934,8 +1946,12 @@ function renderDetail(item){
 
     requestAnimationFrame(fitHeadword);
 
-    // Prefetch which words in examples are clickable
-    prefetchClickableWords();
+    // Prefetch which words in examples are clickable (do it on idle to keep UI snappy)
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(() => { prefetchClickableWords(); }, { timeout: 800 });
+    } else {
+      setTimeout(() => { prefetchClickableWords(); }, 250);
+    }
   }
 
   function renderList(){

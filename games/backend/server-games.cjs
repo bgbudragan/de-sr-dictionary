@@ -57,7 +57,7 @@ app.get("/api/dict/search", async (req, res) => {
   const q = String(req.query.q || "").trim();
   const limit = clampInt(req.query.limit, 1, 50, 20);
 
-  // NEW: pagination
+  // Pagination
   const offset = clampInt(req.query.offset, 0, 1000000, 0);
 
   if (!["DE_SR", "SR_DE"].includes(dir)) {
@@ -67,13 +67,13 @@ app.get("/api/dict/search", async (req, res) => {
   }
 
   try {
-    // Prazan upit: vrati prvih N po abecedi (+ offset)
+    // Empty query: return first N alphabetically (+ offset)
     if (!q) {
       const r = await query(
         `SELECT id, headword, main_gloss, raw_clean, pos, gender, level, topics, plural, image_url
          FROM public.entries
          WHERE direction = $1
-         ORDER BY headword
+         ORDER BY lower(headword)
          LIMIT $2 OFFSET $3`,
         [dir, limit, offset]
       );
@@ -81,14 +81,16 @@ app.get("/api/dict/search", async (req, res) => {
     }
 
     // Prefix match (fast autocomplete) (+ offset)
+    // Use lower(headword) LIKE so Postgres can use the (direction, lower(headword)) btree index.
+    const ql = q.toLowerCase();
     const r = await query(
       `SELECT id, headword, main_gloss, raw_clean, pos, gender, level, topics, plural, image_url
        FROM public.entries
        WHERE direction = $1
-         AND headword ILIKE $2
-       ORDER BY headword
+         AND lower(headword) LIKE $2
+       ORDER BY lower(headword)
        LIMIT $3 OFFSET $4`,
-      [dir, q + "%", limit, offset]
+      [dir, ql + "%", limit, offset]
     );
 
     const rows = r.rows || r;
