@@ -57,7 +57,7 @@ app.get("/api/dict/search", async (req, res) => {
   const q = String(req.query.q || "").trim();
   const limit = clampInt(req.query.limit, 1, 50, 20);
 
-  // Pagination
+  // NEW: pagination
   const offset = clampInt(req.query.offset, 0, 1000000, 0);
 
   if (!["DE_SR", "SR_DE"].includes(dir)) {
@@ -67,13 +67,13 @@ app.get("/api/dict/search", async (req, res) => {
   }
 
   try {
-    // Empty query: return first N alphabetically (+ offset)
+    // Prazan upit: vrati prvih N po abecedi (+ offset)
     if (!q) {
       const r = await query(
         `SELECT id, headword, main_gloss, raw_clean, pos, gender, level, topics, plural, image_url
          FROM public.entries
          WHERE direction = $1
-         ORDER BY lower(headword)
+         ORDER BY headword
          LIMIT $2 OFFSET $3`,
         [dir, limit, offset]
       );
@@ -81,38 +81,17 @@ app.get("/api/dict/search", async (req, res) => {
     }
 
     // Prefix match (fast autocomplete) (+ offset)
-    // Use lower(headword) LIKE so Postgres can use the (direction, lower(headword)) btree index.
-    const ql = q.toLowerCase();
     const r = await query(
       `SELECT id, headword, main_gloss, raw_clean, pos, gender, level, topics, plural, image_url
        FROM public.entries
        WHERE direction = $1
-         AND lower(headword) LIKE $2
-       ORDER BY lower(headword)
+         AND headword ILIKE $2
+       ORDER BY headword
        LIMIT $3 OFFSET $4`,
-      [dir, ql + "%", limit, offset]
+      [dir, q + "%", limit, offset]
     );
 
-    const rows = r.rows || r;
-
-    // If prefix match found results, return them
-    if (rows && rows.length > 0) {
-      return res.json(rows);
-    }
-
-    // Fuzzy fallback (% operator uses GIN trigram index) — only when prefix match returns nothing
-    const fuzzy = await query(
-      `SELECT id, headword, main_gloss, raw_clean, pos, gender, level, topics, plural, image_url,
-              similarity(lower(headword), lower($2)) AS sim
-       FROM public.entries
-       WHERE direction = $1
-         AND lower(headword) % lower($2)
-       ORDER BY sim DESC, headword
-       LIMIT $3`,
-      [dir, q, limit]
-    );
-
-    res.json(fuzzy.rows || fuzzy);
+    res.json(r.rows || r);
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: String(e.message || e) });
@@ -137,131 +116,6 @@ app.get("/api/dict/entry/:id", async (req, res) => {
     }
 
     res.json(rows[0]);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: String(e.message || e) });
-  }
-});
-
-// ---------------------------------------------------------------------
-// Dictionary API: lookup word (for clickable words in examples)
-// Tries exact match first, then fuzzy (trigram) fallback
-// ---------------------------------------------------------------------
-app.get("/api/dict/lookup", async (req, res) => {
-  const word = String(req.query.word || "").trim();
-  const dir = String(req.query.direction || "").toUpperCase();
-
-  if (!word) {
-    return res.status(400).json({ error: "Missing 'word' parameter." });
-  }
-  if (!["DE_SR", "SR_DE"].includes(dir)) {
-    return res.status(400).json({ error: "Invalid direction. Use DE_SR or SR_DE." });
-  }
-
-  try {
-    // 1) Exact match
-    const r = await query(
-      `SELECT id, headword, main_gloss
-       FROM public.entries
-       WHERE direction = $1
-         AND lower(headword) = lower($2)
-       LIMIT 1`,
-      [dir, word]
-    );
-
-    const rows = r.rows || r;
-    if (rows && rows.length > 0) {
-      return res.json({ found: true, id: rows[0].id, headword: rows[0].headword, main_gloss: rows[0].main_gloss });
-    }
-
-    // 2) Fast fuzzy fallback (% operator uses GIN trigram index)
-    const fuzzy = await query(
-      `SELECT id, headword, main_gloss, similarity(lower(headword), lower($2)) AS sim
-       FROM public.entries
-       WHERE direction = $1
-         AND lower(headword) % lower($2)
-       ORDER BY sim DESC
-       LIMIT 1`,
-      [dir, word]
-    );
-
-    const fuzzyRows = fuzzy.rows || fuzzy;
-    if (fuzzyRows && fuzzyRows.length > 0) {
-      return res.json({ found: true, fuzzy: true, id: fuzzyRows[0].id, headword: fuzzyRows[0].headword, main_gloss: fuzzyRows[0].main_gloss });
-    }
-
-    res.json({ found: false });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: String(e.message || e) });
-  }
-});
-
-// ---------------------------------------------------------------------
-// Dictionary API: batch lookup words (for prefetch clickable words)
-// Exact match first, then fast fuzzy (% operator uses GIN index)
-// ---------------------------------------------------------------------
-app.post("/api/dict/lookup-batch", async (req, res) => {
-  const words = req.body.words;
-  const dir = String(req.body.direction || "").toUpperCase();
-
-  if (!Array.isArray(words) || words.length === 0) {
-    return res.status(400).json({ error: "Missing 'words' array." });
-  }
-  if (!["DE_SR", "SR_DE"].includes(dir)) {
-    return res.status(400).json({ error: "Invalid direction. Use DE_SR or SR_DE." });
-  }
-
-  // Limit to 200 words per request
-  const cleaned = [...new Set(words.map(w => String(w).trim().toLowerCase()).filter(Boolean))].slice(0, 200);
-
-  if (cleaned.length === 0) {
-    return res.json({ results: {} });
-  }
-
-  try {
-    // 1) Exact matches (fast, uses index)
-    const r = await query(
-      `SELECT id, headword, main_gloss
-       FROM public.entries
-       WHERE direction = $1
-         AND lower(headword) = ANY($2)`,
-      [dir, cleaned]
-    );
-
-    const rows = r.rows || r;
-    const results = {};
-    for (const row of rows) {
-      const key = row.headword.toLowerCase();
-      if (!results[key]) {
-        results[key] = { id: row.id, headword: row.headword, main_gloss: row.main_gloss };
-      }
-    }
-
-    // 2) Fast fuzzy for unmatched words (% operator uses GIN trigram index)
-    const unmatched = cleaned.filter(w => !results[w]).slice(0, 20);
-
-    if (unmatched.length > 0) {
-      const fuzzy = await query(
-        `SELECT DISTINCT ON (w.word) w.word AS input_word, e.id, e.headword, e.main_gloss
-         FROM unnest($2::text[]) AS w(word)
-         JOIN public.entries e
-           ON e.direction = $1
-           AND lower(e.headword) % w.word
-         ORDER BY w.word, similarity(lower(e.headword), w.word) DESC`,
-        [dir, unmatched]
-      );
-
-      const fuzzyRows = fuzzy.rows || fuzzy;
-      for (const row of fuzzyRows) {
-        const key = row.input_word;
-        if (!results[key]) {
-          results[key] = { id: row.id, headword: row.headword, main_gloss: row.main_gloss, fuzzy: true };
-        }
-      }
-    }
-
-    res.json({ results });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: String(e.message || e) });
