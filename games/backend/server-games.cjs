@@ -98,13 +98,13 @@ app.get("/api/dict/search", async (req, res) => {
       return res.json(rows);
     }
 
-    // Fuzzy fallback (trigram similarity) — only when prefix match returns nothing
+    // Fuzzy fallback (% operator uses GIN trigram index) — only when prefix match returns nothing
     const fuzzy = await query(
       `SELECT id, headword, main_gloss, raw_clean, pos, gender, level, topics, plural, image_url,
               similarity(lower(headword), lower($2)) AS sim
        FROM public.entries
        WHERE direction = $1
-         AND similarity(lower(headword), lower($2)) > 0.3
+         AND lower(headword) % lower($2)
        ORDER BY sim DESC, headword
        LIMIT $3`,
       [dir, q, limit]
@@ -172,12 +172,12 @@ app.get("/api/dict/lookup", async (req, res) => {
       return res.json({ found: true, id: rows[0].id, headword: rows[0].headword, main_gloss: rows[0].main_gloss });
     }
 
-    // 2) Fuzzy fallback (trigram similarity)
+    // 2) Fast fuzzy fallback (% operator uses GIN trigram index)
     const fuzzy = await query(
       `SELECT id, headword, main_gloss, similarity(lower(headword), lower($2)) AS sim
        FROM public.entries
        WHERE direction = $1
-         AND similarity(lower(headword), lower($2)) > 0.35
+         AND lower(headword) % lower($2)
        ORDER BY sim DESC
        LIMIT 1`,
       [dir, word]
@@ -197,7 +197,7 @@ app.get("/api/dict/lookup", async (req, res) => {
 
 // ---------------------------------------------------------------------
 // Dictionary API: batch lookup words (for prefetch clickable words)
-// Exact match only (fast) — fuzzy is handled by individual lookup on click
+// Exact match first, then fast fuzzy (% operator uses GIN index)
 // ---------------------------------------------------------------------
 app.post("/api/dict/lookup-batch", async (req, res) => {
   const words = req.body.words;
@@ -218,6 +218,7 @@ app.post("/api/dict/lookup-batch", async (req, res) => {
   }
 
   try {
+    // 1) Exact matches (fast, uses index)
     const r = await query(
       `SELECT id, headword, main_gloss
        FROM public.entries
@@ -232,6 +233,29 @@ app.post("/api/dict/lookup-batch", async (req, res) => {
       const key = row.headword.toLowerCase();
       if (!results[key]) {
         results[key] = { id: row.id, headword: row.headword, main_gloss: row.main_gloss };
+      }
+    }
+
+    // 2) Fast fuzzy for unmatched words (% operator uses GIN trigram index)
+    const unmatched = cleaned.filter(w => !results[w]).slice(0, 20);
+
+    if (unmatched.length > 0) {
+      const fuzzy = await query(
+        `SELECT DISTINCT ON (w.word) w.word AS input_word, e.id, e.headword, e.main_gloss
+         FROM unnest($2::text[]) AS w(word)
+         JOIN public.entries e
+           ON e.direction = $1
+           AND lower(e.headword) % w.word
+         ORDER BY w.word, similarity(lower(e.headword), w.word) DESC`,
+        [dir, unmatched]
+      );
+
+      const fuzzyRows = fuzzy.rows || fuzzy;
+      for (const row of fuzzyRows) {
+        const key = row.input_word;
+        if (!results[key]) {
+          results[key] = { id: row.id, headword: row.headword, main_gloss: row.main_gloss, fuzzy: true };
+        }
       }
     }
 
