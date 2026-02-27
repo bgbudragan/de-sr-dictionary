@@ -91,7 +91,26 @@ app.get("/api/dict/search", async (req, res) => {
       [dir, q + "%", limit, offset]
     );
 
-    res.json(r.rows || r);
+    const rows = r.rows || r;
+
+    // If prefix match found results, return them
+    if (rows && rows.length > 0) {
+      return res.json(rows);
+    }
+
+    // Fuzzy fallback (trigram similarity) — only when prefix match returns nothing
+    const fuzzy = await query(
+      `SELECT id, headword, main_gloss, raw_clean, pos, gender, level, topics, plural, image_url,
+              similarity(lower(headword), lower($2)) AS sim
+       FROM public.entries
+       WHERE direction = $1
+         AND similarity(lower(headword), lower($2)) > 0.3
+       ORDER BY sim DESC, headword
+       LIMIT $3`,
+      [dir, q, limit]
+    );
+
+    res.json(fuzzy.rows || fuzzy);
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: String(e.message || e) });
@@ -124,6 +143,7 @@ app.get("/api/dict/entry/:id", async (req, res) => {
 
 // ---------------------------------------------------------------------
 // Dictionary API: lookup word (for clickable words in examples)
+// Tries exact match first, then fuzzy (trigram) fallback
 // ---------------------------------------------------------------------
 app.get("/api/dict/lookup", async (req, res) => {
   const word = String(req.query.word || "").trim();
@@ -137,6 +157,7 @@ app.get("/api/dict/lookup", async (req, res) => {
   }
 
   try {
+    // 1) Exact match
     const r = await query(
       `SELECT id, headword, main_gloss
        FROM public.entries
@@ -147,11 +168,101 @@ app.get("/api/dict/lookup", async (req, res) => {
     );
 
     const rows = r.rows || r;
-    if (!rows || rows.length === 0) {
-      return res.json({ found: false });
+    if (rows && rows.length > 0) {
+      return res.json({ found: true, id: rows[0].id, headword: rows[0].headword, main_gloss: rows[0].main_gloss });
     }
 
-    res.json({ found: true, id: rows[0].id, headword: rows[0].headword, main_gloss: rows[0].main_gloss });
+    // 2) Fuzzy fallback (trigram similarity)
+    const fuzzy = await query(
+      `SELECT id, headword, main_gloss, similarity(lower(headword), lower($2)) AS sim
+       FROM public.entries
+       WHERE direction = $1
+         AND similarity(lower(headword), lower($2)) > 0.35
+       ORDER BY sim DESC
+       LIMIT 1`,
+      [dir, word]
+    );
+
+    const fuzzyRows = fuzzy.rows || fuzzy;
+    if (fuzzyRows && fuzzyRows.length > 0) {
+      return res.json({ found: true, fuzzy: true, id: fuzzyRows[0].id, headword: fuzzyRows[0].headword, main_gloss: fuzzyRows[0].main_gloss });
+    }
+
+    res.json({ found: false });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: String(e.message || e) });
+  }
+});
+
+// ---------------------------------------------------------------------
+// Dictionary API: batch lookup words (for prefetch clickable words)
+// Tries exact match first, then fuzzy (trigram) fallback for unmatched
+// ---------------------------------------------------------------------
+app.post("/api/dict/lookup-batch", async (req, res) => {
+  const words = req.body.words;
+  const dir = String(req.body.direction || "").toUpperCase();
+
+  if (!Array.isArray(words) || words.length === 0) {
+    return res.status(400).json({ error: "Missing 'words' array." });
+  }
+  if (!["DE_SR", "SR_DE"].includes(dir)) {
+    return res.status(400).json({ error: "Invalid direction. Use DE_SR or SR_DE." });
+  }
+
+  // Limit to 200 words per request
+  const cleaned = [...new Set(words.map(w => String(w).trim().toLowerCase()).filter(Boolean))].slice(0, 200);
+
+  if (cleaned.length === 0) {
+    return res.json({ results: {} });
+  }
+
+  try {
+    // 1) Exact matches
+    const r = await query(
+      `SELECT id, headword, main_gloss
+       FROM public.entries
+       WHERE direction = $1
+         AND lower(headword) = ANY($2)`,
+      [dir, cleaned]
+    );
+
+    const rows = r.rows || r;
+    const results = {};
+    for (const row of rows) {
+      const key = row.headword.toLowerCase();
+      if (!results[key]) {
+        results[key] = { id: row.id, headword: row.headword, main_gloss: row.main_gloss };
+      }
+    }
+
+    // 2) Fuzzy fallback for unmatched words
+    const unmatched = cleaned.filter(w => !results[w]);
+
+    if (unmatched.length > 0) {
+      // Query each unmatched word with trigram similarity
+      // Use a single query with UNNEST + LATERAL for efficiency
+      const fuzzy = await query(
+        `SELECT DISTINCT ON (w.word) w.word AS input_word, e.id, e.headword, e.main_gloss,
+                similarity(lower(e.headword), w.word) AS sim
+         FROM unnest($2::text[]) AS w(word)
+         JOIN public.entries e
+           ON e.direction = $1
+           AND similarity(lower(e.headword), w.word) > 0.35
+         ORDER BY w.word, sim DESC`,
+        [dir, unmatched]
+      );
+
+      const fuzzyRows = fuzzy.rows || fuzzy;
+      for (const row of fuzzyRows) {
+        const key = row.input_word;
+        if (!results[key]) {
+          results[key] = { id: row.id, headword: row.headword, main_gloss: row.main_gloss, fuzzy: true };
+        }
+      }
+    }
+
+    res.json({ results });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: String(e.message || e) });
