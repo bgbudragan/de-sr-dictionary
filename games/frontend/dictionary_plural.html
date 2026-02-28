@@ -151,7 +151,7 @@
       z-index: 1;
     }
 @media (max-width: 900px){
-      .imgWrap{ height:180px; }
+      .imgWrap{ height:140px; }
     }
     .entryImg{
       display:block;
@@ -385,6 +385,18 @@
     height: auto;
     max-height: none;
     overflow: visible;
+  }
+  .suggestList{
+    max-height:40vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .keys{
+    display:none;
+  }
+  .detail{
+    border-radius:12px;
+    padding:14px;
   }
 }
 
@@ -1956,7 +1968,12 @@ function renderDetail(item){
           <div class="hw">${highlightHtml(item.headword, q.value)}</div>
           <div class="tr">${escapeHtml(normalizeGloss(item.main_gloss || ""))}</div>
         `;
-        li.addEventListener("click", ()=>{ active=idx; addToHistory(item.headword, dir); renderList(); renderDetail(results[active]); });
+        li.addEventListener("click", ()=>{ active=idx; addToHistory(item.headword, dir); renderList(); renderDetail(results[active]);
+          // On mobile, scroll to the detail panel so the user can see the entry
+          if(window.innerWidth <= 920){
+            setTimeout(()=>{ detail.scrollIntoView({ behavior:"smooth", block:"start" }); }, 80);
+          }
+        });
         list.appendChild(li);
       });
     }
