@@ -1589,19 +1589,97 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
   }
 
   // German plural tag: ONLY for DE_SR (German nouns)
+    function buildPluralHtmlFromFull(headword, pluralFull){
+    const hw = (headword ?? "").toString().trim();
+    const pl = (pluralFull ?? "").toString().trim();
+    if(!hw || !pl) return "";
+
+    const low = pl.toLowerCase();
+    if(low === "samosg") return ""; // no plural
+
+    // "-" means plural equals singular
+    if(pl === "-" || pl === "–" || pl === "—") return escapeHtml(hw);
+
+    return highlightPluralEdits(hw, pl);
+  }
+
+  function highlightPluralEdits(source, target){
+    const a = Array.from((source ?? "").toString());
+    const b = Array.from((target ?? "").toString());
+    const n = a.length, m = b.length;
+
+    // Levenshtein DP
+    const dp = Array.from({length: n + 1}, () => new Array(m + 1).fill(0));
+    for(let i=0;i<=n;i++) dp[i][0] = i;
+    for(let j=0;j<=m;j++) dp[0][j] = j;
+
+    for(let i=1;i<=n;i++){
+      for(let j=1;j<=m;j++){
+        const cost = (a[i-1] === b[j-1]) ? 0 : 1;
+        dp[i][j] = Math.min(
+          dp[i-1][j] + 1,        // delete
+          dp[i][j-1] + 1,        // insert
+          dp[i-1][j-1] + cost    // match/substitute
+        );
+      }
+    }
+
+    // Backtrace: mark insert/substitute positions in TARGET
+    const hi = new Array(m).fill(false);
+    let i=n, j=m;
+
+    while(i>0 || j>0){
+      if(i>0 && j>0){
+        const cost = (a[i-1] === b[j-1]) ? 0 : 1;
+        if(dp[i][j] === dp[i-1][j-1] + cost){
+          if(cost === 1) hi[j-1] = true; // substitute
+          i--; j--;
+          continue;
+        }
+      }
+      if(j>0 && dp[i][j] === dp[i][j-1] + 1){
+        hi[j-1] = true; // insert
+        j--;
+        continue;
+      }
+      if(i>0 && dp[i][j] === dp[i-1][j] + 1){
+        i--; // delete (no char in target to mark)
+        continue;
+      }
+
+      // fallback
+      if(i>0) i--;
+      else if(j>0){ hi[j-1] = true; j--; }
+    }
+
+    // Build HTML (group consecutive highlights)
+    let out = "";
+    let open = false;
+    for(let k=0;k<m;k++){
+      const mark = !!hi[k];
+      if(mark && !open){ out += `<span class="plHi">`; open = true; }
+      if(!mark && open){ out += `</span>`; open = false; }
+      out += escapeHtml(b[k]);
+    }
+    if(open) out += `</span>`;
+    return out;
+  }
+
   function renderPluralTag(item){
     if(dir !== "DE_SR") return "";
     const pos = (item?.pos ?? "").toString().trim().toLowerCase();
-    const plRaw = (item?.plural ?? "").toString().trim();
-    if(pos !== "noun" || !plRaw) return "";
+    if(pos !== "noun") return "";
 
-    const info = parsePluralFieldNew(plRaw);
-    if(info.kind === "no_plural") return "";
+    const plFull = (item?.plural_full ?? "").toString().trim();
+    if(!plFull) return "";
 
-    const htmlPlural = buildPluralHtml(item.headword, plRaw);
+    const htmlPlural = buildPluralHtmlFromFull(item.headword, plFull);
     if(!htmlPlural) return "";
 
-    const pluralText = buildPluralFormNew(item.headword, plRaw) || "";
+    const pluralText =
+      (plFull === "-" || plFull === "–" || plFull === "—")
+        ? ((item?.headword ?? "").toString())
+        : plFull;
 
     return `<span class="plTag">
       <span>Pl: ${htmlPlural}</span>
