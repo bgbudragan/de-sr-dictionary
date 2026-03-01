@@ -872,6 +872,12 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
       .replaceAll("'","&#039;");
   }
 
+  function stripLeadingArticle(s){
+    // Removes a leading German definite article (der/die/das) if present.
+    return (s ?? "").toString().trim().replace(/^(der|die|das)\s+/i, "").trim();
+  }
+
+
   function escapeRegExp(s){
     return (s ?? "").toString().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
@@ -1676,15 +1682,18 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
     const htmlPlural = buildPluralHtmlFromFull(item.headword, plFull);
     if(!htmlPlural) return "";
 
-    const pluralText =
+    const pluralBase =
       (plFull === "-" || plFull === "–" || plFull === "—")
         ? ((item?.headword ?? "").toString())
         : plFull;
 
+    // Plural is always "die" in German; speak as "die <plural>"
+    const pluralSay = `die ${stripLeadingArticle(pluralBase)}`;
+
     return `<span class="plTag">
       <span>Pl: ${htmlPlural}</span>
       <button class="speakBtn" type="button" title="Aussprache" aria-label="Plural sprechen"
-        data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(pluralText)}">🔊</button>
+        data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(pluralSay)}">🔊</button>
     </span>`;
   }
 
@@ -1979,9 +1988,15 @@ function renderDetail(item){
     const pluralHtml = renderPluralTag(item) || `<span class="plTag plEmpty">Pl: —</span>`;
     const hwCls = headwordGenderClass(item);
 
+    const hw = (item?.headword ?? "").toString().trim();
+    const pos = (item?.pos ?? "").toString().trim().toLowerCase();
+    const gender = (item?.gender ?? "").toString().trim().toLowerCase();
+    const art = (gender === "der" || gender === "die" || gender === "das") ? gender : "";
+    const headwordSay = (pos === "noun" && art) ? `${art} ${hw}` : hw;
+
     const headwordSpeak = (dir === "DE_SR")
       ? `<button class="speakBtn" type="button" title="Aussprache" aria-label="Wort sprechen"
-          data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(item.headword)}">🔊</button>`
+          data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(headwordSay)}">🔊</button>`
       : "";
 
     detail.innerHTML = `
