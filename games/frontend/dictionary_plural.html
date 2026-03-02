@@ -209,6 +209,7 @@
     .plEmpty{visibility:hidden}
 
     .plHi{color:#7c3aed;font-weight:800;}
+    .plBase{color:#d1242f;font-weight:800;}
 
     .meta{color:var(--faint);font-size:14px;margin-bottom:10px;line-height:1.35}
     .wordUnderline{height:4px;width:160px;background:var(--word-underline);border-radius:2px;margin:10px 0 12px}
@@ -1604,7 +1605,7 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
     if(low === "samosg") return ""; // no plural
 
     // "-" means plural equals singular
-    if(pl === "-" || pl === "–" || pl === "—") return escapeHtml(hw);
+    if(pl === "-" || pl === "–" || pl === "—") return `<span class="plBase">${escapeHtml(hw)}</span>`;
 
     return highlightPluralEdits(hw, pl);
   }
@@ -1659,15 +1660,20 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
     }
 
     // Build HTML (group consecutive highlights)
+    // Unchanged chars (same as headword) → red (die-color), changed/added chars → plHi (purple)
     let out = "";
-    let open = false;
+    let curClass = null; // null = no open span
     for(let k=0;k<m;k++){
       const mark = !!hi[k];
-      if(mark && !open){ out += `<span class="plHi">`; open = true; }
-      if(!mark && open){ out += `</span>`; open = false; }
+      const cls = mark ? "plHi" : "plBase";
+      if(cls !== curClass){
+        if(curClass !== null) out += `</span>`;
+        out += `<span class="${cls}">`;
+        curClass = cls;
+      }
       out += escapeHtml(b[k]);
     }
-    if(open) out += `</span>`;
+    if(curClass !== null) out += `</span>`;
     return out;
   }
 
