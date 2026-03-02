@@ -313,13 +313,11 @@
     .speakBtn:hover{background:var(--bg-hover)}
     .speakBtn:active{transform:translateY(1px)}
     .speakBtn[disabled]{opacity:.45; cursor:not-allowed}
-    .pair .speakBtn{padding:3px 7px;font-size:13px;margin-left:auto}
-    .speakBtn.speakBtnWord{
-      display:inline-flex;align-items:center;justify-content:center;
-      width:36px;height:36px;
-      background:#2da44e;border:1.5px solid #1a7f37;border-bottom-width:3px;
-      border-radius:999px;color:#fff;padding:0;
-    }
+    .pair .speakBtn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;border-radius:999px;background:#2da44e;border:1.5px solid #1a7f37;border-bottom-width:2px;color:#fff;margin-left:auto;}
+    .pair .speakBtn:hover{background:#1a7f37;}
+    .speakBtn.speakBtnGreen{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;padding:0;border-radius:999px;background:#2da44e;border:1.5px solid #1a7f37;border-bottom-width:2px;color:#fff;}
+    .speakBtn.speakBtnGreen:hover{background:#1a7f37;}
+    .speakBtn.speakBtnWord{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:#2da44e;border:1.5px solid #1a7f37;border-bottom-width:3px;border-radius:999px;color:#fff;padding:0;}
     .speakBtn.speakBtnWord:hover{background:#1a7f37;border-color:#116329;}
     .speakBtn.speakBtnWord svg{width:18px;height:18px;flex-shrink:0;}
 
@@ -1722,8 +1720,8 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
 
     return `<span class="plTag">
       <span>Pl: ${htmlPlural}</span>
-      <button class="speakBtn" type="button" title="Aussprache" aria-label="Plural sprechen"
-        data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(pluralSay)}">🔊</button>
+      <button class="speakBtn speakBtnGreen" type="button" title="Aussprache" aria-label="Plural sprechen"
+        data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(pluralSay)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;flex-shrink:0;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></button>
     </span>`;
   }
 
@@ -1823,12 +1821,14 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
       blocks.push({ type:"plain", txt: line });
     }
 
+    const speakSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;flex-shrink:0;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>`;
+
     const inner = blocks.map(b=>{
       if(b.type==="pair"){
         const langTag = b.lang;
         const speak = (langTag === "de")
-          ? `<button class="speakBtn" type="button" title="Aussprache" aria-label="Beispiel sprechen"
-              data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(b.txt)}">🔊</button>`
+          ? `<button class="speakBtn speakBtnGreen" type="button" title="Aussprache" aria-label="Beispiel sprechen"
+              data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(b.txt)}">${speakSvg}</button>`
           : "";
 
         return `<div class="pair">
@@ -1849,7 +1849,7 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
 
     const openClass = openByDefault ? " open" : "";
     const labelHtml = heading ? escapeHtml(heading) : "—";
-    const icon = openByDefault ? "−" : "+";
+    const icon = openByDefault ? "\u2212" : "+";
 
     return `<div class="senseAccordion${openClass}">
       <button class="senseToggle" type="button">
@@ -1872,7 +1872,7 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
     return `<div class="explain">${sensesHtml || `<div class="plain">—</div>`}</div>`;
   }
 
-  const POS_MAP_SR = {
+    const POS_MAP_SR = {
     "noun": "imenica",
     "verb": "glagol",
     "adj":  "pridev",
@@ -2042,12 +2042,7 @@ function renderDetail(item){
 
     const headwordSpeak = (dir === "DE_SR")
       ? `<button class="speakBtn speakBtnWord" type="button" title="Aussprache" aria-label="Wort sprechen"
-          data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(headwordSay)}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-          </svg></button>`
+          data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(headwordSay)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;flex-shrink:0;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></button>`
       : "";
 
     detail.innerHTML = `
