@@ -210,7 +210,6 @@
 
     .plHi{color:#7c3aed;font-weight:800;}
     .plBase{color:#d1242f;font-weight:800;}
-
     .senseAccordion{margin:5px 0;border-radius:10px;overflow:hidden;border:1px solid var(--border);border-bottom-width:2px;}
     .senseToggle{display:flex;align-items:center;gap:10px;width:100%;background:var(--bg2);border:none;padding:9px 12px;cursor:pointer;text-align:left;font-size:15px;font-weight:600;color:var(--text);transition:background .12s ease;}
     .senseToggle:hover{background:var(--bg-hover);}
@@ -315,6 +314,14 @@
     .speakBtn:active{transform:translateY(1px)}
     .speakBtn[disabled]{opacity:.45; cursor:not-allowed}
     .pair .speakBtn{padding:3px 7px;font-size:13px;margin-left:auto}
+    .speakBtn.speakBtnWord{
+      display:inline-flex;align-items:center;justify-content:center;
+      width:36px;height:36px;
+      background:#2da44e;border:1.5px solid #1a7f37;border-bottom-width:3px;
+      border-radius:999px;color:#fff;padding:0;
+    }
+    .speakBtn.speakBtnWord:hover{background:#1a7f37;border-color:#116329;}
+    .speakBtn.speakBtnWord svg{width:18px;height:18px;flex-shrink:0;}
 
     @media (max-width:920px){
       .grid{grid-template-columns:1fr}
@@ -1844,7 +1851,7 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
     const labelHtml = heading ? escapeHtml(heading) : "—";
     const icon = openByDefault ? "−" : "+";
 
-    return `<div class="senseAccordion${openClass}" data-icon-plus="+" data-icon-minus="−">
+    return `<div class="senseAccordion${openClass}">
       <button class="senseToggle" type="button">
         <i class="senseIcon">${icon}</i>
         <span class="senseLabel">${labelHtml}</span>
@@ -2034,8 +2041,13 @@ function renderDetail(item){
     const headwordSay = (pos === "noun" && art) ? `${art} ${hw}` : hw;
 
     const headwordSpeak = (dir === "DE_SR")
-      ? `<button class="speakBtn" type="button" title="Aussprache" aria-label="Wort sprechen"
-          data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(headwordSay)}">🔊</button>`
+      ? `<button class="speakBtn speakBtnWord" type="button" title="Aussprache" aria-label="Wort sprechen"
+          data-lang="${escapeHtml(deLang())}" data-say="${escapeHtml(headwordSay)}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg></button>`
       : "";
 
     detail.innerHTML = `
