@@ -211,6 +211,14 @@
     .plHi{color:#7c3aed;font-weight:800;}
     .plBase{color:#d1242f;font-weight:800;}
 
+    .senseAccordion{margin:5px 0;border-radius:10px;overflow:hidden;border:1px solid var(--border);border-bottom-width:2px;}
+    .senseToggle{display:flex;align-items:center;gap:10px;width:100%;background:var(--bg2);border:none;padding:9px 12px;cursor:pointer;text-align:left;font-size:15px;font-weight:600;color:var(--text);transition:background .12s ease;}
+    .senseToggle:hover{background:var(--bg-hover);}
+    .senseIcon{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:#2da44e;color:#ffe34e;font-size:16px;font-weight:900;font-style:normal;flex-shrink:0;line-height:1;}
+    .senseLabel{flex:1;}
+    .senseBody{display:none;padding:4px 10px 10px;background:var(--bg);}
+    .senseAccordion.open .senseBody{display:block;}
+
     .meta{color:var(--faint);font-size:14px;margin-bottom:10px;line-height:1.35}
     .wordUnderline{height:4px;width:160px;background:var(--word-underline);border-radius:2px;margin:10px 0 12px}
 
@@ -1249,6 +1257,15 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
       hideTooltip();
       handleWordClick(e);
     }
+    const toggle = e.target.closest(".senseToggle");
+    if(toggle){
+      const acc = toggle.closest(".senseAccordion");
+      if(acc){
+        acc.classList.toggle("open");
+        const icon = acc.querySelector(".senseIcon");
+        if(icon) icon.textContent = acc.classList.contains("open") ? "−" : "+";
+      }
+    }
   });
 
   function splitIntoSenses(lines){
@@ -1737,7 +1754,7 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
     }
   }
 
-  function renderSense(lines, quick){
+  function renderSense(lines, quick, openByDefault){
     if(!lines || !lines.length) return "";
 
     const nonEmpty = lines.map(x=>x.trim()).filter(Boolean);
@@ -1749,6 +1766,9 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
       if(normalizeCmp(nonEmpty[0]) !== normalizeCmp(quick)){
         heading = nonEmpty[0];
       }
+      idx = 1;
+    } else if(nonEmpty.length >= 1 && !lineIsLang(nonEmpty[0])){
+      heading = nonEmpty[0];
       idx = 1;
     }
 
@@ -1796,8 +1816,6 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
       blocks.push({ type:"plain", txt: line });
     }
 
-    const headHtml = heading ? `<div class="head">${escapeHtml(heading)}</div>` : "";
-
     const inner = blocks.map(b=>{
       if(b.type==="pair"){
         const langTag = b.lang;
@@ -1817,16 +1835,31 @@ charbar.innerHTML = chars.map(ch => `<button type="button" class="charbtn" data-
       return `<div class="plain">${escapeHtml(b.txt).replace(/\n/g,"<br>")}</div>`;
     }).join("");
 
-    return `<div class="sense">${headHtml}${inner}</div>`;
+    const hasPairs = blocks.some(b => b.type === "pair");
+    if(!hasPairs){
+      return `<div class="sense">${heading ? `<div class="head">${escapeHtml(heading)}</div>` : ""}${inner}</div>`;
+    }
+
+    const openClass = openByDefault ? " open" : "";
+    const labelHtml = heading ? escapeHtml(heading) : "—";
+    const icon = openByDefault ? "−" : "+";
+
+    return `<div class="senseAccordion${openClass}" data-icon-plus="+" data-icon-minus="−">
+      <button class="senseToggle" type="button">
+        <i class="senseIcon">${icon}</i>
+        <span class="senseLabel">${labelHtml}</span>
+      </button>
+      <div class="senseBody">${inner}</div>
+    </div>`;
   }
 
   function renderExplanationRich(rawText, item, quick){
     const baseLines = normalizeRawLines(rawText ?? "");
     const senses = splitIntoSenses(baseLines);
 
-    const sensesHtml = senses.map(sLines=>{
+    const sensesHtml = senses.map((sLines, idx)=>{
       const s2 = dropLeadingQuickDuplicate(sLines, quick);
-      return renderSense(s2, quick);
+      return renderSense(s2, quick, idx === 0);
     }).filter(Boolean).join("");
 
     return `<div class="explain">${sensesHtml || `<div class="plain">—</div>`}</div>`;
