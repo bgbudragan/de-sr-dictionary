@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Drag & Drop — Učenje vokabulara</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f5f4f0; color: #1a1a1a; }
+
+    .header {
+      background: #fff;
+      border-bottom: 1px solid #e0dfd8;
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .header-title { font-size: 16px; font-weight: 600; }
+    .header-sub { font-size: 12px; color: #888; margin-top: 2px; }
+
+    .content { padding: 28px; max-width: 960px; margin: 0 auto; }
+
+    .category-block { margin-bottom: 36px; }
+
+    .category-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #777;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e0dfd8;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e0dfd8;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: border-color .15s, transform .1s;
+    }
+    .card:hover { border-color: #aaa; transform: translateY(-2px); }
+    .card:active { transform: translateY(0); }
+
+    .card-thumb {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      display: block;
+      background: #f0eeea;
+    }
+    .card-thumb-placeholder {
+      width: 100%;
+      height: 130px;
+      background: #f0eeea;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-body { padding: 11px 13px 13px; }
+    .card-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; line-height: 1.3; }
+    .card-meta { font-size: 11px; color: #999; }
+    .card-lang {
+      display: inline-block;
+      margin-top: 7px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #eef0ff;
+      color: #3344bb;
+      letter-spacing: .02em;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px 0;
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    .error {
+      text-align: center;
+      padding: 60px 0;
+      color: #cc4444;
+      font-size: 14px;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 60px 0;
+      color: #aaa;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-title">Drag &amp; Drop — Učenje vokabulara</div>
+    <div class="header-sub">Prevuci reč na odgovarajuće mesto na slici</div>
+  </div>
+</div>
+
+<div class="content" id="content">
+  <div class="loading">Učitavam lekcije...</div>
+</div>
+
+<script>
+  async function loadLessons() {
+    const content = document.getElementById("content");
+    try {
+      const res = await fetch("/api/lessons");
+      if (!res.ok) throw new Error("Server greška: " + res.status);
+      const grouped = await res.json();
+
+      const categories = Object.keys(grouped);
+      if (categories.length === 0) {
+        content.innerHTML = '<div class="empty">Nema dostupnih lekcija.</div>';
+        return;
+      }
+
+      content.innerHTML = "";
+
+      for (const cat of categories) {
+        const lessons = grouped[cat];
+
+        const block = document.createElement("div");
+        block.className = "category-block";
+
+        const label = document.createElement("div");
+        label.className = "category-label";
+        label.textContent = cat;
+        block.appendChild(label);
+
+        const grid = document.createElement("div");
+        grid.className = "cards-grid";
+
+        for (const lesson of lessons) {
+          const a = document.createElement("a");
+          a.className = "card";
+          a.href = `/drag-drop.html?lesson=${lesson.slug}`;
+
+          if (lesson.image_path) {
+            const img = document.createElement("img");
+            img.className = "card-thumb";
+            img.src = lesson.image_path;
+            img.alt = lesson.title;
+            img.onerror = () => {
+              img.replaceWith(placeholder());
+            };
+            a.appendChild(img);
+          } else {
+            a.appendChild(placeholder());
+          }
+
+          const body = document.createElement("div");
+          body.className = "card-body";
+
+          const title = document.createElement("div");
+          title.className = "card-title";
+          title.textContent = lesson.title;
+
+          const lang = document.createElement("span");
+          lang.className = "card-lang";
+          lang.textContent = lesson.lang === "DE_SR" ? "DE → SR" : "SR → DE";
+
+          body.appendChild(title);
+          body.appendChild(lang);
+          a.appendChild(body);
+          grid.appendChild(a);
+        }
+
+        block.appendChild(grid);
+        content.appendChild(block);
+      }
+
+    } catch (e) {
+      content.innerHTML = `<div class="error">Greška: ${e.message}</div>`;
+    }
+  }
+
+  function placeholder() {
+    const div = document.createElement("div");
+    div.className = "card-thumb-placeholder";
+    div.innerHTML = `<svg width="36" height="36" fill="none" stroke="#ccc" stroke-width="1.5" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="18" height="18" rx="3"/>
+      <path d="M3 15l5-5 4 4 3-3 6 6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+    return div;
+  }
+
+  loadLessons();
+</script>
+</body>
+</html>

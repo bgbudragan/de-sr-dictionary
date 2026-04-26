@@ -1,0 +1,1092 @@
+<!doctype html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Drag & Drop</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 18px; }
+    h1 { font-size: 18px; margin: 0 0 10px; }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    .topbar { display:flex; align-items:center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    .meta { color:#666; font-size: 13px; }
+    .btn { border: 1px solid #ddd; background: #fff; border-radius: 10px; padding: 8px 10px; cursor: pointer; }
+    .btn:active { transform: translateY(1px); }
+    .btn.primary { border-color: #cfe7ff; background: #f5fbff; }
+    .btn[disabled] { opacity: .55; cursor: not-allowed; }
+
+    .layout { display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 14px; align-items: start; }
+    @media (max-width: 980px){ .layout { grid-template-columns: 1fr; } }
+
+    .stage {
+      position: relative;
+      border: 1px solid #ddd;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+      min-height: 260px;
+    }
+    .stage img { width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none; }
+
+    .targets {
+      position: absolute;
+      left: 0; top: 0;
+      right: 0; bottom: 0;
+      pointer-events: auto;
+    }
+
+    .target {
+      position: absolute;
+      border: 2px dashed rgba(255,255,255,0.95);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.00);
+      pointer-events: none;
+      display: grid;
+      place-items: center;
+      padding: 6px;
+      box-shadow: 0 0 0 1.5px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(0,0,0,0.15);
+      transition: background .10s ease, border-color .10s ease, box-shadow .10s ease, opacity .10s ease, transform .06s ease;
+    }
+
+    .target .label {
+      font-size: 12px;
+      color: rgba(0,0,0,0.78);
+      text-align: center;
+      line-height: 1.15;
+      user-select: none;
+      pointer-events: none;
+      padding: 5px 8px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(3px);
+      max-width: 95%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity .12s ease;
+    }
+
+    .target.hover {
+      border-color: rgba(0, 120, 255, 0.88);
+      background: rgba(0, 120, 255, 0.12);
+      box-shadow: 0 0 0 3px rgba(0, 120, 255, 0.14) inset;
+      transform: scale(1.01);
+    }
+
+    .target.solved {
+      border: 0;
+      background: rgba(0, 200, 140, 0.10);
+      box-shadow: 0 0 0 1px rgba(0,200,140,0.25) inset;
+      pointer-events: auto; /* allow hover/click */
+      cursor: pointer;
+    }
+    .target.solved .label { opacity: 1; background: rgba(255,255,255,0.88); }
+
+    .target.hidden { opacity: 0; pointer-events: none; }
+
+    .target.flash-wrong {
+      border-color: rgba(255, 80, 120, 0.65) !important;
+      background: rgba(255, 80, 120, 0.08) !important;
+      box-shadow: 0 0 0 3px rgba(255, 80, 120, 0.08) inset !important;
+      transform: none !important;
+    }
+
+    .overlay { position: absolute; left:0; top:0; width: 100%; height: 100%; pointer-events: none; }
+    .debugPoly { fill: rgba(0, 120, 255, 0.06); stroke: rgba(0, 120, 255, 0.55); stroke-width: 0.004; }
+    .zlabel { fill: rgba(0,0,0,0.72); pointer-events: none; }
+
+    .panel { border: 1px solid #ddd; border-radius: 14px; background: #fff; padding: 12px; }
+    .panel h2 { font-size: 15px; margin: 0 0 6px; }
+
+    .panelTop {
+      display:flex; align-items:flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .statsRow {
+      display:flex; gap: 10px; flex-wrap: wrap; align-items: center;
+      margin-top: 6px;
+    }
+    .pill {
+      font-size: 12px;
+      border: 1px solid #eee;
+      background: #fff;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: rgba(0,0,0,0.75);
+    }
+
+    .cards { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+    .card {
+      border: 1px solid #ddd; border-radius: 999px; padding: 8px 10px; background: #fff;
+      cursor: grab; user-select: none; font-size: 14px; display: inline-flex; align-items: center; gap: 10px;
+    }
+    .card:active { cursor: grabbing; }
+    .card.done { opacity: 0.45; cursor: default; text-decoration: line-through; }
+    .card .sbtn {
+      border: 1px solid #eee;
+      background: #fafafa;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .card .sbtn:active { transform: translateY(1px); }
+
+    .roundSummary {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #e8f7ef;
+      background: rgba(0, 200, 140, 0.07);
+      color: rgba(0,0,0,0.78);
+      font-size: 13px;
+      display:none;
+    }
+    .roundSummary.show { display:block; }
+
+    .select {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: #fff;
+      font-size: 13px;
+    }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+      background: rgba(0,0,0,0.82); color: #fff; padding: 10px 12px; border-radius: 12px;
+      font-size: 14px; max-width: min(720px, 92vw);
+      opacity: 0; pointer-events: none; transition: opacity .15s ease;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      z-index: 50;
+    }
+    .toast.show { opacity: 1; }
+
+    .bubble {
+      position: absolute;
+      left: 0; top: 0;
+      transform: translate(-50%, calc(-100% - 10px));
+      background: rgba(0,0,0,0.86);
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-size: 13px;
+      max-width: 260px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .12s ease, transform .12s ease;
+      z-index: 40;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.20);
+    }
+    .bubble.show {
+      opacity: 1;
+      transform: translate(-50%, calc(-100% - 14px));
+    }
+
+    .tip {
+      position: absolute;
+      left: 0; top: 0;
+      transform: translate(-50%, calc(-100% - 10px));
+      background: rgba(0,0,0,0.86);
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-size: 13px;
+      max-width: 340px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .10s ease, transform .10s ease;
+      z-index: 45;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.20);
+    }
+    .tip.show { opacity: 1; transform: translate(-50%, calc(-100% - 14px)); }
+
+    .pairsBox {
+      margin-top: 12px;
+      border-top: 1px solid #eee;
+      padding-top: 10px;
+    }
+    .pairsTitle {
+      display:flex; align-items:center; justify-content: space-between; gap: 10px;
+      margin-bottom: 8px;
+    }
+    .pairsTitle h3 { font-size: 13px; margin: 0; color: rgba(0,0,0,0.78); }
+    .pairsList {
+      max-height: 210px;
+      overflow: auto;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 8px;
+      background: #fafafa;
+      font-size: 13px;
+      scroll-behavior: smooth;
+    }
+    .pairRow {
+      display:flex;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid #eee;
+      margin-bottom: 6px;
+      align-items: baseline;
+    }
+    .pairRow:last-child { margin-bottom: 0; }
+    .pairIdx { width: 22px; flex: 0 0 auto; color: rgba(0,0,0,0.55); }
+    .pairQ { font-weight: 600; }
+    .pairArrow { opacity: .65; }
+    .pairA { opacity: .9; }
+
+    .soundRow { display:flex; gap:10px; align-items:center; flex-wrap: wrap; }
+    .smallNote { font-size: 12px; color:#777; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <h1 id="pageTitle">Drag & Drop</h1>
+        <div class="meta" id="meta" style="display:none"></div>
+      </div>
+
+      <div class="soundRow">
+        <select class="select" id="modeSelect" title="Smer učenja">
+          <option value="DE_SR">DE → SR</option>
+          <option value="SR_DE">SR → DE</option>
+        </select>
+
+        <button class="btn" id="toggleSound">Sound: ON</button>
+
+        <label class="smallNote" style="display:flex; align-items:center; gap:8px;">
+          Rate
+          <input id="rate" type="range" min="0.75" max="1.20" step="0.05" value="0.95" />
+          <span id="rateVal">0.95</span>
+        </label>
+
+        <button class="btn" id="toggleDebug" style="display:none">Debug: OFF</button>
+        <button class="btn" id="restart">Restart</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="stage" id="stage">
+        <img id="faceImg" src="" alt="face" />
+        <div class="targets" id="targets"></div>
+        <svg class="overlay" id="overlay" viewBox="0 0 1 1" preserveAspectRatio="none"></svg>
+        <div class="bubble" id="bubble"></div>
+        <div class="tip" id="tip"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panelTop">
+          <div>
+            <h2 id="panelTitle">Prevuci reč na odgovarajući okvir</h2>
+            <div class="meta">
+              Pogođeno ukupno: <b id="score">0</b>/<b id="total">0</b>
+            </div>
+            <div class="statsRow">
+              <span class="pill" id="pillRoundTime">Runda: 00:00</span>
+              <span class="pill" id="pillRoundMistakes">Greške (runda): 0</span>
+              <span class="pill" id="pillTotalTime">Ukupno: 00:00</span>
+              <span class="pill" id="pillTotalMistakes">Greške (ukupno): 0</span>
+            </div>
+            <div class="smallNote" style="margin-top:6px;">
+              🔊 Klik na karticu (ili dugme) izgovara reč.
+              <br/>✅ Na tačan pogodak čuje se samo reč na jeziku koji se uči.
+              <br/>✅ Klik na pogodjeno polje takođe pušta samo jezik koji se uči.
+              <br/>Hover i dalje prikazuje oba značenja kao tooltip.
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <span class="pill" id="roundBadge">Runda 1/1</span>
+            <button class="btn primary" id="nextRound" disabled>Next round</button>
+          </div>
+        </div>
+
+        <div class="meta" id="roundMeta"></div>
+        <div class="roundSummary" id="roundSummary"></div>
+        <div class="cards" id="cards"></div>
+
+        <div class="pairsBox">
+          <div class="pairsTitle">
+            <h3>Pogođeni parovi (ova igra)</h3>
+            <span class="meta" id="pairsCount">0</span>
+          </div>
+          <div class="pairsList" id="pairsList"></div>
+        </div>
+
+        <div class="meta" style="margin-top:10px;">
+          Hover na pogodjeno polje prikazuje oba značenja (question → answer).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const ROUND_SIZE = 5;
+    let mode = "DE_SR";
+    let soundOn = true;
+
+    let zones = [];
+
+    const TARGET_ADJUST = {};
+
+    const img = document.getElementById("faceImg");
+    const stage = document.getElementById("stage");
+    const bubble = document.getElementById("bubble");
+    const tip = document.getElementById("tip");
+    const targetsEl = document.getElementById("targets");
+    const overlay = document.getElementById("overlay");
+    const cardsEl = document.getElementById("cards");
+    const toast = document.getElementById("toast");
+    const scoreEl = document.getElementById("score");
+    const totalEl = document.getElementById("total");
+    const metaEl = document.getElementById("meta");
+    const roundBadge = document.getElementById("roundBadge");
+    const roundMeta = document.getElementById("roundMeta");
+    const nextRoundBtn = document.getElementById("nextRound");
+    const roundSummaryEl = document.getElementById("roundSummary");
+    const modeSelect = document.getElementById("modeSelect");
+    const panelTitle = document.getElementById("panelTitle");
+
+    const pillRoundTime = document.getElementById("pillRoundTime");
+    const pillRoundMistakes = document.getElementById("pillRoundMistakes");
+    const pillTotalTime = document.getElementById("pillTotalTime");
+    const pillTotalMistakes = document.getElementById("pillTotalMistakes");
+
+    const pairsListEl = document.getElementById("pairsList");
+    const pairsCountEl = document.getElementById("pairsCount");
+
+    const rateSlider = document.getElementById("rate");
+    const rateVal = document.getElementById("rateVal");
+    const toggleSoundBtn = document.getElementById("toggleSound");
+
+    let debugOn = false;
+    let draggedId = null;
+    const solved = new Set();
+    let hoverZoneId = null;
+
+    let roundIndex = 0;
+    let rounds = [];
+    let activeRoundSet = new Set();
+
+    let roundMistakes = 0;
+    let totalMistakes = 0;
+    let roundStartMs = 0;
+    let roundElapsedMs = 0;
+    let totalElapsedMs = 0;
+    let tickTimer = null;
+
+    const pairs = [];
+
+    // =========================
+    // ✅ TTS
+    // =========================
+    function ttsSupported() {
+      return ("speechSynthesis" in window) && ("SpeechSynthesisUtterance" in window);
+    }
+
+    function langHintFor(textLang) {
+      return (textLang === "DE") ? "de-DE" : "sr-RS";
+    }
+
+    function detectTextLangForQuestion() { return (mode === "DE_SR") ? "DE" : "SR"; }
+
+    function speak(text, lang) {
+      if (!soundOn) return;
+      if (!ttsSupported()) { showToast("TTS nije podržan u ovom browseru."); return; }
+
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = langHintFor(lang);
+      u.rate = parseFloat(rateSlider.value || "0.95");
+      u.pitch = 1.0;
+
+      try {
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(u);
+      } catch {}
+    }
+
+    function getQuestionText(z) { return (mode === "DE_SR") ? z.de : z.sr; }
+    function getAnswerText(z)   { return (mode === "DE_SR") ? z.sr : z.de; }
+    function getSolvedLabelText(z) { return getQuestionText(z); }
+
+    function bothMeanings(z) { return `${getQuestionText(z)} → ${getAnswerText(z)}`; }
+
+    function speakLearningOnly(z) {
+      speak(getQuestionText(z), detectTextLangForQuestion());
+    }
+
+    // =========================
+
+    function updateModeUI() {
+      modeSelect.value = mode;
+      panelTitle.textContent = (mode === "DE_SR")
+        ? "Prevuci NEMAČKU reč na deo lica (odgovor je SR)"
+        : "Prevuci SRPSKU reč na deo lica (odgovor je DE)";
+    }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.classList.remove("show"), 1050);
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function showBubbleAt(nx, ny, q, a) {
+      const rect = stage.getBoundingClientRect();
+      const x = rect.width * nx;
+      const y = rect.height * ny;
+
+      bubble.style.left = `${x}px`;
+      bubble.style.top  = `${y}px`;
+      bubble.innerHTML = `<span class="pairQ">${escapeHtml(q)}</span> <span class="pairArrow">→</span> <span class="pairA">${escapeHtml(a)}</span>`;
+      bubble.classList.add("show");
+      clearTimeout(showBubbleAt._t);
+      showBubbleAt._t = setTimeout(() => bubble.classList.remove("show"), 1250);
+    }
+
+    function hideTip() { tip.classList.remove("show"); }
+    function showTipAt(nx, ny, text) {
+      const rect = stage.getBoundingClientRect();
+      tip.style.left = `${rect.width * nx}px`;
+      tip.style.top  = `${rect.height * ny}px`;
+      tip.textContent = text;
+      tip.classList.add("show");
+      clearTimeout(showTipAt._t);
+      showTipAt._t = setTimeout(() => hideTip(), 1800);
+    }
+
+    function autoscrollPairsToBottom() {
+      requestAnimationFrame(() => { pairsListEl.scrollTop = pairsListEl.scrollHeight; });
+    }
+
+    function addPair(z) {
+      const q = getQuestionText(z);
+      const a = getAnswerText(z);
+      pairs.push({ id: z.id, q, a, modeAtTime: mode });
+      renderPairs(true);
+    }
+
+    function renderPairs(shouldAutoscroll = false) {
+      pairsCountEl.textContent = String(pairs.length);
+      if (pairs.length === 0) {
+        pairsListEl.innerHTML = `<div class="meta">Još nema pogodaka.</div>`;
+        return;
+      }
+      pairsListEl.innerHTML = pairs.map((p, i) => `
+        <div class="pairRow">
+          <div class="pairIdx">${i+1}.</div>
+          <div class="pairQ">${escapeHtml(p.q)}</div>
+          <div class="pairArrow">→</div>
+          <div class="pairA">${escapeHtml(p.a)}</div>
+        </div>
+      `).join("");
+
+      if (shouldAutoscroll) autoscrollPairsToBottom();
+    }
+
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function centroid(poly) {
+      const cx = poly.reduce((s,p)=>s+p[0],0)/poly.length;
+      const cy = poly.reduce((s,p)=>s+p[1],0)/poly.length;
+      return [cx, cy];
+    }
+
+    function toPoints01(poly) { return poly.map(([x,y]) => `${x},${y}`).join(" "); }
+
+    function bbox(poly) {
+      let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+      for (const [x,y] of poly) {
+        if (x<minX) minX=x;
+        if (y<minY) minY=y;
+        if (x>maxX) maxX=x;
+        if (y>maxY) maxY=y;
+      }
+      return {minX, minY, maxX, maxY};
+    }
+
+    function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+
+    function adjustedBBoxForZone(z) {
+      const b = bbox(z.poly);
+      const adj = TARGET_ADJUST[z.id] || { dx:0, dy:0, dw:0, dh:0 };
+
+      let minX = b.minX + adj.dx;
+      let maxX = b.maxX + adj.dx;
+      let minY = b.minY + adj.dy;
+      let maxY = b.maxY + adj.dy;
+
+      const cx = (minX + maxX) / 2;
+      const cy = (minY + maxY) / 2;
+      const w = (maxX - minX) * (1 + (adj.dw || 0));
+      const h = (maxY - minY) * (1 + (adj.dh || 0));
+
+      minX = cx - w/2; maxX = cx + w/2;
+      minY = cy - h/2; maxY = cy + h/2;
+
+      minX = clamp01(minX); maxX = clamp01(maxX);
+      minY = clamp01(minY); maxY = clamp01(maxY);
+
+      if (maxX < minX) [minX, maxX] = [maxX, minX];
+      if (maxY < minY) [minY, maxY] = [maxY, minY];
+
+      return {minX, minY, maxX, maxY};
+    }
+
+    function pointInRect(nx, ny, r) {
+      return nx >= r.minX && nx <= r.maxX && ny >= r.minY && ny <= r.maxY;
+    }
+
+    function rectArea(r) {
+      return Math.max(0, (r.maxX - r.minX)) * Math.max(0, (r.maxY - r.minY));
+    }
+
+    function pickZoneByBBoxAtPoint(nx, ny) {
+      let best = null;
+      let bestA = Infinity;
+      for (const z of zones) {
+        if (solved.has(z.id)) continue;
+        if (!activeRoundSet.has(z.id)) continue;
+        const r = adjustedBBoxForZone(z);
+        if (!pointInRect(nx, ny, r)) continue;
+        const a = rectArea(r);
+        if (a < bestA) { bestA = a; best = z; }
+      }
+      return best;
+    }
+
+    function isRoundSolved() {
+      const ids = rounds[roundIndex] || [];
+      return ids.every(id => solved.has(id));
+    }
+
+    function formatMs(ms) {
+      const s = Math.max(0, Math.floor(ms / 1000));
+      const mm = String(Math.floor(s / 60)).padStart(2, "0");
+      const ss = String(s % 60).padStart(2, "0");
+      return `${mm}:${ss}`;
+    }
+
+    function setPills() {
+      pillRoundTime.textContent = `Runda: ${formatMs(roundElapsedMs)}`;
+      pillRoundMistakes.textContent = `Greške (runda): ${roundMistakes}`;
+      pillTotalTime.textContent = `Ukupno: ${formatMs(totalElapsedMs + (isRoundSolved() ? 0 : roundElapsedMs))}`;
+      pillTotalMistakes.textContent = `Greške (ukupno): ${totalMistakes}`;
+    }
+
+    function stopTick() {
+      if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
+    }
+
+    function startRoundTimer() {
+      roundStartMs = Date.now();
+      roundElapsedMs = 0;
+      stopTick();
+      tickTimer = setInterval(() => {
+        if (!isRoundSolved()) {
+          roundElapsedMs = Date.now() - roundStartMs;
+          setPills();
+        }
+      }, 250);
+      setPills();
+    }
+
+    function finalizeRoundTimerIfSolved() {
+      if (!isRoundSolved()) return;
+      roundElapsedMs = Date.now() - roundStartMs;
+      totalElapsedMs += roundElapsedMs;
+      stopTick();
+      setPills();
+    }
+
+    function flashWrong(targetEl) {
+      targetEl.classList.add("flash-wrong");
+      setTimeout(() => targetEl.classList.remove("flash-wrong"), 420);
+    }
+
+    function clearHover() {
+      if (!hoverZoneId) return;
+      const el = targetsEl.querySelector(`.target[data-zone-id="${hoverZoneId}"]`);
+      if (el) el.classList.remove("hover");
+      hoverZoneId = null;
+    }
+
+    function setHover(zoneId) {
+      if (hoverZoneId === zoneId) return;
+      clearHover();
+      if (!zoneId) return;
+      const el = targetsEl.querySelector(`.target[data-zone-id="${zoneId}"]`);
+      if (el && !el.classList.contains("solved") && !el.classList.contains("hidden")) {
+        el.classList.add("hover");
+        hoverZoneId = zoneId;
+      }
+    }
+
+    function showRoundSummary() {
+      const totalRounds = rounds.length || 1;
+      const idx = roundIndex + 1;
+      const ids = rounds[roundIndex] || [];
+      const solvedCount = ids.filter(id => solved.has(id)).length;
+
+      roundSummaryEl.classList.add("show");
+      roundSummaryEl.textContent =
+        `Runda ${idx}/${totalRounds} završena: ${solvedCount}/${ids.length} | Greške: ${roundMistakes} | Vreme: ${formatMs(roundElapsedMs)}`;
+    }
+
+    function hideRoundSummary() {
+      roundSummaryEl.classList.remove("show");
+      roundSummaryEl.textContent = "";
+    }
+
+    function updateMeta() {
+      metaEl.textContent =
+        `Mode: ${mode} | Round + statistika | Zona: ${zones.length} | Debug: ${debugOn ? "ON" : "OFF"} | Sound: ${soundOn ? "ON" : "OFF"} | Round size: ${ROUND_SIZE}`;
+      totalEl.textContent = String(zones.length);
+      scoreEl.textContent = String(solved.size);
+
+      const totalRounds = rounds.length || 1;
+      roundBadge.textContent = `Runda ${Math.min(roundIndex+1, totalRounds)}/${totalRounds}`;
+
+      const activeIds = rounds[roundIndex] || [];
+      const left = activeIds.filter(id => !solved.has(id)).length;
+      roundMeta.textContent = left === 0
+        ? "Runda rešena ✅ Klikni Next round."
+        : `U ovoj rundi ostalo: ${left}/${activeIds.length}`;
+
+      nextRoundBtn.disabled = !(left === 0) || (roundIndex >= totalRounds-1);
+      setPills();
+    }
+
+    function markSolved(zoneId, dropNx, dropNy) {
+      solved.add(zoneId);
+
+      const z = zones.find(x => x.id === zoneId);
+
+      const c = cardsEl.querySelector(`.card[data-zone-id="${zoneId}"]`);
+      if (c) { c.classList.add("done"); c.draggable = false; }
+
+      const t = targetsEl.querySelector(`.target[data-zone-id="${zoneId}"]`);
+      if (t && z) {
+        t.classList.remove("hover");
+        t.classList.remove("hidden");
+        t.classList.add("solved");
+
+        t.querySelector(".label").textContent = getSolvedLabelText(z);
+        t.title = bothMeanings(z);
+      }
+
+      if (z) showBubbleAt(dropNx, dropNy, getQuestionText(z), getAnswerText(z));
+      if (z) addPair(z);
+
+      // ✅ correct: only learning language
+      if (z) speakLearningOnly(z);
+
+      renderTargets();
+      renderDebugOverlay();
+
+      if (isRoundSolved()) {
+        finalizeRoundTimerIfSolved();
+        showRoundSummary();
+        if (roundIndex < (rounds.length-1)) showToast("Runda rešena ✅");
+        else showToast("Sve rešeno ✅");
+      } else {
+        showToast("Tačno ✅");
+      }
+
+      updateMeta();
+    }
+
+    function buildRounds() {
+      const ids = shuffle(zones.map(z => z.id));
+      const r = [];
+      for (let i = 0; i < ids.length; i += ROUND_SIZE) r.push(ids.slice(i, i + ROUND_SIZE));
+      rounds = r;
+    }
+
+    function setRound(idx) {
+      roundIndex = idx;
+      activeRoundSet = new Set(rounds[roundIndex] || []);
+      renderTargets();
+      renderCardsForRound();
+      clearHover();
+      renderDebugOverlay();
+
+      roundMistakes = 0;
+      hideRoundSummary();
+      startRoundTimer();
+
+      updateMeta();
+    }
+
+    function renderTargets() {
+      targetsEl.innerHTML = "";
+
+      zones.forEach((z) => {
+        const b = adjustedBBoxForZone(z);
+
+        const t = document.createElement("div");
+        t.className = "target";
+        t.dataset.zoneId = z.id;
+
+        t.style.left   = (b.minX * 100) + "%";
+        t.style.top    = (b.minY * 100) + "%";
+        t.style.width  = ((b.maxX - b.minX) * 100) + "%";
+        t.style.height = ((b.maxY - b.minY) * 100) + "%";
+
+        const label = document.createElement("div");
+        label.className = "label";
+
+        const inRound = activeRoundSet.has(z.id);
+        const isSolvedZ = solved.has(z.id);
+
+        if (isSolvedZ) {
+          t.classList.add("solved");
+          label.textContent = getSolvedLabelText(z);
+          t.title = bothMeanings(z);
+          label.style.opacity = "1";
+
+          t.addEventListener("mouseenter", () => {
+            const [cx, cy] = centroid(z.poly);
+            showTipAt(cx, cy, bothMeanings(z));
+          });
+          t.addEventListener("mousemove", (e) => {
+            const rect = targetsEl.getBoundingClientRect();
+            const nx = (e.clientX - rect.left) / rect.width;
+            const ny = (e.clientY - rect.top) / rect.height;
+            showTipAt(clamp01(nx), clamp01(ny), bothMeanings(z));
+          });
+          t.addEventListener("mouseleave", () => hideTip());
+
+          // ✅ CHANGED: click on solved target speaks ONLY learning language
+          t.addEventListener("click", (e) => {
+            e.stopPropagation();
+            speakLearningOnly(z);
+          });
+
+        } else {
+          label.textContent = "";
+          if (!inRound) t.classList.add("hidden");
+        }
+
+        t.appendChild(label);
+        targetsEl.appendChild(t);
+      });
+
+      hoverZoneId = null;
+    }
+
+    function renderDebugOverlay() {
+      overlay.innerHTML = "";
+      if (!debugOn) return;
+
+      zones.forEach((z) => {
+        if (solved.has(z.id)) return;
+        if (!activeRoundSet.has(z.id)) return;
+
+        const p = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        p.setAttribute("points", toPoints01(z.poly));
+        p.setAttribute("class", "debugPoly");
+        overlay.appendChild(p);
+
+        const [cx, cy] = centroid(z.poly);
+        const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        t.setAttribute("x", cx);
+        t.setAttribute("y", cy);
+        t.setAttribute("font-size", "0.03");
+        t.setAttribute("text-anchor", "middle");
+        t.setAttribute("dominant-baseline", "middle");
+        t.setAttribute("class", "zlabel");
+        t.textContent = z.id;
+        overlay.appendChild(t);
+      });
+    }
+
+    function renderCardsForRound() {
+      cardsEl.innerHTML = "";
+      const ids = rounds[roundIndex] || [];
+      const roundZones = ids.map(id => zones.find(z => z.id === id)).filter(Boolean);
+      const order = shuffle(roundZones);
+
+      order.forEach((z) => {
+        const c = document.createElement("div");
+        c.className = "card";
+        c.setAttribute("draggable", "true");
+        c.dataset.zoneId = z.id;
+
+        const textSpan = document.createElement("span");
+        textSpan.textContent = getQuestionText(z);
+
+        const sbtn = document.createElement("button");
+        sbtn.className = "sbtn";
+        sbtn.type = "button";
+        sbtn.textContent = "🔊";
+        sbtn.title = "Izgovori";
+
+        sbtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          speakLearningOnly(z);
+        });
+
+        c.addEventListener("click", () => speakLearningOnly(z));
+
+        c.addEventListener("dragstart", (e) => {
+          if (c.classList.contains("done")) return;
+          draggedId = z.id;
+          try {
+            e.dataTransfer.setData("text/plain", z.id);
+            e.dataTransfer.effectAllowed = "move";
+          } catch {}
+        });
+
+        c.addEventListener("dragend", () => {
+          draggedId = null;
+          clearHover();
+        });
+
+        c.appendChild(textSpan);
+        c.appendChild(sbtn);
+
+        if (solved.has(z.id)) {
+          c.classList.add("done");
+          c.draggable = false;
+        }
+
+        cardsEl.appendChild(c);
+      });
+    }
+
+    function updateHoverFromEvent(e) {
+      const rect = targetsEl.getBoundingClientRect();
+      const nx = (e.clientX - rect.left) / rect.width;
+      const ny = (e.clientY - rect.top) / rect.height;
+      if (nx < 0 || nx > 1 || ny < 0 || ny > 1) { setHover(null); return; }
+      const hit = pickZoneByBBoxAtPoint(nx, ny);
+      setHover(hit ? hit.id : null);
+    }
+
+    targetsEl.addEventListener("dragover", (e) => { e.preventDefault(); updateHoverFromEvent(e); });
+    targetsEl.addEventListener("dragenter", (e) => { e.preventDefault(); updateHoverFromEvent(e); });
+    targetsEl.addEventListener("dragleave", (e) => {
+      if (e.relatedTarget && targetsEl.contains(e.relatedTarget)) return;
+      clearHover();
+    });
+
+    targetsEl.addEventListener("drop", (e) => {
+      e.preventDefault();
+
+      let guess = draggedId;
+      if (!guess) {
+        try { guess = e.dataTransfer.getData("text/plain"); } catch {}
+      }
+      if (!guess) { showToast("Ne vidim koju karticu si prevukao."); return; }
+
+      if (!activeRoundSet.has(guess) || solved.has(guess)) {
+        showToast("Ovo nije kartica iz tekuće runde.");
+        clearHover();
+        return;
+      }
+
+      const rect = targetsEl.getBoundingClientRect();
+      const nx = (e.clientX - rect.left) / rect.width;
+      const ny = (e.clientY - rect.top) / rect.height;
+
+      const hit = pickZoneByBBoxAtPoint(nx, ny);
+      clearHover();
+
+      if (!hit) {
+        roundMistakes++; totalMistakes++;
+        setPills();
+        showToast("Pusti unutar okvira iz tekuće runde.");
+        return;
+      }
+
+      if (guess === hit.id) {
+        const srect = stage.getBoundingClientRect();
+        const sx = (e.clientX - srect.left) / srect.width;
+        const sy = (e.clientY - srect.top) / srect.height;
+        markSolved(hit.id, clamp01(sx), clamp01(sy));
+      } else {
+        roundMistakes++; totalMistakes++;
+        setPills();
+        showToast("Netačno ❌");
+        const t = targetsEl.querySelector(`.target[data-zone-id="${hit.id}"]`);
+        if (t) flashWrong(t);
+      }
+    });
+
+    function applyModeChange(newMode) {
+      mode = newMode;
+      updateModeUI();
+
+      cardsEl.querySelectorAll(".card").forEach((c) => {
+        const id = c.dataset.zoneId;
+        const z = zones.find(x => x.id === id);
+        if (!z) return;
+        c.querySelector("span").textContent = getQuestionText(z);
+      });
+
+      targetsEl.querySelectorAll(".target.solved").forEach((t) => {
+        const id = t.dataset.zoneId;
+        const z = zones.find(x => x.id === id);
+        if (!z) return;
+        const lab = t.querySelector(".label");
+        if (lab) lab.textContent = getSolvedLabelText(z);
+        t.title = bothMeanings(z);
+      });
+
+      updateMeta();
+      showToast(mode === "DE_SR" ? "Mod: DE→SR" : "Mod: SR→DE");
+    }
+
+    function init() {
+      solved.clear();
+      draggedId = null;
+      hoverZoneId = null;
+
+      roundMistakes = 0;
+      totalMistakes = 0;
+      totalElapsedMs = 0;
+      roundElapsedMs = 0;
+
+      pairs.length = 0;
+      renderPairs(false);
+
+      hideRoundSummary();
+
+      buildRounds();
+      roundIndex = 0;
+      activeRoundSet = new Set(rounds[0] || []);
+      renderTargets();
+      renderCardsForRound();
+      renderDebugOverlay();
+
+      startRoundTimer();
+      updateModeUI();
+      updateMeta();
+      showToast("Start ✅");
+    }
+
+    document.getElementById("toggleDebug").addEventListener("click", () => {
+      debugOn = !debugOn;
+      document.getElementById("toggleDebug").textContent = `Debug: ${debugOn ? "ON" : "OFF"}`;
+      renderDebugOverlay();
+      updateMeta();
+    });
+
+    document.getElementById("restart").addEventListener("click", () => {
+      init();
+      showToast("Restart ✅");
+    });
+
+    nextRoundBtn.addEventListener("click", () => {
+      if (!isRoundSolved()) return;
+      if (roundIndex < (rounds.length - 1)) {
+        setRound(roundIndex + 1);
+        showToast("Sledeća runda ▶");
+      }
+    });
+
+    modeSelect.addEventListener("change", () => applyModeChange(modeSelect.value));
+
+    toggleSoundBtn.addEventListener("click", () => {
+      soundOn = !soundOn;
+      toggleSoundBtn.textContent = `Sound: ${soundOn ? "ON" : "OFF"}`;
+      if (!soundOn && ("speechSynthesis" in window)) {
+        try { window.speechSynthesis.cancel(); } catch {}
+      }
+      updateMeta();
+      showToast(soundOn ? "Zvuk uključen 🔊" : "Zvuk isključen 🔇");
+    });
+
+    rateSlider.addEventListener("input", () => { rateVal.textContent = String(rateSlider.value); });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) stopTick();
+      else if (!isRoundSolved()) {
+        roundStartMs = Date.now() - roundElapsedMs;
+        stopTick();
+        tickTimer = setInterval(() => {
+          if (!isRoundSolved()) {
+            roundElapsedMs = Date.now() - roundStartMs;
+            setPills();
+          }
+        }, 250);
+      }
+    });
+
+    // Load lesson from API
+    async function loadLesson() {
+      const params = new URLSearchParams(window.location.search);
+      const slug = params.get("lesson");
+
+      if (!slug) {
+        document.getElementById("pageTitle").textContent = "Drag & Drop – nema lekcije";
+        showToast("Nedostaje ?lesson= u URL-u", 4000);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/lessons/${slug}`);
+        if (!res.ok) throw new Error("Lekcija nije pronađena: " + slug);
+        const data = await res.json();
+
+        // Populate zones
+        zones.length = 0;
+        for (const z of data.zones) {
+          zones.push({ id: z.id, de: z.de, sr: z.sr, poly: z.poly });
+        }
+
+        // Set title and mode
+        document.getElementById("pageTitle").textContent = `Drag & Drop – ${data.title}`;
+        document.title = `Drag & Drop – ${data.title}`;
+        mode = data.lang || "DE_SR";
+        modeSelect.value = mode;
+
+        // Set image
+        img.src = data.image_path;
+        img.onload = () => init();
+        if (img.complete) init();
+
+      } catch (e) {
+        showToast("Greška: " + e.message, 4000);
+        console.error(e);
+      }
+    }
+
+    loadLesson();
+
+    if (!ttsSupported()) showToast("Napomena: ovaj browser nema TTS (speechSynthesis).");
+  </script>
+</body>
+</html>

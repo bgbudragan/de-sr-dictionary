@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Zone Editor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f5f4f0; color: #1a1a1a; font-size: 14px; }
+
+    .app { display: flex; flex-direction: column; height: 100vh; }
+
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid #e0dfd8;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .topbar h1 { font-size: 15px; font-weight: 600; margin-right: 8px; }
+
+    .btn {
+      border: 1px solid #d0cfc8;
+      background: #fff;
+      border-radius: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background .1s;
+    }
+    .btn:hover { background: #f5f4f0; }
+    .btn:active { transform: translateY(1px); }
+    .btn.primary { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .btn.primary:hover { background: #333; }
+    .btn.danger { background: #fff0f0; border-color: #ffb3b3; color: #cc0000; }
+    .btn.danger:hover { background: #ffe0e0; }
+    .btn[disabled] { opacity: .4; cursor: not-allowed; }
+
+    input[type=text], input[type=number], select, textarea {
+      border: 1px solid #d0cfc8;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+      background: #fff;
+      outline: none;
+    }
+    input[type=text]:focus, input[type=number]:focus, select:focus, textarea:focus {
+      border-color: #888;
+    }
+
+    .main { display: flex; flex: 1; overflow: hidden; }
+
+    .canvas-area {
+      flex: 1;
+      overflow: auto;
+      padding: 16px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .stage-wrap {
+      position: relative;
+      display: inline-block;
+      border: 1px solid #d0cfd8;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+      cursor: crosshair;
+      user-select: none;
+    }
+    .stage-wrap.mode-poly { cursor: cell; }
+
+    .stage-wrap img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      pointer-events: none;
+      -webkit-user-drag: none;
+    }
+
+    .zones-layer {
+      position: absolute;
+      left: 0; top: 0; right: 0; bottom: 0;
+      pointer-events: none;
+    }
+
+    .zone-rect {
+      position: absolute;
+      border: 2px solid rgba(0, 120, 255, 0.75);
+      background: rgba(0, 120, 255, 0.08);
+      border-radius: 6px;
+      pointer-events: all;
+      cursor: pointer;
+      transition: background .1s;
+    }
+    .zone-rect:hover { background: rgba(0, 120, 255, 0.16); }
+    .zone-rect.selected {
+      border-color: #e05c00;
+      background: rgba(224, 92, 0, 0.10);
+      z-index: 5;
+    }
+    .zone-rect .zone-label {
+      position: absolute;
+      top: 2px; left: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(0, 80, 200, 0.9);
+      pointer-events: none;
+      white-space: nowrap;
+      overflow: hidden;
+      max-width: 95%;
+      text-overflow: ellipsis;
+    }
+    .zone-rect.selected .zone-label { color: #e05c00; }
+
+    .draw-rect {
+      position: absolute;
+      border: 2px dashed rgba(0, 120, 255, 0.8);
+      background: rgba(0, 120, 255, 0.06);
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    .poly-overlay {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    .sidebar {
+      width: 300px;
+      min-width: 260px;
+      background: #fff;
+      border-left: 1px solid #e0dfd8;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-section {
+      padding: 14px 16px;
+      border-bottom: 1px solid #e0dfd8;
+    }
+    .sidebar-section h3 { font-size: 13px; font-weight: 600; margin-bottom: 10px; color: #555; text-transform: uppercase; letter-spacing: .04em; }
+
+    .field { margin-bottom: 10px; }
+    .field label { display: block; font-size: 12px; color: #666; margin-bottom: 4px; }
+    .field input, .field select { width: 100%; }
+
+    .zone-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 12px;
+    }
+    .zone-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #e8e7e0;
+      margin-bottom: 6px;
+      cursor: pointer;
+      background: #fff;
+      transition: background .1s, border-color .1s;
+    }
+    .zone-item:hover { background: #f5f4f0; }
+    .zone-item.selected { border-color: #e05c00; background: #fff8f4; }
+    .zone-item .zone-num {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: #e8e7e0;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: #555;
+    }
+    .zone-item.selected .zone-num { background: #e05c00; color: #fff; }
+    .zone-item .zone-words { flex: 1; min-width: 0; }
+    .zone-item .zone-de { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .zone-item .zone-sr { font-size: 12px; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .zone-item .del-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #bbb;
+      font-size: 16px;
+      padding: 0 4px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .zone-item .del-btn:hover { color: #cc0000; }
+
+    .empty-state {
+      text-align: center;
+      color: #aaa;
+      font-size: 13px;
+      padding: 24px 16px;
+    }
+
+    .mode-toggle {
+      display: flex;
+      gap: 6px;
+    }
+    .mode-btn {
+      border: 1px solid #d0cfc8;
+      background: #fff;
+      border-radius: 8px;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .mode-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+    .poly-hint {
+      font-size: 11px;
+      color: #888;
+      margin-top: 6px;
+      padding: 6px 8px;
+      background: #f5f4f0;
+      border-radius: 6px;
+      display: none;
+    }
+    .poly-hint.show { display: block; }
+
+    .export-box {
+      padding: 12px 16px;
+      border-top: 1px solid #e0dfd8;
+    }
+
+    .drop-zone {
+      border: 2px dashed #d0cfc8;
+      border-radius: 10px;
+      padding: 32px 20px;
+      text-align: center;
+      color: #999;
+      font-size: 13px;
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+    }
+    .drop-zone:hover, .drop-zone.dragover { border-color: #888; background: #f5f4f0; color: #555; }
+    .drop-zone svg { display: block; margin: 0 auto 10px; }
+
+    .toast {
+      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.82); color: #fff;
+      padding: 8px 16px; border-radius: 10px; font-size: 13px;
+      opacity: 0; pointer-events: none; transition: opacity .15s;
+      z-index: 100;
+    }
+    .toast.show { opacity: 1; }
+
+    .selected-panel {
+      padding: 14px 16px;
+      border-bottom: 1px solid #e0dfd8;
+      display: none;
+    }
+    .selected-panel.show { display: block; }
+    .selected-panel h3 { font-size: 13px; font-weight: 600; margin-bottom: 10px; color: #e05c00; }
+    .selected-panel .row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .selected-panel .row > * { flex: 1; }
+
+    .tag { display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 999px; margin-right: 4px; }
+    .tag.rect { background: #e8f0ff; color: #1a4db3; }
+    .tag.poly { background: #fff0e0; color: #995500; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <h1>Zone Editor</h1>
+
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="modeRect" title="Crtaj pravougaonik">▭ Rect</button>
+      <button class="mode-btn" id="modePoly" title="Crtaj poligon (klik po klik)">⬠ Poly</button>
+    </div>
+
+    <div class="poly-hint" id="polyHint">Klikni da dodaš tačke · Dvostruki klik ili Enter = zatvori poligon · Esc = odustani</div>
+
+    <div style="flex:1"></div>
+
+    <button class="btn" id="btnLoad">Učitaj sliku</button>
+    <input type="file" id="fileInput" accept="image/*" style="display:none" />
+    <button class="btn primary" id="btnExport" disabled>Exportuj JSON</button>
+  </div>
+
+  <div class="main">
+    <div class="canvas-area" id="canvasArea">
+      <div id="dropZoneWrap">
+        <div class="drop-zone" id="dropZone">
+          <svg width="40" height="40" fill="none" stroke="#bbb" stroke-width="1.5" viewBox="0 0 24 24">
+            <path d="M4 16l4-4 4 4 4-6 4 6" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="3" y="3" width="18" height="18" rx="3"/>
+          </svg>
+          Prevuci sliku ovde ili klikni da odabereš
+        </div>
+      </div>
+
+      <div class="stage-wrap" id="stageWrap" style="display:none">
+        <img id="stageImg" alt="stage" />
+        <div class="zones-layer" id="zonesLayer"></div>
+        <svg class="poly-overlay" id="polyOverlay"></svg>
+        <div class="draw-rect" id="drawRect" style="display:none"></div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <h3>Lekcija</h3>
+        <div class="field">
+          <label>Naziv lekcije</label>
+          <input type="text" id="lessonTitle" placeholder="npr. Delovi tela" />
+        </div>
+        <div class="field">
+          <label>Kategorija</label>
+          <input type="text" id="lessonCategory" placeholder="npr. Der Mensch — Čovek" />
+        </div>
+        <div class="field">
+          <label>Slug (za URL)</label>
+          <input type="text" id="lessonSlug" placeholder="npr. delovi-tela" />
+        </div>
+        <div class="field">
+          <label>Putanja slike</label>
+          <input type="text" id="lessonImage" placeholder="npr. /images/dasGesicht_Lice.png" />
+        </div>
+        <div class="field">
+          <label>Jezik (question)</label>
+          <select id="lessonLang">
+            <option value="DE_SR">DE → SR</option>
+            <option value="SR_DE">SR → DE</option>
+          </select>
+        </div>
+        <button class="btn primary" id="btnSaveToDB" style="width:100%;margin-top:4px" disabled>Sačuvaj u bazu</button>
+      </div>
+
+      <div class="selected-panel" id="selectedPanel">
+        <h3>Uredi zonu</h3>
+        <div class="field">
+          <label>ID zone</label>
+          <input type="text" id="editId" placeholder="npr. noga_leva" />
+        </div>
+        <div class="row">
+          <div>
+            <label style="font-size:12px;color:#666;display:block;margin-bottom:4px;">DE reč</label>
+            <input type="text" id="editDe" placeholder="das Bein" style="width:100%" />
+          </div>
+          <div>
+            <label style="font-size:12px;color:#666;display:block;margin-bottom:4px;">SR reč</label>
+            <input type="text" id="editSr" placeholder="noga" style="width:100%" />
+          </div>
+        </div>
+        <button class="btn primary" id="btnSaveZone" style="width:100%;margin-top:4px">Sačuvaj zonu</button>
+      </div>
+
+      <div style="padding: 10px 12px 6px; display:flex; align-items:center; justify-content:space-between;">
+        <span style="font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.04em">Zone (<span id="zoneCount">0</span>)</span>
+        <button class="btn danger" id="btnClearAll" style="padding:4px 8px;font-size:11px" disabled>Obriši sve</button>
+      </div>
+
+      <div class="zone-list" id="zoneList">
+        <div class="empty-state">Nema zona. Učitaj sliku i počni da crtaš.</div>
+      </div>
+
+      <div class="export-box">
+        <button class="btn primary" id="btnExport2" style="width:100%" disabled>Kopiraj zones[] u clipboard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const stageWrap = document.getElementById("stageWrap");
+  const stageImg  = document.getElementById("stageImg");
+  const zonesLayer = document.getElementById("zonesLayer");
+  const polyOverlay = document.getElementById("polyOverlay");
+  const drawRect  = document.getElementById("drawRect");
+  const zoneList  = document.getElementById("zoneList");
+  const zoneCount = document.getElementById("zoneCount");
+  const selectedPanel = document.getElementById("selectedPanel");
+  const polyHint  = document.getElementById("polyHint");
+  const toast     = document.getElementById("toast");
+  const dropZoneWrap = document.getElementById("dropZoneWrap");
+  const canvasArea = document.getElementById("canvasArea");
+
+  let zones = [];
+  let selectedId = null;
+  let drawMode = "rect";
+
+  let dragging = false;
+  let dragStart = null;
+
+  let polyPoints = [];
+  let polyActive = false;
+  let polyCursor = null;
+
+  function showToast(msg, dur = 1800) {
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove("show"), dur);
+  }
+
+  function genId() {
+    return "zona_" + (zones.length + 1);
+  }
+
+  function setMode(m) {
+    drawMode = m;
+    document.getElementById("modeRect").classList.toggle("active", m === "rect");
+    document.getElementById("modePoly").classList.toggle("active", m === "poly");
+    stageWrap.classList.toggle("mode-poly", m === "poly");
+    polyHint.classList.toggle("show", m === "poly");
+    if (m === "rect") cancelPoly();
+  }
+
+  document.getElementById("modeRect").addEventListener("click", () => setMode("rect"));
+  document.getElementById("modePoly").addEventListener("click", () => setMode("poly"));
+
+  function imgCoords(e) {
+    const rect = stageWrap.getBoundingClientRect();
+    const imgW = stageImg.naturalWidth || stageImg.offsetWidth;
+    const imgH = stageImg.naturalHeight || stageImg.offsetHeight;
+    const scaleX = stageImg.offsetWidth / imgW;
+    const scaleY = stageImg.offsetHeight / imgH;
+    const px = (e.clientX - rect.left) / stageImg.offsetWidth;
+    const py = (e.clientY - rect.top)  / stageImg.offsetHeight;
+    return { px: Math.max(0, Math.min(1, px)), py: Math.max(0, Math.min(1, py)) };
+  }
+
+  function pxToDisplay(px, py) {
+    return {
+      x: px * stageImg.offsetWidth,
+      y: py * stageImg.offsetHeight
+    };
+  }
+
+  stageWrap.addEventListener("mousedown", (e) => {
+    if (e.button !== 0) return;
+    if (drawMode === "rect") {
+      const c = imgCoords(e);
+      dragging = true;
+      dragStart = c;
+      drawRect.style.display = "block";
+      drawRect.style.left   = (c.px * stageImg.offsetWidth) + "px";
+      drawRect.style.top    = (c.py * stageImg.offsetHeight) + "px";
+      drawRect.style.width  = "0px";
+      drawRect.style.height = "0px";
+      selectedId = null;
+      renderZones();
+    }
+  });
+
+  stageWrap.addEventListener("mousemove", (e) => {
+    if (drawMode === "rect" && dragging && dragStart) {
+      const c = imgCoords(e);
+      const x0 = Math.min(dragStart.px, c.px) * stageImg.offsetWidth;
+      const y0 = Math.min(dragStart.py, c.py) * stageImg.offsetHeight;
+      const w  = Math.abs(c.px - dragStart.px) * stageImg.offsetWidth;
+      const h  = Math.abs(c.py - dragStart.py) * stageImg.offsetHeight;
+      drawRect.style.left   = x0 + "px";
+      drawRect.style.top    = y0 + "px";
+      drawRect.style.width  = w + "px";
+      drawRect.style.height = h + "px";
+    }
+    if (drawMode === "poly" && polyActive && polyPoints.length > 0) {
+      updatePolyPreview(e);
+    }
+  });
+
+  stageWrap.addEventListener("mouseup", (e) => {
+    if (drawMode === "rect" && dragging && dragStart) {
+      dragging = false;
+      const c = imgCoords(e);
+      drawRect.style.display = "none";
+      const minX = Math.min(dragStart.px, c.px);
+      const minY = Math.min(dragStart.py, c.py);
+      const maxX = Math.max(dragStart.px, c.px);
+      const maxY = Math.max(dragStart.py, c.py);
+      if ((maxX - minX) < 0.01 || (maxY - minY) < 0.01) return;
+      const poly = [
+        [r4(minX), r4(minY)],
+        [r4(maxX), r4(minY)],
+        [r4(maxX), r4(maxY)],
+        [r4(minX), r4(maxY)]
+      ];
+      addZone(poly);
+      dragStart = null;
+    }
+  });
+
+  stageWrap.addEventListener("click", (e) => {
+    if (drawMode !== "poly") return;
+    const c = imgCoords(e);
+    polyPoints.push([r4(c.px), r4(c.py)]);
+    polyActive = true;
+    renderPolyPreview();
+  });
+
+  stageWrap.addEventListener("dblclick", (e) => {
+    if (drawMode !== "poly" || !polyActive || polyPoints.length < 3) return;
+    polyPoints.pop();
+    finishPoly();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && drawMode === "poly" && polyActive && polyPoints.length >= 3) {
+      finishPoly();
+    }
+    if (e.key === "Escape") {
+      if (polyActive) cancelPoly();
+      selectedId = null;
+      renderZones();
+      selectedPanel.classList.remove("show");
+    }
+    if ((e.key === "Delete" || e.key === "Backspace") && selectedId && document.activeElement.tagName !== "INPUT") {
+      deleteZone(selectedId);
+    }
+  });
+
+  function cancelPoly() {
+    polyPoints = [];
+    polyActive = false;
+    polyCursor = null;
+    polyOverlay.innerHTML = "";
+  }
+
+  function finishPoly() {
+    if (polyPoints.length < 3) { cancelPoly(); return; }
+    const poly = polyPoints.map(([x,y]) => [r4(x), r4(y)]);
+    cancelPoly();
+    addZone(poly);
+  }
+
+  function renderPolyPreview() {
+    polyOverlay.innerHTML = "";
+    if (polyPoints.length === 0) return;
+
+    const pts = polyPoints.map(([x,y]) => `${x * stageImg.offsetWidth},${y * stageImg.offsetHeight}`).join(" ");
+
+    const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    polygon.setAttribute("points", pts);
+    polygon.setAttribute("fill", "rgba(0,120,255,0.08)");
+    polygon.setAttribute("stroke", "rgba(0,120,255,0.8)");
+    polygon.setAttribute("stroke-width", "1.5");
+    polygon.setAttribute("stroke-dasharray", "4,3");
+    polyOverlay.appendChild(polygon);
+
+    polyPoints.forEach(([x,y]) => {
+      const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circle.setAttribute("cx", x * stageImg.offsetWidth);
+      circle.setAttribute("cy", y * stageImg.offsetHeight);
+      circle.setAttribute("r", "4");
+      circle.setAttribute("fill", "rgba(0,100,220,0.9)");
+      circle.setAttribute("stroke", "#fff");
+      circle.setAttribute("stroke-width", "1.5");
+      polyOverlay.appendChild(circle);
+    });
+  }
+
+  function updatePolyPreview(e) {
+    if (polyPoints.length === 0) return;
+    const c = imgCoords(e);
+    renderPolyPreview();
+    if (polyPoints.length >= 2) {
+      const last = polyPoints[polyPoints.length - 1];
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", last[0] * stageImg.offsetWidth);
+      line.setAttribute("y1", last[1] * stageImg.offsetHeight);
+      line.setAttribute("x2", c.px * stageImg.offsetWidth);
+      line.setAttribute("y2", c.py * stageImg.offsetHeight);
+      line.setAttribute("stroke", "rgba(0,120,255,0.5)");
+      line.setAttribute("stroke-width", "1");
+      line.setAttribute("stroke-dasharray", "3,3");
+      polyOverlay.appendChild(line);
+    }
+  }
+
+  function r4(n) { return Math.round(n * 1000000) / 1000000; }
+
+  function addZone(poly) {
+    const id = genId();
+    zones.push({ id, de: "", sr: "", poly });
+    selectedId = id;
+    renderZones();
+    renderList();
+    openEditPanel(id);
+    updateButtons();
+  }
+
+  function deleteZone(id) {
+    zones = zones.filter(z => z.id !== id);
+    if (selectedId === id) {
+      selectedId = null;
+      selectedPanel.classList.remove("show");
+    }
+    renderZones();
+    renderList();
+    updateButtons();
+    showToast("Zona obrisana");
+  }
+
+  function openEditPanel(id) {
+    const z = zones.find(z => z.id === id);
+    if (!z) return;
+    selectedPanel.classList.add("show");
+    document.getElementById("editId").value = z.id;
+    document.getElementById("editDe").value = z.de;
+    document.getElementById("editSr").value = z.sr;
+    setTimeout(() => document.getElementById("editDe").focus(), 50);
+  }
+
+  document.getElementById("btnSaveZone").addEventListener("click", () => {
+    if (!selectedId) return;
+    const z = zones.find(z => z.id === selectedId);
+    if (!z) return;
+    const newId = document.getElementById("editId").value.trim() || selectedId;
+    const newDe = document.getElementById("editDe").value.trim();
+    const newSr = document.getElementById("editSr").value.trim();
+    if (newId !== z.id && zones.some(x => x.id === newId)) {
+      showToast("ID već postoji!"); return;
+    }
+    z.id = newId;
+    z.de = newDe;
+    z.sr = newSr;
+    selectedId = newId;
+    renderZones();
+    renderList();
+    showToast("Zona sačuvana ✓");
+  });
+
+  document.getElementById("editDe").addEventListener("keydown", e => { if (e.key === "Tab") { e.preventDefault(); document.getElementById("editSr").focus(); } });
+  document.getElementById("editSr").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("btnSaveZone").click(); });
+
+  function renderZones() {
+    zonesLayer.innerHTML = "";
+    zones.forEach(z => {
+      const xs = z.poly.map(p => p[0]);
+      const ys = z.poly.map(p => p[1]);
+      const minX = Math.min(...xs);
+      const minY = Math.min(...ys);
+      const maxX = Math.max(...xs);
+      const maxY = Math.max(...ys);
+      const isPoly = z.poly.length > 4;
+
+      const el = document.createElement("div");
+      el.className = "zone-rect" + (z.id === selectedId ? " selected" : "");
+      el.style.left   = (minX * stageImg.offsetWidth) + "px";
+      el.style.top    = (minY * stageImg.offsetHeight) + "px";
+      el.style.width  = ((maxX - minX) * stageImg.offsetWidth) + "px";
+      el.style.height = ((maxY - minY) * stageImg.offsetHeight) + "px";
+
+      const label = document.createElement("div");
+      label.className = "zone-label";
+      label.textContent = (z.de || z.id) + (isPoly ? " ⬠" : "");
+      el.appendChild(label);
+
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
+        selectedId = z.id;
+        renderZones();
+        renderList();
+        openEditPanel(z.id);
+      });
+
+      zonesLayer.appendChild(el);
+    });
+  }
+
+  function renderList() {
+    zoneCount.textContent = zones.length;
+    if (zones.length === 0) {
+      zoneList.innerHTML = '<div class="empty-state">Nema zona. Učitaj sliku i počni da crtaš.</div>';
+      return;
+    }
+    zoneList.innerHTML = "";
+    zones.forEach((z, i) => {
+      const item = document.createElement("div");
+      item.className = "zone-item" + (z.id === selectedId ? " selected" : "");
+
+      const num = document.createElement("div");
+      num.className = "zone-num";
+      num.textContent = i + 1;
+
+      const words = document.createElement("div");
+      words.className = "zone-words";
+      const de = document.createElement("div");
+      de.className = "zone-de";
+      de.textContent = z.de || "(bez DE reči)";
+      const sr = document.createElement("div");
+      sr.className = "zone-sr";
+      sr.textContent = z.sr || "(bez SR reči)";
+      words.appendChild(de);
+      words.appendChild(sr);
+
+      const del = document.createElement("button");
+      del.className = "del-btn";
+      del.textContent = "×";
+      del.title = "Obriši zonu";
+      del.addEventListener("click", (e) => { e.stopPropagation(); deleteZone(z.id); });
+
+      item.appendChild(num);
+      item.appendChild(words);
+      item.appendChild(del);
+
+      item.addEventListener("click", () => {
+        selectedId = z.id;
+        renderZones();
+        renderList();
+        openEditPanel(z.id);
+      });
+
+      zoneList.appendChild(item);
+    });
+  }
+
+  function updateButtons() {
+    const hasZones = zones.length > 0;
+    document.getElementById("btnExport").disabled = !hasZones;
+    document.getElementById("btnExport2").disabled = !hasZones;
+    document.getElementById("btnClearAll").disabled = !hasZones;
+    document.getElementById("btnSaveToDB").disabled = !hasZones;
+  }
+
+  document.getElementById("btnSaveToDB").addEventListener("click", async () => {
+    const title = document.getElementById("lessonTitle").value.trim();
+    const slug  = document.getElementById("lessonSlug").value.trim();
+    const image_path = document.getElementById("lessonImage").value.trim();
+    const lang  = document.getElementById("lessonLang").value;
+    const category = document.getElementById("lessonCategory").value.trim();
+
+    if (!title) { showToast("Upiši naziv lekcije!"); return; }
+    if (!slug)  { showToast("Upiši slug!"); return; }
+    if (zones.length === 0) { showToast("Nema zona!"); return; }
+
+    const btn = document.getElementById("btnSaveToDB");
+    btn.disabled = true;
+    btn.textContent = "Čuvam...";
+
+    try {
+      const res = await fetch("/api/lessons", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, title, image_path, lang, category, zones })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Greška");
+      showToast(`Sačuvano ✓ (slug: ${data.slug})`, 3000);
+    } catch (e) {
+      showToast("Greška: " + e.message, 3000);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Sačuvaj u bazu";
+    }
+  });
+
+  function generateJSON() {
+    const title = document.getElementById("lessonTitle").value.trim() || "Lekcija";
+    const lang  = document.getElementById("lessonLang").value;
+    const arr = zones.map(z => {
+      return `  { id:"${z.id}", de:"${z.de}", sr:"${z.sr}", poly:[${z.poly.map(([x,y])=>`[${x},${y}]`).join(",")}] }`;
+    }).join(",\n");
+    return `// ${title} (${lang})\nconst zones = [\n${arr}\n];`;
+  }
+
+  document.getElementById("btnExport").addEventListener("click", exportJSON);
+  document.getElementById("btnExport2").addEventListener("click", exportJSON);
+
+  function exportJSON() {
+    const txt = generateJSON();
+    navigator.clipboard.writeText(txt).then(() => {
+      showToast("Kopirano u clipboard ✓", 2000);
+    }).catch(() => {
+      const ta = document.createElement("textarea");
+      ta.value = txt;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      showToast("Kopirano ✓", 2000);
+    });
+  }
+
+  document.getElementById("btnClearAll").addEventListener("click", () => {
+    if (!confirm("Obrisati sve zone?")) return;
+    zones = [];
+    selectedId = null;
+    selectedPanel.classList.remove("show");
+    renderZones();
+    renderList();
+    updateButtons();
+  });
+
+  function loadImage(file) {
+    if (!file || !file.type.startsWith("image/")) return;
+    const url = URL.createObjectURL(file);
+    stageImg.onload = () => {
+      dropZoneWrap.style.display = "none";
+      stageWrap.style.display = "inline-block";
+      zones = [];
+      selectedId = null;
+      selectedPanel.classList.remove("show");
+      renderZones();
+      renderList();
+      updateButtons();
+      showToast("Slika učitana ✓");
+    };
+    stageImg.src = url;
+  }
+
+  document.getElementById("btnLoad").addEventListener("click", () => document.getElementById("fileInput").click());
+  document.getElementById("fileInput").addEventListener("change", (e) => loadImage(e.target.files[0]));
+
+  const dropZone = document.getElementById("dropZone");
+  dropZone.addEventListener("click", () => document.getElementById("fileInput").click());
+  dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("dragover"); });
+  dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+  dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropZone.classList.remove("dragover");
+    loadImage(e.dataTransfer.files[0]);
+  });
+
+  canvasArea.addEventListener("dragover", (e) => e.preventDefault());
+  canvasArea.addEventListener("drop", (e) => {
+    e.preventDefault();
+    loadImage(e.dataTransfer.files[0]);
+  });
+
+  stageWrap.addEventListener("click", (e) => {
+    if (e.target === stageWrap || e.target === stageImg) {
+      if (drawMode === "rect") {
+        selectedId = null;
+        renderZones();
+        renderList();
+        selectedPanel.classList.remove("show");
+      }
+    }
+  });
+</script>
+</body>
+</html>

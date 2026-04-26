@@ -295,6 +295,113 @@ app.get("/api/game/gender-drill", async (req, res) => {
 
 app.get("/health", (req, res) => res.json({ ok: true }));
 
+// ---------------------------------------------------------------------
+// Drag & Drop Lessons API
+// ---------------------------------------------------------------------
+
+// GET /api/lessons — lista svih lekcija, grupisana po kategoriji
+app.get("/api/lessons", async (req, res) => {
+  try {
+    const r = await query(
+      `SELECT id, slug, title, image_path, lang, category, created_at
+       FROM public.dd_lessons
+       ORDER BY category, created_at DESC`
+    );
+    const rows = r.rows || r;
+
+    // Grupiši po kategoriji
+    const grouped = {};
+    for (const row of rows) {
+      const cat = row.category || "Ostalo";
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(row);
+    }
+
+    res.json(grouped);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: String(e.message || e) });
+  }
+});
+
+// GET /api/lessons/:slug — jedna lekcija sa zonama
+app.get("/api/lessons/:slug", async (req, res) => {
+  try {
+    const lessonR = await query(
+      `SELECT id, slug, title, image_path, lang, category
+       FROM public.dd_lessons
+       WHERE slug = $1`,
+      [req.params.slug]
+    );
+    const rows = lessonR.rows || lessonR;
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ error: "Lekcija nije pronađena." });
+    }
+    const lesson = rows[0];
+
+    const zonesR = await query(
+      `SELECT zone_key AS id, de, sr, poly
+       FROM public.dd_zones
+       WHERE lesson_id = $1
+       ORDER BY sort_order`,
+      [lesson.id]
+    );
+    const zones = (zonesR.rows || zonesR).map(z => ({
+      id: z.id,
+      de: z.de,
+      sr: z.sr,
+      poly: z.poly,
+    }));
+
+    res.json({ ...lesson, zones });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: String(e.message || e) });
+  }
+});
+
+// POST /api/lessons — sačuvaj novu lekciju (iz editora)
+app.post("/api/lessons", async (req, res) => {
+  const { slug, title, image_path, lang, category, zones } = req.body;
+
+  if (!slug || !title || !zones || !Array.isArray(zones)) {
+    return res.status(400).json({ error: "Nedostaju polja: slug, title, zones." });
+  }
+
+  try {
+    // Upsert lekcije
+    const lessonR = await query(
+      `INSERT INTO public.dd_lessons (slug, title, image_path, lang, category)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (slug) DO UPDATE
+         SET title = EXCLUDED.title,
+             image_path = EXCLUDED.image_path,
+             lang = EXCLUDED.lang,
+             category = EXCLUDED.category
+       RETURNING id`,
+      [slug, title, image_path || null, lang || "DE_SR", category || null]
+    );
+    const lessonId = (lessonR.rows || lessonR)[0].id;
+
+    // Obrisi stare zone i upiši nove
+    await query(`DELETE FROM public.dd_zones WHERE lesson_id = $1`, [lessonId]);
+
+    for (let i = 0; i < zones.length; i++) {
+      const z = zones[i];
+      await query(
+        `INSERT INTO public.dd_zones (lesson_id, zone_key, de, sr, poly, sort_order)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [lessonId, z.id, z.de, z.sr, JSON.stringify(z.poly), i]
+      );
+    }
+
+    res.json({ ok: true, lesson_id: lessonId, slug });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: String(e.message || e) });
+  }
+});
+
 // Render sets PORT for web services; keep local override too.
 const port = process.env.PORT || process.env.GAMES_PORT || 3100;
 
